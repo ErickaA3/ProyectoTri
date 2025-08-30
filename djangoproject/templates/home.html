@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyOwnStudy{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            color: #4a5568;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .welcome-section h2 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .welcome-section p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:nth-child(1) .card-icon {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .card:nth-child(2) .card-icon {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .card:nth-child(3) .card-icon {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .card:nth-child(4) .card-icon {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .card h3 {
+            color: #2d3748;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: #718096;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .card-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .navbar h1 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding: 2rem 1rem;
+            }
+
+            .welcome-section h2 {
+                font-size: 2rem;
+            }
+
+            .welcome-section p {
+                font-size: 1rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar">
+        <h1>MyOwnStudy</h1>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container">
+        <div class="welcome-section">
+            <h2>¡Bienvenido a tu espacio de estudio!</h2>
+            <p>Organiza y optimiza tu aprendizaje con nuestras herramientas</p>
+        </div>
+
+        <!-- Grid de tarjetas -->
+        <div class="cards-grid">
+            <!-- Tarjeta Resúmenes -->
+            <div class="card">
+                <div class="card-icon">📄</div>
+                <h3>Resúmenes</h3>
+                <p>Crea y organiza resúmenes de tus temas de estudio para un repaso rápido y efectivo.</p>
+                <a href="{% url 'resumenes:home' %}" class="card-btn">Ir a Resúmenes</a>
+            </div>
+
+            <!-- Tarjeta Esquemas -->
+            <div class="card">
+                <div class="card-icon">🗂️</div>
+                <h3>Esquemas</h3>
+                <p>Estructura tu conocimiento con esquemas visuales que te ayuden a comprender mejor.</p>
+                <a href="{% url 'esquemas:home' %}" class="card-btn">Ir a Esquemas</a>
+            </div>
+
+            <!-- Tarjeta Flashcards -->
+            <div class="card">
+                <div class="card-icon">🎴</div>
+                <h3>Flashcards</h3>
+                <p>Practica con tarjetas de memoria para memorizar conceptos y definiciones importantes.</p>
+                <a href="{% url 'flashcards:home' %}" class="card-btn">Ir a Flashcards</a>
+            </div>
+
+            <!-- Tarjeta Cuestionarios -->
+            <div class="card">
+                <div class="card-icon">❓</div>
+                <h3>Cuestionarios</h3>
+                <p>Pon a prueba tus conocimientos con cuestionarios personalizados y mide tu progreso.</p>
+                <a href="{% url 'cuestionarios:home' %}" class="card-btn">Ir a Cuestionarios</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
