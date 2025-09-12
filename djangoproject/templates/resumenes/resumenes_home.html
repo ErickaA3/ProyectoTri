@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resúmenes</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
          * {
             margin: 0;
@@ -68,21 +69,24 @@
         }
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin: 3rem 0;
+            justify-items: center;
         }
 
         .card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 2rem;
+            padding: 2.5rem;
             text-align: center;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             cursor: pointer;
             border: 2px solid transparent;
+            width: 100%;
+            max-width: 400px;
         }
 
         .card:hover {
@@ -92,14 +96,14 @@
         }
 
         .card-icon {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             margin: 0 auto 1.5rem;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: white;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
@@ -112,35 +116,27 @@
             background: linear-gradient(135deg, #f093fb, #f5576c);
         }
 
-        .card:nth-child(3) .card-icon {
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-        }
-
-        .card:nth-child(4) .card-icon {
-            background: linear-gradient(135deg, #43e97b, #38f9d7);
-        }
-
         .card h3 {
             color: #2d3748;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             margin-bottom: 1rem;
             font-weight: 600;
         }
 
         .card p {
             color: #718096;
-            font-size: 1rem;
+            font-size: 1.1rem;
             line-height: 1.6;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .card-btn {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
-            padding: 0.8rem 2rem;
+            padding: 1rem 2.5rem;
             border-radius: 25px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -152,43 +148,374 @@
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
+
+        /* Estilos para los modales */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #667eea;
+        }
+
+        .modal h2 {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        /* Estilos para el área de subir archivos */
+        .file-upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            margin: 2rem 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .file-upload-area:hover,
+        .file-upload-area.dragover {
+            border-color: #5a6fd8;
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+
+        .file-upload-area .upload-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-area p {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .browse-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .browse-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Estilos para el área de texto */
+        .text-input-area {
+            margin: 2rem 0;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 300px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .selected-file {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: left;
+        }
+
+        .selected-file .file-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .selected-file .file-size {
+            color: #718096;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
      <nav class="navbar">
-        <h1>MyOwnStudy</h1>
+        <h1>FocusPy</h1>
     </nav>
     <div class="container">
         <h1>{{ titulo }}</h1>
         <h1>{{ descripcion }}</h1>
         <div class="cards-grid">
-            <!-- Tarjeta Resúmenes -->
-            <div class="card">
-                <div class="card-icon">📄</div>
-                <h3>Archivo txt</h3>
-                <a href="{% url 'resumenes:home' %}" class="card-btn">Subir</a>
+            <!-- Tarjeta Subir Archivos -->
+            <div class="card" onclick="openFileModal()">
+                <div class="card-icon">📁</div>
+                <h3>Subir Archivos</h3>
+                <p>Sube archivos TXT, PDF, Word y otros formatos para procesar automáticamente.</p>
+                <div class="card-btn">Subir Archivo</div>
             </div>
 
-            <!-- Tarjeta Esquemas -->
-            <div class="card">
-                <div class="card-icon">📕</div>
-                <h3>Archivo PDF</h3>
-                <a href="{% url 'esquemas:home' %}" class="card-btn">Ir a Esquemas</a>
+            <!-- Tarjeta Ingresar Texto -->
+            <div class="card" onclick="openTextModal()">
+                <div class="card-icon">✍️</div>
+                <h3>Ingresar Texto</h3>
+                <p>Escribe o pega texto directamente para crear resúmenes, esquemas y más.</p>
+                <div class="card-btn">Ingresar Texto</div>
             </div>
-
-            <!-- Tarjeta Flashcards -->
-            <div class="card">
-                <div class="card-icon">🎴</div>
-                <h3>Flashcards</h3>
-                <p>Practica con tarjetas de memoria para memorizar conceptos y definiciones importantes.</p>
-                <a href="{% url 'flashcards:home' %}" class="card-btn">Ir a Flashcards</a>
-            </div>
-
-            <!-- Tarjeta Cuestionarios -->
-            
         </div>
         
         <a href="{% url 'home' %}" class="boton-volver">← Volver al Inicio</a>
     </div>
+
+    <!-- Modal para Subir Archivos -->
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('fileModal')">&times;</span>
+            <h2>Subir Archivo</h2>
+            
+            <div class="file-upload-area" onclick="document.getElementById('fileInput').click()" 
+                 ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                <div class="upload-icon">📁</div>
+                <p><strong>Haz clic aquí o arrastra un archivo</strong></p>
+                <p>Formatos soportados: PDF, TXT, DOC, DOCX</p>
+                <button class="browse-btn" type="button">Explorar Archivos</button>
+                <input type="file" id="fileInput" class="file-input" accept=".pdf,.txt,.doc,.docx" onchange="handleFileSelect(event)">
+            </div>
+            
+            <div id="selectedFile" class="selected-file" style="display: none;">
+                <div class="file-name"></div>
+                <div class="file-size"></div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal('fileModal')">Cancelar</button>
+                <button class="btn-primary" onclick="processFile()">Procesar Archivo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Ingresar Texto -->
+    <div id="textModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('textModal')">&times;</span>
+            <h2>Ingresar Texto</h2>
+            
+            <div class="text-input-area">
+                <textarea class="text-input" id="textInput" 
+                          placeholder="Pega aquí tu texto o escribe directamente...
+
+Puedes incluir:
+• Artículos
+• Notas de clase
+• Documentos
+• Cualquier texto que quieras procesar
+
+El sistema creará automáticamente resúmenes, esquemas y más contenido útil para tu estudio."></textarea>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal('textModal')">Cancelar</button>
+                <button class="btn-primary" onclick="processText()">Procesar Texto</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+
+        // Funciones para abrir y cerrar modales
+        function openFileModal() {
+            document.getElementById('fileModal').style.display = 'block';
+        }
+
+        function openTextModal() {
+            document.getElementById('textModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            if (modalId === 'fileModal') {
+                selectedFile = null;
+                document.getElementById('selectedFile').style.display = 'none';
+            }
+            if (modalId === 'textModal') {
+                document.getElementById('textInput').value = '';
+            }
+        }
+
+        // Cerrar modal al hacer clic fuera de él
+        window.onclick = function(event) {
+            const fileModal = document.getElementById('fileModal');
+            const textModal = document.getElementById('textModal');
+            if (event.target === fileModal) {
+                closeModal('fileModal');
+            }
+            if (event.target === textModal) {
+                closeModal('textModal');
+            }
+        }
+
+        // Funciones para manejo de archivos
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                showSelectedFile(file);
+            }
+        }
+
+        function handleFileDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const uploadArea = event.currentTarget;
+            uploadArea.classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                selectedFile = files[0];
+                showSelectedFile(files[0]);
+            }
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.currentTarget.classList.remove('dragover');
+        }
+
+        function showSelectedFile(file) {
+            const selectedFileDiv = document.getElementById('selectedFile');
+            const fileName = selectedFileDiv.querySelector('.file-name');
+            const fileSize = selectedFileDiv.querySelector('.file-size');
+            
+            fileName.textContent = file.name;
+            fileSize.textContent = `Tamaño: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+            
+            selectedFileDiv.style.display = 'block';
+        }
+
+        function processFile() {
+            if (selectedFile) {
+                alert(`Procesando archivo: ${selectedFile.name}\n\n¡Esta funcionalidad se conectará con tu backend de Django!`);
+                closeModal('fileModal');
+            } else {
+                alert('Por favor selecciona un archivo primero.');
+            }
+        }
+
+        function processText() {
+            const text = document.getElementById('textInput').value.trim();
+            if (text) {
+                alert(`Procesando texto de ${text.length} caracteres.\n\n¡Esta funcionalidad se conectará con tu backend de Django!`);
+                closeModal('textModal');
+            } else {
+                alert('Por favor ingresa algún texto primero.');
+            }
+        }
+    </script>
 </body>
 </html>
