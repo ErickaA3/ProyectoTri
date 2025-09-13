@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionarios - FocusPy</title>
+    <!-- Enlace al archivo CSS -->
+    <link rel="stylesheet" href="{% static 'css/cuestionarios.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <h1>FocusPy</h1>
+    </nav>
+
+    <div class="container">
+        <!-- Vista Principal: Selección de método -->
+        {% if not show_config and not show_quiz and not show_results %}
+        <div class="section-header">
+            <h2>📝 Cuestionarios</h2>
+            <p>Pon a prueba tus conocimientos con cuestionarios personalizados</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- Tarjeta Subir Archivos -->
+            <div class="card">
+                <form method="get" action="{% url 'cuestionarios:config' %}">
+                    <input type="hidden" name="method" value="file">
+                    <div class="card-icon">📁</div>
+                    <h3>Crear desde Archivo</h3>
+                    <p>Genera un cuestionario automático a partir de tus documentos PDF, Word o TXT.</p>
+                    <button type="submit" class="card-btn">Subir Archivo</button>
+                </form>
+            </div>
+
+            <!-- Tarjeta Ingresar Texto -->
+            <div class="card">
+                <form method="get" action="{% url 'cuestionarios:config' %}">
+                    <input type="hidden" name="method" value="text">
+                    <div class="card-icon">✏️</div>
+                    <h3>Crear desde Texto</h3>
+                    <p>Pega o escribe tu contenido para generar preguntas de forma instantánea.</p>
+                    <button type="submit" class="card-btn">Ingresar Texto</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Vista de Configuración -->
+        {% if show_config %}
+        <div class="config-container">
+            <h2>
+                {% if method == 'file' %}
+                    📁 Crear Cuestionario desde Archivo
+                {% else %}
+                    ✏️ Crear Cuestionario desde Texto
+                {% endif %}
+            </h2>
+
+            <form method="post" action="{% url 'cuestionarios:create' %}" {% if method == 'file' %}enctype="multipart/form-data"{% endif %}>
+                {% csrf_token %}
+                
+                <!-- Área de entrada según el método -->
+                {% if method == 'file' %}
+                <div class="file-upload-section">
+                    <label for="file" class="file-label">
+                        <div class="file-upload-area">
+                            <div class="upload-icon">📁</div>
+                            <p><strong>Selecciona un archivo</strong></p>
+                            <p>Formatos soportados: PDF, TXT, DOC, DOCX</p>
+                            <span class="browse-btn">Explorar Archivos</span>
+                        </div>
+                    </label>
+                    <input type="file" id="file" name="file" class="file-input" accept=".pdf,.txt,.doc,.docx" required>
+                </div>
+                {% else %}
+                <div class="text-input-area">
+                    <textarea name="text_content" class="text-input" required
+                              placeholder="Pega aquí tu texto o escribe directamente...
+
+El sistema analizará tu contenido y generará preguntas relevantes automáticamente.
+
+Puedes incluir:
+• Artículos o lecturas
+• Notas de clase
+• Capítulos de libros
+• Cualquier material de estudio
+
+Entre más detallado sea el texto, mejores serán las preguntas generadas."></textarea>
+                </div>
+                {% endif %}
+
+                <!-- Configuración del cuestionario -->
+                <div class="quiz-config">
+                    <h3>Configuración del Cuestionario</h3>
+                    
+                    <div class="config-group">
+                        <label for="num_questions">Número de preguntas:</label>
+                        <input type="number" class="config-input" id="num_questions" name="num_questions" 
+                               value="10" min="5" max="50" required>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Dificultad:</label>
+                        <div class="difficulty-radio">
+                            <label class="radio-option">
+                                <input type="radio" name="difficulty" value="facil">
+                                <span class="radio-label">Fácil</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="difficulty" value="medio" checked>
+                                <span class="radio-label">Medio</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="difficulty" value="dificil">
+                                <span class="radio-label">Difícil</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="{% url 'cuestionarios:home' %}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-primary">Generar Cuestionario</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Vista del Quiz -->
+        {% if show_quiz %}
+        <div class="quiz-container-active">
+            <div class="quiz-header">
+                <h3>Cuestionario en Progreso</h3>
+                <div class="quiz-progress">
+                    <div class="quiz-progress-bar" style="width: {{ progress_percentage }}%"></div>
+                </div>
+                <p class="progress-text">Pregunta {{ current_question }} de {{ total_questions }}</p>
+            </div>
+
+            <form method="post" action="{% url 'cuestionarios:answer' %}">
+                {% csrf_token %}
+                <input type="hidden" name="quiz_id" value="{{ quiz_id }}">
+                <input type="hidden" name="question_num" value="{{ current_question }}">
+                
+                <div class="quiz-body">
+                    <div class="question">
+                        {{ question_text }}
+                    </div>
+                    
+                    <div class="answers">
+                        {% for answer in answers %}
+                        <label class="answer-option">
+                            <input type="radio" name="answer" value="{{ forloop.counter0 }}" required>
+                            <span class="answer-text">{{ answer }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="quiz-footer">
+                        <div class="quiz-info">
+                            <span>Pregunta {{ current_question }} de {{ total_questions }}</span>
+                        </div>
+                        <div class="quiz-actions">
+                            <button type="submit" name="action" value="skip" class="btn-secondary">Saltar</button>
+                            <button type="submit" name="action" value="next" class="btn-primary">Siguiente</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Vista de Resultados -->
+        {% if show_results %}
+        <div class="quiz-results-active">
+            <div class="results-icon">🏆</div>
+            <div class="results-score">{{ score }}%</div>
+            <div class="results-message">
+                {% if score >= 90 %}
+                    ¡Excelente trabajo! 🎉
+                {% elif score >= 70 %}
+                    ¡Muy bien! 👏
+                {% elif score >= 50 %}
+                    Buen intento 👍
+                {% else %}
+                    Sigue practicando 💪
+                {% endif %}
+            </div>
+            
+            <div class="results-stats">
+                <div class="stat-card">
+                    <div class="stat-value">{{ correct_answers }}</div>
+                    <div class="stat-label">Respuestas Correctas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ incorrect_answers }}</div>
+                    <div class="stat-label">Respuestas Incorrectas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ total_questions }}</div>
+                    <div class="stat-label">Total de Preguntas</div>
+                </div>
+            </div>
+
+            <!-- Revisión de respuestas -->
+            {% if show_review %}
+            <div class="review-section">
+                <h3>Revisión de Respuestas</h3>
+                {% for item in review_data %}
+                <div class="review-item {% if item.correct %}correct{% else %}incorrect{% endif %}">
+                    <h4>Pregunta {{ forloop.counter }}: {{ item.question }}</h4>
+                    <p><strong>Tu respuesta:</strong> {{ item.user_answer|default:"No respondida" }}</p>
+                    <p><strong>Respuesta correcta:</strong> {{ item.correct_answer }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="results-actions">
+                <form method="get" action="{% url 'cuestionarios:home' %}" style="display: inline;">
+                    <button type="submit" class="btn-primary">Nuevo Cuestionario</button>
+                </form>
+                {% if not show_review %}
+                <form method="post" action="{% url 'cuestionarios:review' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="quiz_id" value="{{ quiz_id }}">
+                    <button type="submit" class="btn-secondary">Revisar Respuestas</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'home' %}" class="boton-volver">← Volver al Inicio</a>
+    </div>
+</body>
+</html>
