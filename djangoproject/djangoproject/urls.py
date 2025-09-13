@@ -3,7 +3,6 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import render
-
 # Vista para la página de inicio (si no tienes una app principal)
 def home(request):
     return render(request, 'home.html')
@@ -16,3 +15,5 @@ urlpatterns = [
     path('flashcards/', include('flashcards.urls')),
     path('cuestionarios/', include('cuestionarios.urls')),
 ]
+
+
