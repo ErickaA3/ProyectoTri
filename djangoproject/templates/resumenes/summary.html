@@ -1,4 +1,5 @@
 <!-- resumenes/templates/resumenes/summary.html -->
+{% load markdown_extras %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,33 +12,29 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 2rem;
         }
         
-        .navbar {
+         .navbar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             padding: 1rem 2rem;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            margin-bottom: 2rem;
         }
-        
         .navbar h1 {
+            text-align: justify;
             color: #4a5568;
             font-size: 1.8rem;
             font-weight: 700;
-            text-align: center;
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            margin-top: 20px;
+            max-width: 1000px;
+            margin: 30px auto;
         }
         
         .summary-card {
@@ -103,7 +100,35 @@
             line-height: 1.8;
             font-size: 1.1rem;
             color: #2d3748;
-            white-space: pre-wrap;
+        }
+        
+        /* Estilos para el contenido markdown procesado */
+        .summary-content h3 {
+            color: #2d3748;
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem 0;
+            font-weight: 600;
+        }
+        
+        .summary-content h4 {
+            color: #4a5568;
+            font-size: 1.2rem;
+            margin: 1rem 0 0.5rem 0;
+            font-weight: 500;
+        }
+        
+        .summary-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .summary-content strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .summary-content em {
+            color: #718096;
+            font-style: italic;
         }
         
         .actions-bar {
@@ -238,7 +263,7 @@
 </head>
 <body>
     <nav class="navbar">
-        <h1>FocusPy - Resumen Generado</h1>
+        <h1>FocusPy</h1>
     </nav>
     
     <div class="container">
@@ -261,28 +286,8 @@
                 </div>
             </div>
             
-            <div class="stats">
-                <div class="stat-card">
-                    <span class="stat-number">{{ document.original_text|length }}</span>
-                    <div class="stat-label">Caracteres originales</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">{{ summary.summary_text|length }}</span>
-                    <div class="stat-label">Caracteres del resumen</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">{{ document.original_text|wordcount }}</span>
-                    <div class="stat-label">Palabras originales</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">{{ summary.summary_text|wordcount }}</span>
-                    <div class="stat-label">Palabras del resumen</div>
-                </div>
-            </div>
-            
             <div class="summary-section">
-                <h2 class="section-title">📋 Resumen Generado por IA</h2>
-                <div class="summary-content">{{ summary.summary_text }}</div>
+                <div class="summary-content">{{ summary.summary_text|markdown_to_html }}</div>
             </div>
             
             <div class="actions-bar">
