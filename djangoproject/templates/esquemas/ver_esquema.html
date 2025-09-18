@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ esquema.titulo }} - FocusPy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            color: #4a5568;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border-left: 4px solid #48bb78;
+        }
+
+        .alert-error, .alert-danger {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border-left: 4px solid #f56565;
+        }
+
+        .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        .esquema-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .esquema-header h2 {
+            color: #2d3748;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .esquema-meta {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .esquema-content {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        /* Esquemas Jerárquicos */
+        .level-1 {
+            margin: 1rem 0;
+            padding-left: 0;
+        }
+
+        .level-2 {
+            margin: 0.75rem 0;
+            padding-left: 2rem;
+        }
+
+        .level-3 {
+            margin: 0.5rem 0;
+            padding-left: 4rem;
+        }
+
+        .node-content {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .level-1 .node-content {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-left: 4px solid #667eea;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .level-2 .node-content {
+            border-left: 3px solid #a78bfa;
+        }
+
+        .level-3 .node-content {
+            border-left: 2px solid #c4b5fd;
+            font-size: 0.95rem;
+        }
+
+        .node-content:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .node-icon {
+            margin-right: 0.75rem;
+            color: #667eea;
+            flex-shrink: 0;
+        }
+
+        .node-text {
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        /* Mapas Conceptuales */
+        .concept-map {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .central-concept {
+            margin-bottom: 3rem;
+        }
+
+        .concept-node {
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            background: white;
+            border: 3px solid #667eea;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .concept-node.main {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 1.3rem;
+            padding: 2rem 3rem;
+        }
+
+        .sub-concepts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .concept-branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .connector {
+            width: 2px;
+            height: 40px;
+            background: #667eea;
+            margin-bottom: -20px;
+            margin-top: -60px;
+        }
+
+        .concept-node.sub {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid #a78bfa;
+            color: #2d3748;
+        }
+
+        /* Líneas de Tiempo */
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #667eea;
+        }
+
+        .timeline-item {
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border: 4px solid white;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-content {
+            width: 45%;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-item.left .timeline-content {
+            margin-right: auto;
+        }
+
+        .timeline-item.right .timeline-content {
+            margin-left: auto;
+        }
+
+        .timeline-date {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-description {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* Botones */
+        .esquema-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-export {
+            background: #48bb78;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn-export:hover {
+            background: #38a169;
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            color: #4a5568;
+            text-decoration: none;
+        }
+
+        .boton-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 25px;
+            transition: background 0.3s;
+        }
+
+        .boton-volver:hover {
+            background: #5a6fd8;
+            color: white;
+            text-decoration: none;
+        }
+
+        .empty-content {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+
+            .esquema-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .esquema-content {
+                padding: 1rem;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-content {
+                width: calc(100% - 60px);
+                margin-left: 50px !important;
+            }
+
+            .timeline-marker {
+                left: 20px;
+            }
+
+            .sub-concepts {
+                grid-template-columns: 1fr;
+            }
+
+            .esquema-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .level-2 {
+                padding-left: 1rem;
+            }
+
+            .level-3 {
+                padding-left: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>FocusPy - Esquemas</h1>
+    </nav>
+
+    <div class="container">
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="esquema-header">
+            <h2>{{ esquema.titulo }}</h2>
+            <p class="esquema-meta">
+                Tipo: {{ esquema.get_tipo_display }} | 
+                Creado: {{ esquema.fecha_creacion|date:"d/m/Y H:i" }}
+                {% if esquema.fuente == 'archivo' and esquema.archivo_original %}
+                    | Fuente: {{ esquema.archivo_original.name }}
+                {% else %}
+                    | Fuente: Texto directo
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Contenido según el tipo de esquema -->
+        {% if esquema.tipo == 'jerarquico' %}
+            <div class="esquema-content">
+                {% for nodo in nodos %}
+                    <div class="level-{{ nodo.nivel }}">
+                        <div class="node-content">
+                            <span class="node-icon">
+                                {% if nodo.nivel == 1 %}📌
+                                {% elif nodo.nivel == 2 %}▶
+                                {% else %}•{% endif %}
+                            </span>
+                            <span class="node-text">{{ nodo.texto }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="empty-content">
+                        <p>No hay contenido disponible para este esquema.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+        {% elif esquema.tipo == 'conceptual' %}
+            <div class="esquema-content">
+                <div class="concept-map">
+                    {% if concepto_central %}
+                    <div class="central-concept">
+                        <div class="concept-node main">
+                            {{ concepto_central.texto|upper }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if conceptos_relacionados %}
+                    <div class="sub-concepts">
+                        {% for concepto in conceptos_relacionados %}
+                        <div class="concept-branch">
+                            <div class="connector"></div>
+                            <div class="concept-node sub">
+                                <strong>{{ concepto.texto }}</strong>
+                                {% if concepto.descripcion %}
+                                <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+                                    {{ concepto.descripcion|linebreaksbr }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-content">
+                        <p>No hay conceptos relacionados disponibles.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        {% elif esquema.tipo == 'cronologico' %}
+            <div class="esquema-content">
+                <div class="timeline">
+                    {% for evento in eventos %}
+                    <div class="timeline-item {% cycle 'left' 'right' %}">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4 class="timeline-date">{{ evento.fecha }}</h4>
+                            <h3 class="timeline-title">{{ evento.titulo }}</h3>
+                            <p class="timeline-description">{{ evento.descripcion }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-content">
+                        <p>No hay eventos disponibles para esta línea de tiempo.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Acciones del esquema -->
+        <div class="esquema-actions">
+            <a href="{% url 'esquemas:home' %}" class="btn-primary">
+                ✨ Crear Nuevo
+            </a>
+        </div>
+
+        <a href="{% url 'esquemas:home' %}" class="boton-volver">← Volver a Esquemas</a>
+    </div>
+
+    <script>
+        // Cerrar alertas automáticamente
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html> url 'esquemas:exportar_pdf' esquema.id %}" class="btn-export">
+                📄 Exportar PDF
+            </a>
+            <a href="{% url 'esquemas:exportar_txt' esquema.id %}" class="btn-export">
+                📝 Exportar TXT
+            </a>
+            <a href="{% url 'esquemas:home' %}" class="btn-secondary">
+                📂 Volver a Esquemas
+            </a>
+            <a href="{%
+                

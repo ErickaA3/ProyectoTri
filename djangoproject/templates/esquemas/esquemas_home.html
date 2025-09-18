@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esquemas - FocusPy (Vista Previa)</title>
+    <title>Esquemas - FocusPy</title>
     <style>
         * {
             margin: 0;
@@ -23,12 +23,20 @@
             backdrop-filter: blur(10px);
             padding: 1rem 2rem;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .navbar h1 {
             color: #4a5568;
             font-size: 1.8rem;
             font-weight: 700;
+        }
+
+        .navbar .user-info {
+            color: #718096;
+            font-size: 0.9rem;
         }
 
         /* Container principal */
@@ -41,6 +49,41 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
+        /* Mensajes de Django */
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border-left: 4px solid #48bb78;
+        }
+
+        .alert-error, .alert-danger {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border-left: 4px solid #f56565;
+        }
+
+        .alert-info {
+            background: rgba(102, 126, 234, 0.1);
+            color: #4c51bf;
+            border-left: 4px solid #667eea;
+        }
+
+        .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+        }
+
         /* Tabs para mostrar diferentes vistas */
         .view-tabs {
             display: flex;
@@ -48,6 +91,7 @@
             margin-bottom: 2rem;
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 1rem;
+            flex-wrap: wrap;
         }
 
         .tab-btn {
@@ -59,11 +103,17 @@
             color: #718096;
             font-weight: 600;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
 
         .tab-btn.active {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
+        }
+
+        .tab-btn:hover {
+            color: white;
+            text-decoration: none;
         }
 
         .view-section {
@@ -167,262 +217,246 @@
             cursor: pointer;
             transition: all 0.3s ease;
             display: inline-block;
+            text-decoration: none;
         }
 
         .card-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
         }
 
-        /* Esquema Jerárquico */
-        .esquema-header {
+        /* Formularios */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-header {
             text-align: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 3rem;
         }
 
-        .esquema-header h2 {
+        .form-header h2 {
             color: #2d3748;
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .esquema-meta {
+        .form-header p {
             color: #718096;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
         }
 
-        .esquema-content {
-            background: #f7fafc;
-            padding: 2rem;
-            border-radius: 15px;
-            margin: 2rem 0;
+        .form-group {
+            margin-bottom: 2rem;
         }
 
-        .level-1 {
-            margin: 1rem 0;
-            padding-left: 0;
-        }
-
-        .level-2 {
-            margin: 0.75rem 0;
-            padding-left: 2rem;
-        }
-
-        .level-3 {
-            margin: 0.5rem 0;
-            padding-left: 4rem;
-        }
-
-        .node-content {
-            display: flex;
-            align-items: flex-start;
-            padding: 0.75rem;
-            background: white;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .level-1 .node-content {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            border-left: 4px solid #667eea;
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
             font-weight: 600;
             font-size: 1.1rem;
         }
 
-        .level-2 .node-content {
-            border-left: 3px solid #a78bfa;
-        }
-
-        .level-3 .node-content {
-            border-left: 2px solid #c4b5fd;
-            font-size: 0.95rem;
-        }
-
-        .node-content:hover {
-            transform: translateX(5px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .node-icon {
-            margin-right: 0.75rem;
-            color: #667eea;
-            flex-shrink: 0;
-        }
-
-        .node-text {
-            color: #2d3748;
-            line-height: 1.6;
-        }
-
-        /* Mapa Conceptual */
-        .concept-map {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem;
-        }
-
-        .central-concept {
-            margin-bottom: 3rem;
-        }
-
-        .concept-node {
-            padding: 1.5rem;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
-            background: white;
-            border: 3px solid #667eea;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .concept-node.main {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            font-size: 1.3rem;
-            padding: 2rem 3rem;
-        }
-
-        .sub-concepts {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
+        .form-control {
             width: 100%;
-        }
-
-        .concept-branch {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .connector {
-            width: 2px;
-            height: 40px;
-            background: #667eea;
-            margin-bottom: -20px;
-            margin-top: -60px;
-        }
-
-        .concept-node.sub {
-            background: rgba(102, 126, 234, 0.1);
-            border: 2px solid #a78bfa;
-            color: #2d3748;
-        }
-
-        /* Línea de Tiempo */
-        .timeline {
-            position: relative;
-            padding: 2rem 0;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #667eea;
-        }
-
-        .timeline-item {
-            margin: 2rem 0;
-            position: relative;
-        }
-
-        .timeline-marker {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 20px;
-            background: #667eea;
-            border: 4px solid white;
-            border-radius: 50%;
-            z-index: 1;
-        }
-
-        .timeline-content {
-            width: 45%;
-            padding: 1.5rem;
-            background: white;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
             border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
         }
 
-        .timeline-item.left .timeline-content {
-            margin-right: auto;
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
         }
 
-        .timeline-item.right .timeline-content {
-            margin-left: auto;
+        .form-control.textarea {
+            min-height: 300px;
+            resize: vertical;
+            font-family: inherit;
         }
 
-        .timeline-date {
-            color: #667eea;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px 12px;
+            padding-right: 40px;
+            cursor: pointer;
         }
 
-        .timeline-title {
-            color: #2d3748;
-            margin-bottom: 0.5rem;
-        }
-
-        .timeline-description {
+        .form-text {
+            margin-top: 0.5rem;
             color: #718096;
-            line-height: 1.6;
+            font-size: 0.9rem;
         }
 
-        /* Acciones */
-        .esquema-actions {
+        .error-text {
+            color: #e53e3e;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* File upload */
+        .file-upload-area {
+            border: 2px dashed #e2e8f0;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            background: #fafafa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .file-upload-area.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+
+        .file-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-text {
+            color: #4a5568;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-hint {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-selected {
+            background: rgba(72, 187, 120, 0.1);
+            border-color: #48bb78;
+        }
+
+        /* Botones */
+        .form-actions {
             display: flex;
             justify-content: center;
             gap: 1rem;
-            margin: 2rem 0;
+            margin-top: 3rem;
             flex-wrap: wrap;
         }
 
-        .btn-export {
-            background: #48bb78;
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border: none;
+        .btn {
+            padding: 12px 30px;
             border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-        }
-
-        .btn-export:hover {
-            background: #38a169;
-            transform: scale(1.05);
+            text-decoration: none;
+            border: none;
+            display: inline-block;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            padding: 0.8rem 2rem;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .btn-secondary {
             background: #e2e8f0;
             color: #4a5568;
-            padding: 0.8rem 2rem;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            color: #4a5568;
             text-decoration: none;
         }
 
+        /* Loading spinner */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Info cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card h5 {
+            color: #2d3748;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card p {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* Botón volver */
         .boton-volver {
             display: block;
             width: 200px;
@@ -438,21 +472,230 @@
 
         .boton-volver:hover {
             background: #5a6fd8;
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .empty-state h5 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .empty-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Esquemas recientes */
+        .recent-schemes {
+            margin-top: 3rem;
+        }
+
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .recent-header h3 {
+            color: #2d3748;
+            font-size: 1.8rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+
+        .schemes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .scheme-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .scheme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .scheme-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .scheme-title {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .scheme-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .scheme-meta {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .scheme-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-small {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success-small {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-primary-small:hover, .btn-success-small:hover {
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .view-tabs {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .tab-btn {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+
+            .empty-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .recent-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .schemes-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <h1>FocusPy</h1>
+        <h1>FocusPy - Esquemas</h1>
     </nav>
 
     <div class="container">
+        <!-- Mensajes de Django -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
         <!-- Tabs para navegar entre vistas -->
         <div class="view-tabs">
             <button class="tab-btn active" onclick="showView('home')">🏠 Inicio</button>
-            <button class="tab-btn" onclick="showView('jerarquico')">📊 Esquema Jerárquico</button>
-            <button class="tab-btn" onclick="showView('conceptual')">🔗 Mapa Conceptual</button>
-            <button class="tab-btn" onclick="showView('cronologico')">📅 Línea de Tiempo</button>
+            <button class="tab-btn" onclick="showView('crear-texto')">✏️ Crear desde Texto</button>
+            <button class="tab-btn" onclick="showView('crear-archivo')">📁 Crear desde Archivo</button>
         </div>
 
         <!-- Vista Principal -->
@@ -463,299 +706,138 @@
             </div>
 
             <div class="cards-grid">
-                <div class="card">
+                <div class="card" onclick="showView('crear-archivo')">
                     <div class="card-icon">📁</div>
                     <h3>Crear desde Archivo</h3>
                     <p>Genera un esquema automático a partir de tus documentos PDF, Word o TXT.</p>
-                    <button class="card-btn">Subir Archivo</button>
+                    <button class="card-btn" onclick="event.stopPropagation(); showView('crear-archivo')">Subir Archivo</button>
                 </div>
 
-                <div class="card">
+                <div class="card" onclick="showView('crear-texto')">
                     <div class="card-icon">✏️</div>
                     <h3>Crear desde Texto</h3>
                     <p>Pega o escribe tu contenido para generar esquemas organizados al instante.</p>
-                    <button class="card-btn">Ingresar Texto</button>
+                    <button class="card-btn" onclick="event.stopPropagation(); showView('crear-texto')">Ingresar Texto</button>
+                </div>
+            </div>
+
+            <!-- Esquemas recientes -->
+            {% if esquemas_recientes %}
+            <div class="recent-schemes">
+                <div class="recent-header">
+                    <h3>📚 Esquemas Recientes</h3>
+                    <a href="{% url 'esquemas:mis_esquemas' %}" class="btn-outline">Ver todos</a>
+                </div>
+                
+                <div class="schemes-grid">
+                    {% for esquema in esquemas_recientes %}
+                    <div class="scheme-card">
+                        <div class="scheme-header">
+                            <h4 class="scheme-title">{{ esquema.titulo|truncatechars:35 }}</h4>
+                            <span class="scheme-badge">{{ esquema.get_tipo_display }}</span>
+                        </div>
+                        <div class="scheme-meta">
+                            Creado: {{ esquema.fecha_creacion|date:"d/m/Y" }}
+                            {% if esquema.fuente == 'archivo' %}
+                                <br>📁 Desde archivo
+                            {% else %}
+                                <br>✏️ Desde texto
+                            {% endif %}
+                        </div>
+                        <div class="scheme-actions">
+                            <a href="{% url 'esquemas:ver_esquema' esquema.id %}" class="btn-small btn-primary-small">Ver</a>
+                            <a href="{% url 'esquemas:exportar_pdf' esquema.id %}" class="btn-small btn-success-small">PDF</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h5>¡Bienvenido a Esquemas!</h5>
+                <p>Aún no has creado ningún esquema. Comienza creando uno desde texto o archivo.</p>
+                <div class="empty-actions">
+                    <button class="card-btn" onclick="showView('crear-texto')">✏️ Crear desde Texto</button>
+                    <button class="card-btn" onclick="showView('crear-archivo')">📁 Crear desde Archivo</button>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Información adicional -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <h5>📊 Jerárquico</h5>
+                    <p>Organiza información en niveles y categorías claras</p>
+                </div>
+                <div class="info-card">
+                    <h5>🔗 Conceptual</h5>
+                    <p>Crea mapas de conceptos y sus relaciones</p>
+                </div>
+                <div class="info-card">
+                    <h5>📅 Cronológico</h5>
+                    <p>Ordena eventos y procesos en el tiempo</p>
                 </div>
             </div>
         </div>
 
-        <!-- Vista Esquema Jerárquico -->
-        <div id="jerarquico" class="view-section">
-            <div class="esquema-header">
-                <h2>Fotosíntesis: Proceso y Componentes</h2>
-                <p class="esquema-meta">Tipo: Jerárquico | Creado: 14/09/2025 10:30</p>
-            </div>
-
-            <div class="esquema-content">
-                <div class="level-1">
-                    <div class="node-content">
-                        <span class="node-icon">📌</span>
-                        <span class="node-text">1. Definición de Fotosíntesis</span>
-                    </div>
-                </div>
-                
-                <div class="level-2">
-                    <div class="node-content">
-                        <span class="node-icon">▶</span>
-                        <span class="node-text">Proceso biológico de conversión de energía lumínica</span>
-                    </div>
-                </div>
-                
-                <div class="level-2">
-                    <div class="node-content">
-                        <span class="node-icon">▶</span>
-                        <span class="node-text">Producción de glucosa y oxígeno</span>
-                    </div>
+        <!-- Vista Crear desde Texto -->
+        <div id="crear-texto" class="view-section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>✏️ Crear Esquema desde Texto</h2>
+                    <p>Pega o escribe tu contenido para generar esquemas organizados al instante</p>
                 </div>
 
-                <div class="level-1">
-                    <div class="node-content">
-                        <span class="node-icon">📌</span>
-                        <span class="node-text">2. Fases del Proceso</span>
-                    </div>
-                </div>
-                
-                <div class="level-2">
-                    <div class="node-content">
-                        <span class="node-icon">▶</span>
-                        <span class="node-text">Fase Lumínica (Reacciones de luz)</span>
-                    </div>
-                </div>
-                
-                <div class="level-3">
-                    <div class="node-content">
-                        <span class="node-icon">•</span>
-                        <span class="node-text">Ocurre en los tilacoides</span>
-                    </div>
-                </div>
-                
-                <div class="level-3">
-                    <div class="node-content">
-                        <span class="node-icon">•</span>
-                        <span class="node-text">Requiere luz solar directa</span>
-                    </div>
-                </div>
-                
-                <div class="level-3">
-                    <div class="node-content">
-                        <span class="node-icon">•</span>
-                        <span class="node-text">Produce ATP y NADPH</span>
-                    </div>
-                </div>
-                
-                <div class="level-2">
-                    <div class="node-content">
-                        <span class="node-icon">▶</span>
-                        <span class="node-text">Fase Oscura (Ciclo de Calvin)</span>
-                    </div>
-                </div>
-                
-                <div class="level-3">
-                    <div class="node-content">
-                        <span class="node-icon">•</span>
-                        <span class="node-text">Ocurre en el estroma</span>
-                    </div>
-                </div>
-                
-                <div class="level-3">
-                    <div class="node-content">
-                        <span class="node-icon">•</span>
-                        <span class="node-text">No requiere luz directa</span>
-                    </div>
-                </div>
-                
-                <div class="level-3">
-                    <div class="node-content">
-                        <span class="node-icon">•</span>
-                        <span class="node-text">Fijación del CO₂</span>
-                    </div>
-                </div>
-
-                <div class="level-1">
-                    <div class="node-content">
-                        <span class="node-icon">📌</span>
-                        <span class="node-text">3. Importancia Ecológica</span>
-                    </div>
-                </div>
-                
-                <div class="level-2">
-                    <div class="node-content">
-                        <span class="node-icon">▶</span>
-                        <span class="node-text">Base de la cadena alimenticia</span>
-                    </div>
-                </div>
-                
-                <div class="level-2">
-                    <div class="node-content">
-                        <span class="node-icon">▶</span>
-                        <span class="node-text">Producción de oxígeno atmosférico</span>
-                    </div>
-                </div>
-                
-                <div class="level-2">
-                    <div class="node-content">
-                        <span class="node-icon">▶</span>
-                        <span class="node-text">Regulación del CO₂ atmosférico</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="esquema-actions">
-                <button class="btn-export">📄 Exportar PDF</button>
-                <button class="btn-export">📝 Exportar TXT</button>
-                <button class="btn-primary">💾 Guardar Esquema</button>
-                <button class="btn-secondary">✨ Crear Nuevo</button>
-            </div>
-        </div>
-
-        <!-- Vista Mapa Conceptual -->
-        <div id="conceptual" class="view-section">
-            <div class="esquema-header">
-                <h2>Sistema Solar: Conceptos Clave</h2>
-                <p class="esquema-meta">Tipo: Mapa Conceptual | Creado: 14/09/2025 11:00</p>
-            </div>
-
-            <div class="esquema-content">
-                <div class="concept-map">
-                    <div class="central-concept">
-                        <div class="concept-node main">
-                            SISTEMA SOLAR
-                        </div>
-                    </div>
+                <form method="post" action="{% url 'esquemas:crear_desde_texto' %}" id="esquemaTextoForm">
+                    {% csrf_token %}
                     
-                    <div class="sub-concepts">
-                        <div class="concept-branch">
-                            <div class="connector"></div>
-                            <div class="concept-node sub">
-                                <strong>Sol</strong>
-                                <p style="font-size: 0.9rem; margin-top: 0.5rem;">
-                                    • Estrella central<br>
-                                    • Fuente de energía<br>
-                                    • 99.86% de la masa
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="concept-branch">
-                            <div class="connector"></div>
-                            <div class="concept-node sub">
-                                <strong>Planetas Interiores</strong>
-                                <p style="font-size: 0.9rem; margin-top: 0.5rem;">
-                                    • Mercurio<br>
-                                    • Venus<br>
-                                    • Tierra<br>
-                                    • Marte
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="concept-branch">
-                            <div class="connector"></div>
-                            <div class="concept-node sub">
-                                <strong>Planetas Exteriores</strong>
-                                <p style="font-size: 0.9rem; margin-top: 0.5rem;">
-                                    • Júpiter<br>
-                                    • Saturno<br>
-                                    • Urano<br>
-                                    • Neptuno
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="concept-branch">
-                            <div class="connector"></div>
-                            <div class="concept-node sub">
-                                <strong>Otros Cuerpos</strong>
-                                <p style="font-size: 0.9rem; margin-top: 0.5rem;">
-                                    • Asteroides<br>
-                                    • Cometas<br>
-                                    • Meteoroides<br>
-                                    • Planetas enanos
-                                </p>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label for="titulo_texto" class="form-label">Título del Esquema</label>
+                        <input type="text" 
+                               id="titulo_texto" 
+                               name="titulo" 
+                               class="form-control"
+                               placeholder="Título de tu esquema"
+                               required>
                     </div>
+
+                    <div class="form-group">
+                        <label for="tipo_texto" class="form-label">Tipo de Esquema</label>
+                        <select id="tipo_texto" 
+                                name="tipo" 
+                                class="form-control form-select"
+                                required>
+                            <option value="">Selecciona el tipo de esquema</option>
+                            <option value="jerarquico">Esquema Jerárquico</option>
+                            <option value="conceptual">Mapa Conceptual</option>
+                            <option value="cronologico">Línea de Tiempo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contenido_texto" class="form-label">Contenido</label>
+                        <textarea id="contenido_texto" 
+                                  name="contenido_texto" 
+                                  class="form-control textarea"
+                                  placeholder="Pega o escribe aquí el contenido que quieres convertir en esquema..."
+                                  required></textarea>
+                        <div class="form-text">Introduce el texto del cual quieres generar el esquema</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showView('home')">
+                            ← Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitArchivoBtn">
+                            🚀 Procesar Archivo
+                        </button>
+                    </div>
+                </form>
+
+                <div class="loading-spinner" id="loadingArchivoSpinner">
+                    <div class="spinner"></div>
+                    <p>Extrayendo texto y generando esquema...</p>
                 </div>
-            </div>
-
-            <div class="esquema-actions">
-                <button class="btn-export">📄 Exportar PDF</button>
-                <button class="btn-export">📝 Exportar TXT</button>
-                <button class="btn-primary">💾 Guardar Esquema</button>
-                <button class="btn-secondary">✨ Crear Nuevo</button>
-            </div>
-        </div>
-
-        <!-- Vista Línea de Tiempo -->
-        <div id="cronologico" class="view-section">
-            <div class="esquema-header">
-                <h2>Historia de la Computación</h2>
-                <p class="esquema-meta">Tipo: Línea de Tiempo | Creado: 14/09/2025 11:30</p>
-            </div>
-
-            <div class="esquema-content">
-                <div class="timeline">
-                    <div class="timeline-item left">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <h4 class="timeline-date">1837</h4>
-                            <h3 class="timeline-title">Máquina Analítica</h3>
-                            <p class="timeline-description">Charles Babbage diseña la primera computadora mecánica programable.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item right">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <h4 class="timeline-date">1936</h4>
-                            <h3 class="timeline-title">Máquina de Turing</h3>
-                            <p class="timeline-description">Alan Turing desarrolla el concepto teórico de la computación moderna.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item left">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <h4 class="timeline-date">1946</h4>
-                            <h3 class="timeline-title">ENIAC</h3>
-                            <p class="timeline-description">Primera computadora electrónica de propósito general.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item right">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <h4 class="timeline-date">1971</h4>
-                            <h3 class="timeline-title">Intel 4004</h3>
-                            <p class="timeline-description">Primer microprocesador comercial de la historia.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item left">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <h4 class="timeline-date">1981</h4>
-                            <h3 class="timeline-title">IBM PC</h3>
-                            <p class="timeline-description">Lanzamiento de la primera computadora personal de IBM.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item right">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <h4 class="timeline-date">1991</h4>
-                            <h3 class="timeline-title">World Wide Web</h3>
-                            <p class="timeline-description">Tim Berners-Lee hace pública la WWW.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="esquema-actions">
-                <button class="btn-export">📄 Exportar PDF</button>
-                <button class="btn-export">📝 Exportar TXT</button>
-                <button class="btn-primary">💾 Guardar Esquema</button>
-                <button class="btn-secondary">✨ Crear Nuevo</button>
             </div>
         </div>
 
@@ -778,8 +860,142 @@
             document.getElementById(viewId).classList.add('active');
             
             // Activar el tab correspondiente
-            event.target.classList.add('active');
+            const activeBtn = document.querySelector(`[onclick="showView('${viewId}')"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
         }
+
+        // Manejo del formulario de texto
+        document.getElementById('esquemaTextoForm').addEventListener('submit', function() {
+            document.getElementById('submitTextoBtn').disabled = true;
+            document.getElementById('loadingTextoSpinner').style.display = 'block';
+            document.getElementById('submitTextoBtn').innerHTML = '⏳ Generando...';
+        });
+
+        // Manejo del archivo
+        const fileInput = document.getElementById('archivo');
+        const fileUploadArea = document.getElementById('fileUploadArea');
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                fileUploadArea.classList.add('file-selected');
+                fileUploadArea.innerHTML = `
+                    <div class="file-icon">✅</div>
+                    <div class="file-upload-text">Archivo seleccionado: ${file.name}</div>
+                    <div class="file-upload-hint">Tamaño: ${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                `;
+            }
+        });
+
+        // Drag and drop
+        fileUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Manejo del formulario de archivo
+        document.getElementById('esquemaArchivoForm').addEventListener('submit', function() {
+            document.getElementById('submitArchivoBtn').disabled = true;
+            document.getElementById('loadingArchivoSpinner').style.display = 'block';
+            document.getElementById('submitArchivoBtn').innerHTML = '⏳ Procesando...';
+        });
+
+        // Cerrar alertas automáticamente
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
     </script>
 </body>
-</html>
+</html><button type="button" class="btn btn-secondary" onclick="showView('home')">
+                            ← Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitTextoBtn">
+                            🚀 Generar Esquema
+                        </button>
+                    </div>
+                </form>
+
+                <div class="loading-spinner" id="loadingTextoSpinner">
+                    <div class="spinner"></div>
+                    <p>Generando tu esquema con inteligencia artificial...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Crear desde Archivo -->
+        <div id="crear-archivo" class="view-section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>📁 Crear Esquema desde Archivo</h2>
+                    <p>Sube un documento y genera esquemas automáticamente</p>
+                </div>
+
+                <form method="post" action="{% url 'esquemas:crear_desde_archivo' %}" enctype="multipart/form-data" id="esquemaArchivoForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="titulo_archivo" class="form-label">Título del Esquema</label>
+                        <input type="text" 
+                               id="titulo_archivo" 
+                               name="titulo" 
+                               class="form-control"
+                               placeholder="Título de tu esquema"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipo_archivo" class="form-label">Tipo de Esquema</label>
+                        <select id="tipo_archivo" 
+                                name="tipo" 
+                                class="form-control form-select"
+                                required>
+                            <option value="">Selecciona el tipo de esquema</option>
+                            <option value="jerarquico">Esquema Jerárquico</option>
+                            <option value="conceptual">Mapa Conceptual</option>
+                            <option value="cronologico">Línea de Tiempo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="archivo" class="form-label">Archivo</label>
+                        
+                        <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('archivo').click()">
+                            <div class="file-icon">📄</div>
+                            <div class="file-upload-text">Haz clic para seleccionar un archivo</div>
+                            <div class="file-upload-hint">o arrastra y suelta aquí</div>
+                        </div>
+                        
+                        <input type="file" 
+                               id="archivo" 
+                               name="archivo" 
+                               class="file-input"
+                               accept=".pdf,.doc,.docx,.txt"
+                               required>
+                        
+                        <div class="form-text">Sube un archivo PDF, DOC, DOCX o TXT (máximo 10MB)</div>
+                    </div>
+
+                    <div class="form-actions">

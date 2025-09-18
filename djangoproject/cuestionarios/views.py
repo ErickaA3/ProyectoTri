@@ -1,4 +1,4 @@
-# cuestionarios/views.py - VERSION SIN LOGIN (para pruebas)
+# cuestionarios/views.py - CÓDIGO COMPLETO
 from django.shortcuts import render, redirect, get_object_or_404
 # from django.contrib.auth.decorators import login_required  # Comentado temporalmente
 from django.contrib import messages
@@ -16,7 +16,6 @@ from .utils import generar_preguntas_openai, extraer_texto_archivo
 # Configurar OpenAI
 openai.api_key = settings.OPENAI_API_KEY
 
-# @login_required  # Comentado temporalmente
 def cuestionarios_home(request):
     """Vista principal de cuestionarios"""
     return render(request, 'cuestionarios/cuestionarios_home.html', {
@@ -25,7 +24,6 @@ def cuestionarios_home(request):
         'show_results': False
     })
 
-# @login_required  # Comentado temporalmente
 def config_cuestionario(request):
     """Vista de configuración según el método seleccionado"""
     method = request.GET.get('method', 'text')
@@ -39,7 +37,6 @@ def config_cuestionario(request):
     
     return render(request, 'cuestionarios/cuestionarios_home.html', context)
 
-# @login_required  # Comentado temporalmente
 def crear_cuestionario(request):
     """Crear cuestionario desde archivo o texto"""
     if request.method != 'POST':
@@ -66,7 +63,6 @@ def crear_cuestionario(request):
             return redirect('cuestionarios:home')
         
         # Crear el cuestionario en la base de datos
-        # Para pruebas sin usuario, usa un usuario ficticio o None
         cuestionario = Cuestionario.objects.create(
             usuario=request.user if request.user.is_authenticated else None,
             titulo=titulo,
@@ -95,7 +91,6 @@ def crear_cuestionario(request):
         messages.error(request, f'Error al crear el cuestionario: {str(e)}')
         return redirect('cuestionarios:home')
 
-# @login_required  # Comentado temporalmente
 def mostrar_quiz(request, quiz_id):
     """Mostrar pregunta actual del quiz"""
     cuestionario = get_object_or_404(Cuestionario, id=quiz_id)
@@ -128,7 +123,6 @@ def mostrar_quiz(request, quiz_id):
     
     return render(request, 'cuestionarios/cuestionarios_home.html', context)
 
-# @login_required  # Comentado temporalmente
 def responder_pregunta(request):
     """Procesar respuesta de una pregunta"""
     if request.method != 'POST':
@@ -181,7 +175,6 @@ def responder_pregunta(request):
         calcular_resultados(cuestionario)
         return redirect('cuestionarios:results', quiz_id=quiz_id)
 
-# @login_required  # Comentado temporalmente
 def mostrar_resultados(request, quiz_id):
     """Mostrar resultados del cuestionario"""
     cuestionario = get_object_or_404(Cuestionario, id=quiz_id)
@@ -215,7 +208,6 @@ def mostrar_resultados(request, quiz_id):
     
     return render(request, 'cuestionarios/cuestionarios_home.html', context)
 
-# @login_required  # Comentado temporalmente
 def revisar_respuestas(request):
     """Mostrar revisión detallada de respuestas"""
     if request.method != 'POST':
@@ -225,7 +217,7 @@ def revisar_respuestas(request):
     cuestionario = get_object_or_404(Cuestionario, id=quiz_id)
     resultado = get_object_or_404(ResultadoCuestionario, cuestionario=cuestionario)
     
-    # Preparar datos de revisión
+    # Preparar datos de revisión con información detallada
     review_data = []
     for pregunta in cuestionario.preguntas.all():
         try:
@@ -234,23 +226,43 @@ def revisar_respuestas(request):
                 pregunta=pregunta
             )
             
+            # Determinar respuesta del usuario
             user_answer = None
+            user_answer_text = "No respondida"
             if respuesta_usuario.respuesta_seleccionada is not None:
-                user_answer = pregunta.opciones[respuesta_usuario.respuesta_seleccionada]
+                user_answer = respuesta_usuario.respuesta_seleccionada
+                user_answer_text = pregunta.opciones[respuesta_usuario.respuesta_seleccionada]
             
-            review_data.append({
+            # Información completa para la revisión
+            review_item = {
                 'question': pregunta.texto,
-                'user_answer': user_answer,
-                'correct_answer': pregunta.opciones[pregunta.respuesta_correcta],
-                'correct': respuesta_usuario.es_correcta
-            })
+                'question_number': pregunta.numero,
+                'user_answer_index': user_answer,
+                'user_answer_text': user_answer_text,
+                'correct_answer_index': pregunta.respuesta_correcta,
+                'correct_answer_text': pregunta.opciones[pregunta.respuesta_correcta],
+                'all_options': pregunta.opciones,
+                'correct': respuesta_usuario.es_correcta,
+                'answered': user_answer is not None
+            }
+            
+            review_data.append(review_item)
+            
         except RespuestaUsuario.DoesNotExist:
-            review_data.append({
+            # Pregunta no respondida
+            review_item = {
                 'question': pregunta.texto,
-                'user_answer': None,
-                'correct_answer': pregunta.opciones[pregunta.respuesta_correcta],
-                'correct': False
-            })
+                'question_number': pregunta.numero,
+                'user_answer_index': None,
+                'user_answer_text': "No respondida",
+                'correct_answer_index': pregunta.respuesta_correcta,
+                'correct_answer_text': pregunta.opciones[pregunta.respuesta_correcta],
+                'all_options': pregunta.opciones,
+                'correct': False,
+                'answered': False
+            }
+            
+            review_data.append(review_item)
     
     context = {
         'show_config': False,

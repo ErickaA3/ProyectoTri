@@ -163,63 +163,29 @@ body {
     background: #5a6fd8;
 }
 
-/* Estilos para los modales */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
-}
-
-.modal-content {
-    background-color: white;
-    margin: 5% auto;
+/* Configuración del quiz */
+.config-container {
+    background: white;
     padding: 2rem;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 600px;
-    position: relative;
-    animation: modalSlideIn 0.3s ease;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
 }
 
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-.close:hover {
-    color: #667eea;
-}
-
-.modal h2 {
+.config-container h2 {
     color: #2d3748;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     text-align: center;
-    font-size: 1.8rem;
+    font-size: 2rem;
 }
 
 /* Área de subir archivos */
+.file-upload-section {
+    margin: 2rem 0;
+}
+
+.file-label {
+    cursor: pointer;
+}
+
 .file-upload-area {
     border: 3px dashed #667eea;
     border-radius: 15px;
@@ -301,6 +267,12 @@ body {
     margin: 2rem 0;
 }
 
+.quiz-config h3 {
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+}
+
 .config-group {
     margin-bottom: 1.5rem;
 }
@@ -327,36 +299,49 @@ body {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.difficulty-buttons {
+/* Radio buttons para dificultad */
+.difficulty-radio {
     display: flex;
     gap: 1rem;
     margin-top: 0.5rem;
 }
 
-.difficulty-btn {
+.radio-option {
     flex: 1;
-    padding: 0.8rem;
-    border: 2px solid #e2e8f0;
-    background: white;
-    border-radius: 10px;
+    position: relative;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
 }
 
-.difficulty-btn:hover {
+.radio-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.radio-label {
+    display: block;
+    padding: 0.8rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.radio-option:hover .radio-label {
     border-color: #667eea;
     background: rgba(102, 126, 234, 0.05);
 }
 
-.difficulty-btn.active {
+.radio-option input[type="radio"]:checked + .radio-label {
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
     border-color: #667eea;
 }
 
-/* Botones de acción en modales */
-.modal-actions {
+/* Acciones del formulario */
+.form-actions {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
@@ -372,6 +357,7 @@ body {
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    text-decoration: none;
 }
 
 .btn-secondary:hover {
@@ -394,27 +380,8 @@ body {
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
-.selected-file {
-    background: rgba(102, 126, 234, 0.1);
-    padding: 1rem;
-    border-radius: 10px;
-    margin: 1rem 0;
-    text-align: left;
-}
-
-.selected-file .file-name {
-    font-weight: 600;
-    color: #2d3748;
-}
-
-.selected-file .file-size {
-    color: #718096;
-    font-size: 0.9rem;
-}
-
 /* Quiz activo */
-.quiz-container {
-    display: none;
+.quiz-container-active {
     margin-top: 2rem;
 }
 
@@ -424,6 +391,11 @@ body {
     padding: 2rem;
     border-radius: 15px 15px 0 0;
     text-align: center;
+}
+
+.quiz-header h3 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
 }
 
 .quiz-progress {
@@ -441,6 +413,11 @@ body {
     transition: width 0.3s ease;
 }
 
+.progress-text {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
 .quiz-body {
     background: white;
     padding: 2rem;
@@ -454,6 +431,7 @@ body {
     color: #2d3748;
     margin-bottom: 2rem;
     font-weight: 600;
+    line-height: 1.5;
 }
 
 .answers {
@@ -476,19 +454,13 @@ body {
     background: rgba(102, 126, 234, 0.05);
 }
 
-.answer-option.selected {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
+.answer-option input[type="radio"] {
+    margin-right: 1rem;
 }
 
-.answer-option.correct {
-    border-color: #48bb78;
-    background: rgba(72, 187, 120, 0.1);
-}
-
-.answer-option.incorrect {
-    border-color: #f56565;
-    background: rgba(245, 101, 101, 0.1);
+.answer-text {
+    font-size: 1rem;
+    line-height: 1.4;
 }
 
 .quiz-footer {
@@ -500,26 +472,24 @@ body {
     border-top: 2px solid #e2e8f0;
 }
 
-.quiz-timer {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.quiz-info {
     color: #718096;
     font-weight: 600;
 }
 
-.timer-icon {
-    font-size: 1.5rem;
+.quiz-actions {
+    display: flex;
+    gap: 1rem;
 }
 
 /* Resultados del quiz */
-.quiz-results {
-    display: none;
+.quiz-results-active {
     text-align: center;
     padding: 3rem;
     background: white;
     border-radius: 15px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
 }
 
 .results-icon {
@@ -565,6 +535,140 @@ body {
     margin-top: 0.5rem;
 }
 
+.results-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Estilos para la revisión de respuestas */
+.review-section {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 15px;
+}
+
+.review-section h3 {
+    color: #2d3748;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.review-item {
+    background: white;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #e2e8f0;
+}
+
+.review-item.correct {
+    border-left-color: #48bb78;
+    background: rgba(72, 187, 120, 0.02);
+}
+
+.review-item.incorrect {
+    border-left-color: #f56565;
+    background: rgba(245, 101, 101, 0.02);
+}
+
+.review-question {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.review-answers {
+    margin-top: 1rem;
+}
+
+.review-answer {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    margin: 0.5rem 0;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.review-answer.user-correct {
+    background: rgba(72, 187, 120, 0.1);
+    color: #2f855a;
+    border: 2px solid #48bb78;
+}
+
+.review-answer.user-incorrect {
+    background: rgba(245, 101, 101, 0.1);
+    color: #c53030;
+    border: 2px solid #f56565;
+}
+
+.review-answer.correct-answer {
+    background: rgba(72, 187, 120, 0.15);
+    color: #2f855a;
+    border: 2px solid #48bb78;
+    font-weight: 600;
+}
+
+.review-answer.not-answered {
+    background: rgba(160, 174, 192, 0.1);
+    color: #4a5568;
+    border: 2px solid #a0aec0;
+}
+
+.answer-icon {
+    margin-right: 0.8rem;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.answer-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.answer-label.correct {
+    color: #2f855a;
+}
+
+.answer-label.incorrect {
+    color: #c53030;
+}
+
+.answer-label.not-answered {
+    color: #4a5568;
+}
+
+.question-status {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+}
+
+.question-status.correct {
+    background: rgba(72, 187, 120, 0.2);
+    color: #2f855a;
+}
+
+.question-status.incorrect {
+    background: rgba(245, 101, 101, 0.2);
+    color: #c53030;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .navbar {
@@ -597,12 +701,6 @@ body {
         padding: 2rem;
     }
 
-    .modal-content {
-        width: 95%;
-        margin: 10% auto;
-        padding: 1.5rem;
-    }
-
     .file-upload-area {
         padding: 2rem;
     }
@@ -616,8 +714,38 @@ body {
         gap: 1rem;
     }
 
-    .quiz-timer {
-        margin-bottom: 1rem;
+    .quiz-actions {
+        justify-content: center;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .results-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .difficulty-radio {
+        flex-direction: column;
+    }
+
+    .review-section {
+        padding: 1rem;
+    }
+    
+    .review-item {
+        padding: 1.5rem;
+    }
+    
+    .review-question {
+        font-size: 1.1rem;
+    }
+    
+    .review-answer {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
     }
 }
     </style>
@@ -640,7 +768,7 @@ body {
             <div class="card">
                 <form method="get" action="{% url 'cuestionarios:config' %}">
                     <input type="hidden" name="method" value="file">
-                    <div class="card-icon">📁</div>
+                    <div class="card-icon">📄</div>
                     <h3>Crear desde Archivo</h3>
                     <p>Genera un cuestionario automático a partir de tus documentos PDF, Word o TXT.</p>
                     <button type="submit" class="card-btn">Subir Archivo</button>
@@ -665,7 +793,7 @@ body {
         <div class="config-container">
             <h2>
                 {% if method == 'file' %}
-                    📁 Crear Cuestionario desde Archivo
+                    📄 Crear Cuestionario desde Archivo
                 {% else %}
                     ✏️ Crear Cuestionario desde Texto
                 {% endif %}
@@ -679,7 +807,7 @@ body {
                 <div class="file-upload-section">
                     <label for="file" class="file-label">
                         <div class="file-upload-area">
-                            <div class="upload-icon">📁</div>
+                            <div class="upload-icon">📄</div>
                             <p><strong>Selecciona un archivo</strong></p>
                             <p>Formatos soportados: PDF, TXT, DOC, DOCX</p>
                             <span class="browse-btn">Explorar Archivos</span>
@@ -820,12 +948,67 @@ Entre más detallado sea el texto, mejores serán las preguntas generadas."></te
             <!-- Revisión de respuestas -->
             {% if show_review %}
             <div class="review-section">
-                <h3>Revisión de Respuestas</h3>
+                <h3>📋 Revisión Detallada de Respuestas</h3>
+                
                 {% for item in review_data %}
                 <div class="review-item {% if item.correct %}correct{% else %}incorrect{% endif %}">
-                    <h4>Pregunta {{ forloop.counter }}: {{ item.question }}</h4>
-                    <p><strong>Tu respuesta:</strong> {{ item.user_answer|default:"No respondida" }}</p>
-                    <p><strong>Respuesta correcta:</strong> {{ item.correct_answer }}</p>
+                    <!-- Estado de la pregunta -->
+                    <div class="question-status {% if item.correct %}correct{% else %}incorrect{% endif %}">
+                        {% if item.correct %}
+                            ✅ Correcta
+                        {% elif not item.answered %}
+                            ⏭️ No respondida
+                        {% else %}
+                            ❌ Incorrecta
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Pregunta -->
+                    <div class="review-question">
+                        <strong>Pregunta {{ forloop.counter }}:</strong> {{ item.question }}
+                    </div>
+                    
+                    <div class="review-answers">
+                        {% if item.answered %}
+                            <!-- Mostrar respuesta del usuario -->
+                            {% if item.correct %}
+                                <!-- Respuesta correcta del usuario -->
+                                <div class="answer-label correct">Tu respuesta (Correcta):</div>
+                                <div class="review-answer user-correct">
+                                    <span class="answer-icon">✅</span>
+                                    {{ item.user_answer_text }}
+                                </div>
+                            {% else %}
+                                <!-- Respuesta incorrecta del usuario -->
+                                <div class="answer-label incorrect">Tu respuesta (Incorrecta):</div>
+                                <div class="review-answer user-incorrect">
+                                    <span class="answer-icon">❌</span>
+                                    {{ item.user_answer_text }}
+                                </div>
+                                
+                                <!-- Mostrar respuesta correcta -->
+                                <div class="answer-label correct" style="margin-top: 1rem;">Respuesta correcta:</div>
+                                <div class="review-answer correct-answer">
+                                    <span class="answer-icon">✅</span>
+                                    {{ item.correct_answer_text }}
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <!-- Pregunta no respondida -->
+                            <div class="answer-label not-answered">No respondiste esta pregunta</div>
+                            <div class="review-answer not-answered">
+                                <span class="answer-icon">⏭️</span>
+                                Pregunta saltada
+                            </div>
+                            
+                            <!-- Mostrar respuesta correcta -->
+                            <div class="answer-label correct" style="margin-top: 1rem;">Respuesta correcta:</div>
+                            <div class="review-answer correct-answer">
+                                <span class="answer-icon">✅</span>
+                                {{ item.correct_answer_text }}
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
                 {% endfor %}
             </div>
