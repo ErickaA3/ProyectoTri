@@ -184,6 +184,7 @@ body {
 
 .file-label {
     cursor: pointer;
+    display: block;
 }
 
 .file-upload-area {
@@ -195,6 +196,7 @@ body {
     transition: all 0.3s ease;
     cursor: pointer;
     background: rgba(102, 126, 234, 0.05);
+    position: relative;
 }
 
 .file-upload-area:hover,
@@ -217,7 +219,61 @@ body {
 }
 
 .file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+}
+
+/* Estilos para mostrar archivo seleccionado */
+.file-input:valid + .file-upload-content .upload-icon {
+    color: #48bb78;
+}
+
+.file-input:valid + .file-upload-content .upload-text {
+    color: #2f855a;
+    font-weight: 600;
+}
+
+.file-input:valid + .file-upload-content .upload-text::after {
+    content: "\A✅ Archivo seleccionado correctamente";
+    white-space: pre;
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    color: #2f855a;
+}
+
+.file-input:valid + .file-upload-content .file-instructions {
     display: none;
+}
+
+.file-input:valid + .file-upload-content .browse-btn {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+}
+
+.file-input:valid + .file-upload-content .browse-btn::before {
+    content: "✅ ";
+    margin-right: 0.5rem;
+}
+
+.file-upload-content {
+    pointer-events: none;
+}
+
+.upload-text {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.file-instructions {
+    color: #718096;
+    font-size: 1rem;
+    margin-bottom: 1rem;
 }
 
 .browse-btn {
@@ -229,11 +285,61 @@ body {
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: inline-block;
 }
 
 .browse-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Indicador visual cuando archivo está seleccionado */
+.file-input:valid ~ .file-selected-indicator {
+    display: block;
+}
+
+.file-selected-indicator {
+    display: none;
+    background: rgba(72, 187, 120, 0.1);
+    border: 2px solid #48bb78;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    color: #2f855a;
+    text-align: center;
+}
+
+.file-selected-indicator .success-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.file-selected-indicator .success-text {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.file-selected-indicator .file-info {
+    font-size: 0.9rem;
+    color: #276749;
+    margin-top: 0.5rem;
+}
+
+/* Estilos adicionales para mejor UX */
+.file-input:valid + .file-upload-content {
+    border-color: #48bb78;
+}
+
+.file-upload-area:has(.file-input:valid) {
+    border-color: #48bb78;
+    background: rgba(72, 187, 120, 0.05);
+}
+
+/* Fallback para navegadores que no soportan :has() */
+.file-input:valid ~ * {
+    --file-selected: true;
 }
 
 /* Área de texto */
@@ -805,15 +911,29 @@ body {
                 <!-- Área de entrada según el método -->
                 {% if method == 'file' %}
                 <div class="file-upload-section">
-                    <label for="file" class="file-label">
-                        <div class="file-upload-area">
+                    <div class="file-upload-area">
+                        <input type="file" id="file" name="file" class="file-input" accept=".pdf,.txt,.doc,.docx" required 
+                               title="Selecciona tu archivo PDF, TXT, DOC o DOCX">
+                        <div class="file-upload-content">
                             <div class="upload-icon">📄</div>
-                            <p><strong>Selecciona un archivo</strong></p>
-                            <p>Formatos soportados: PDF, TXT, DOC, DOCX</p>
+                            <div class="upload-text">
+                                <strong>Selecciona un archivo</strong>
+                            </div>
+                            <div class="file-instructions">
+                                <p>Formatos soportados: PDF, TXT, DOC, DOCX</p>
+                                <p>Haz clic aquí para seleccionar tu archivo</p>
+                            </div>
                             <span class="browse-btn">Explorar Archivos</span>
                         </div>
-                    </label>
-                    <input type="file" id="file" name="file" class="file-input" accept=".pdf,.txt,.doc,.docx" required>
+                    </div>
+                    <div class="file-selected-indicator">
+                        <span class="success-icon">✅</span>
+                        <div class="success-text">¡Archivo cargado exitosamente!</div>
+                        <div class="file-info">
+                            Tu archivo está listo para procesar. Puedes continuar con la configuración del cuestionario.
+                            <br><small>Tip: El nombre del archivo aparecerá en el navegador al pasar el cursor sobre el campo.</small>
+                        </div>
+                    </div>
                 </div>
                 {% else %}
                 <div class="text-input-area">

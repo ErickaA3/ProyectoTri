@@ -251,6 +251,37 @@
         .form-header p {
             color: #718096;
             font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* Estilos específicos para la sección de archivos */
+        #crear-archivo .form-header h2 {
+            color: #ffffff;
+            background: none;
+            -webkit-text-fill-color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        #crear-archivo .form-header p {
+            color: #ffffff;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        #crear-archivo .form-text {
+            color: #ffffff !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Textos del área de archivo en blanco */
+        #crear-archivo .file-upload-text {
+            color: #ffffff !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        #crear-archivo .file-upload-hint {
+            color: #ffffff !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         .form-group {
@@ -311,50 +342,175 @@
 
         /* File upload */
         .file-upload-area {
-            border: 2px dashed #e2e8f0;
-            border-radius: 10px;
-            padding: 2rem;
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 3rem 2rem;
             text-align: center;
-            background: #fafafa;
+            background: rgba(102, 126, 234, 0.05);
             transition: all 0.3s ease;
             cursor: pointer;
+            position: relative;
         }
 
         .file-upload-area:hover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
-        }
-
-        .file-upload-area.dragover {
             border-color: #667eea;
             background: rgba(102, 126, 234, 0.1);
             transform: scale(1.02);
         }
 
         .file-icon {
-            font-size: 3rem;
+            font-size: 3.5rem;
             color: #667eea;
             margin-bottom: 1rem;
+            transition: all 0.3s ease;
         }
 
         .file-upload-text {
-            color: #4a5568;
-            font-size: 1.1rem;
+            color: #2d3748;
+            font-size: 1.2rem;
+            font-weight: 600;
             margin-bottom: 0.5rem;
         }
 
         .file-upload-hint {
             color: #718096;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
         }
 
         .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .file-upload-content {
+            pointer-events: none;
+            position: relative;
+        }
+
+        .browse-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .browse-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* === ESTILOS MÁGICOS CUANDO SE SELECCIONA ARCHIVO === */
+
+        /* Cuando hay archivo, el icono se vuelve verde */
+        .file-input:valid + .file-upload-content .file-icon {
+            color: #48bb78 !important;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+
+        /* El texto cambia */
+        .file-input:valid + .file-upload-content .file-upload-text {
+            color: #2f855a !important;
+            font-weight: 700 !important;
+        }
+
+        /* Agrega confirmación */
+        .file-input:valid + .file-upload-content .file-upload-text::after {
+            content: "\A✅ Archivo seleccionado correctamente";
+            white-space: pre;
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: #2f855a;
+            font-weight: 600;
+        }
+
+        /* Oculta las instrucciones */
+        .file-input:valid + .file-upload-content .file-upload-hint {
             display: none;
         }
 
-        .file-selected {
-            background: rgba(72, 187, 120, 0.1);
-            border-color: #48bb78;
+        /* El botón se vuelve verde */
+        .file-input:valid + .file-upload-content .browse-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169) !important;
+        }
+
+        .file-input:valid + .file-upload-content .browse-btn::before {
+            content: "✅ ";
+            margin-right: 0.5rem;
+        }
+
+        /* El área completa se vuelve verde */
+        .file-upload-area:has(.file-input:valid) {
+            border-color: #48bb78 !important;
+            background: rgba(72, 187, 120, 0.1) !important;
+        }
+
+        /* Indicador de éxito */
+        .file-selected-indicator {
+            display: none;
+            background: rgba(72, 187, 120, 0.15);
+            border: 2px solid #48bb78;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            color: #2f855a;
+            text-align: center;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        /* Mostrar cuando hay archivo válido */
+        .file-input:valid ~ .file-selected-indicator {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .success-text {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #22543d;
+        }
+
+        .file-info {
+            font-size: 1rem;
+            color: #276749;
+            font-weight: 500;
         }
 
         /* Botones */
@@ -873,23 +1029,9 @@
             document.getElementById('submitTextoBtn').innerHTML = '⏳ Generando...';
         });
 
-        // Manejo del archivo
-        const fileInput = document.getElementById('archivo');
+        // Drag and drop funcionalidad
         const fileUploadArea = document.getElementById('fileUploadArea');
 
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                fileUploadArea.classList.add('file-selected');
-                fileUploadArea.innerHTML = `
-                    <div class="file-icon">✅</div>
-                    <div class="file-upload-text">Archivo seleccionado: ${file.name}</div>
-                    <div class="file-upload-hint">Tamaño: ${(file.size / 1024 / 1024).toFixed(2)} MB</div>
-                `;
-            }
-        });
-
-        // Drag and drop
         fileUploadArea.addEventListener('dragover', function(e) {
             e.preventDefault();
             fileUploadArea.classList.add('dragover');
@@ -905,8 +1047,7 @@
             fileUploadArea.classList.remove('dragover');
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                fileInput.files = files;
-                fileInput.dispatchEvent(new Event('change'));
+                document.getElementById('archivo').files = files;
             }
         });
 
@@ -982,18 +1123,36 @@
                     <div class="form-group">
                         <label for="archivo" class="form-label">Archivo</label>
                         
-                        <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('archivo').click()">
-                            <div class="file-icon">📄</div>
-                            <div class="file-upload-text">Haz clic para seleccionar un archivo</div>
-                            <div class="file-upload-hint">o arrastra y suelta aquí</div>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" 
+                                   id="archivo" 
+                                   name="archivo" 
+                                   class="file-input"
+                                   accept=".pdf,.doc,.docx,.txt"
+                                   required
+                                   title="Archivo seleccionado">
+                            
+                            <div class="file-upload-content">
+                                <div class="file-icon">📄</div>
+                                <div class="file-upload-text">
+                                    <strong>Selecciona un archivo</strong>
+                                </div>
+                                <div class="file-upload-hint">
+                                    Formatos soportados: PDF, TXT, DOC, DOCX<br>
+                                    Haz clic aquí para seleccionar tu archivo
+                                </div>
+                                <span class="browse-btn">Explorar Archivos</span>
+                            </div>
                         </div>
                         
-                        <input type="file" 
-                               id="archivo" 
-                               name="archivo" 
-                               class="file-input"
-                               accept=".pdf,.doc,.docx,.txt"
-                               required>
+                        <!-- Indicador que aparece cuando se selecciona archivo -->
+                        <div class="file-selected-indicator">
+                            <span class="success-icon">✅</span>
+                            <div class="success-text">¡Archivo cargado exitosamente!</div>
+                            <div class="file-info">
+                                Tu archivo está listo para procesar. Puedes continuar.
+                            </div>
+                        </div>
                         
                         <div class="form-text">Sube un archivo PDF, DOC, DOCX o TXT (máximo 10MB)</div>
                     </div>
