@@ -5,7 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}MyOwnStudy{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fugaz+One&family=Paytone+One&display=swap" rel="stylesheet">
     <style>
+        .paytone-one-regular {
+            font-family: "Paytone One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -21,7 +35,7 @@
         .navbar {
             background: rgba(255, 254, 254, 1);
             backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
+            padding: 0rem 1rem;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
@@ -29,20 +43,24 @@
         }
 
         .navbar .logo-img {
-            width: 50px;
-            height: 50px;
+            width: 80px;
+            height: 80px;
             border-radius: 0px;
             object-fit: cover;
         }
 
         .navbar h1 {
-            color: #1a1919d8;
-            font-size: 1.8rem;
-            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.4rem;
+            font-weight: 400;
+            font-family: "Fugaz One", sans-serif;
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1300px;
             margin: 0 auto;
             padding: 3rem 2rem;
         }
@@ -193,8 +211,8 @@
 <body>
     <!-- Barra de navegación -->
     <nav class="navbar">
-        <img src="{% static 'images/logo.png' %}" alt="FocusPy Logo" class="logo-img">
-        <h1>FocusPy</h1>
+        <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
+        <h1 class="paytone-one-regular">FocusPy</h1>
     </nav>
 
     <!-- Contenido principal -->
