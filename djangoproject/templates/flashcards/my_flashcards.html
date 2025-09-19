@@ -281,25 +281,7 @@
     </nav>
 
     <div class="container">
-        <div class="header">
-            <h1>Mis Flashcards</h1>
-            <p>Todas tus colecciones de estudio en un solo lugar</p>
-            
-            <div class="stats">
-                <div class="stat-item">
-                    <span class="stat-number">{{ total_collections }}</span>
-                    <span class="stat-label">Colecciones</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">{{ collections|length|add:"0" }}</span>
-                    <span class="stat-label">Total Tarjetas</span>
-                </div>
-            </div>
-            
-            <a href="{% url 'flashcards:flashcards_home' %}" class="create-button">
-                ➕ Crear Nueva Colección
-            </a>
-        </div>
+    
 
         {% if collections %}
         <div class="collections-grid">

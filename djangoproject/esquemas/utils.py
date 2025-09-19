@@ -58,90 +58,119 @@ def extraer_texto_txt(archivo):
             raise ValueError(f"Error al leer archivo TXT: {str(e)}")
 
 
+def truncar_texto_para_openai(texto, max_tokens=3000):
+    """
+    Trunca el texto para que quepa dentro del límite de tokens de OpenAI
+    Estima ~4 caracteres por token en español
+    """
+    max_chars = max_tokens * 4
+    if len(texto) <= max_chars:
+        return texto
+    
+    # Truncar manteniendo párrafos completos cuando sea posible
+    truncated = texto[:max_chars]
+    last_paragraph = truncated.rfind('\n\n')
+    
+    if last_paragraph > max_chars * 0.7:  # Si tenemos al menos 70% del texto
+        return truncated[:last_paragraph] + "\n\n[...texto truncado...]"
+    else:
+        return truncated + "\n\n[...texto truncado...]"
+
+
 def generar_esquema_openai(texto, tipo_esquema):
     """
-    Genera un esquema usando OpenAI GPT
+    Genera un esquema usando OpenAI GPT con información expandible
     """
     client = OpenAI(api_key=settings.OPENAI_API_KEY)
     
+    # Truncar el texto de entrada para evitar exceder límites
+    texto_truncado = truncar_texto_para_openai(texto, max_tokens=3000)
+    
     prompts = {
         'jerarquico': """
-        Analiza el siguiente texto y crea un esquema jerárquico bien estructurado.
-        Devuelve SOLO un JSON válido con esta estructura exacta:
+Analiza el siguiente texto y crea un esquema jerárquico detallado con información expandible.
+Devuelve SOLO un JSON válido con esta estructura exacta:
+{
+    "titulo": "Título principal del tema",
+    "nodos": [
         {
-            "titulo": "Título principal del tema basado en el contenido",
-            "nodos": [
+            "texto": "Punto principal 1",
+            "nivel": 1,
+            "orden": 0,
+            "detalles": "Información adicional expandible sobre este punto",
+            "palabras_clave": ["palabra1", "palabra2", "palabra3"],
+            "hijos": [
                 {
-                    "texto": "Punto principal 1",
-                    "nivel": 1,
+                    "texto": "Subpunto 1.1",
+                    "nivel": 2,
                     "orden": 0,
+                    "detalles": "Detalles específicos del subpunto",
+                    "palabras_clave": ["concepto", "ejemplo"],
                     "hijos": [
                         {
-                            "texto": "Subpunto 1.1",
-                            "nivel": 2,
+                            "texto": "Sub-subpunto 1.1.1",
+                            "nivel": 3,
                             "orden": 0,
-                            "hijos": [
-                                {
-                                    "texto": "Sub-subpunto 1.1.1",
-                                    "nivel": 3,
-                                    "orden": 0
-                                }
-                            ]
+                            "detalles": "Información detallada del punto específico",
+                            "palabras_clave": ["detalle"]
                         }
                     ]
                 }
             ]
         }
-        
-        Texto a analizar:
-        """,
+    ]
+}
+
+IMPORTANTE: 
+- Para cada nodo, incluye detalles específicos en "detalles" que expliquen más sobre ese punto
+- Las palabras_clave deben ser conceptos relevantes de 1-3 palabras
+- Los detalles deben ser informativos y complementar el texto principal
+- Máximo 3 niveles de profundidad
+
+Texto a analizar:
+""",
         
         'conceptual': """
-        Analiza el siguiente texto y crea un mapa conceptual.
-        Devuelve SOLO un JSON válido con esta estructura exacta:
+Analiza el siguiente texto y crea un mapa conceptual detallado.
+Devuelve SOLO un JSON válido con esta estructura:
+{
+    "titulo": "Título del mapa conceptual",
+    "concepto_central": "Concepto principal extraído del texto",
+    "conceptos": [
         {
-            "titulo": "Título del mapa conceptual basado en el contenido",
-            "concepto_central": "Concepto principal extraído del texto",
-            "conceptos": [
-                {
-                    "texto": "Concepto relacionado 1",
-                    "descripcion": "Descripción o puntos clave del concepto",
-                    "es_central": false
-                },
-                {
-                    "texto": "Concepto relacionado 2",
-                    "descripcion": "Descripción del segundo concepto",
-                    "es_central": false
-                }
-            ]
+            "texto": "Concepto relacionado 1",
+            "descripcion": "Descripción detallada del concepto",
+            "es_central": false,
+            "conexiones": ["concepto2", "concepto3"],
+            "importancia": "alta",
+            "ejemplos": ["ejemplo1", "ejemplo2"]
         }
-        
-        Texto a analizar:
-        """,
+    ]
+}
+
+Texto a analizar:
+""",
         
         'cronologico': """
-        Analiza el siguiente texto y crea una línea de tiempo cronológica.
-        Devuelve SOLO un JSON válido con esta estructura exacta:
+Analiza el siguiente texto y crea una línea de tiempo detallada.
+Devuelve SOLO un JSON válido con esta estructura:
+{
+    "titulo": "Título de la línea de tiempo",
+    "eventos": [
         {
-            "titulo": "Título de la línea de tiempo basado en el contenido",
-            "eventos": [
-                {
-                    "fecha": "Año o fecha del evento",
-                    "titulo": "Nombre del evento importante",
-                    "descripcion": "Descripción detallada del evento",
-                    "orden": 0
-                },
-                {
-                    "fecha": "Siguiente año o fecha",
-                    "titulo": "Segundo evento importante",
-                    "descripcion": "Descripción del segundo evento",
-                    "orden": 1
-                }
-            ]
+            "fecha": "Año o fecha del evento",
+            "titulo": "Nombre del evento",
+            "descripcion": "Descripción detallada del evento",
+            "orden": 0,
+            "importancia": "alta",
+            "consecuencias": ["consecuencia1", "consecuencia2"],
+            "contexto": "Contexto histórico o situacional"
         }
-        
-        Texto a analizar:
-        """
+    ]
+}
+
+Texto a analizar:
+"""
     }
     
     try:
@@ -152,14 +181,14 @@ def generar_esquema_openai(texto, tipo_esquema):
             messages=[
                 {
                     "role": "system", 
-                    "content": "Eres un experto en crear esquemas educativos. Responde ÚNICAMENTE con JSON válido, sin texto adicional antes o después del JSON."
+                    "content": "Eres un experto en crear esquemas educativos detallados. Incluye siempre información adicional expandible. Responde ÚNICAMENTE con JSON válido."
                 },
                 {
                     "role": "user", 
-                    "content": f"{prompt}\n\n{texto}"
+                    "content": f"{prompt}\n\n{texto_truncado}"
                 }
             ],
-            max_tokens=8000,
+            max_tokens=3000,
             temperature=0.7
         )
         
@@ -189,13 +218,118 @@ def generar_esquema_openai(texto, tipo_esquema):
     except json.JSONDecodeError as e:
         raise ValueError(f"Error al procesar respuesta de OpenAI como JSON: {str(e)}")
     except Exception as e:
+        # Si es error de límite de tokens, intentar con texto más corto
+        if "context_length_exceeded" in str(e) or "maximum context length" in str(e):
+            texto_muy_corto = truncar_texto_para_openai(texto, max_tokens=2000)
+            return generar_esquema_openai_fallback(texto_muy_corto, tipo_esquema, client)
+        
         raise ValueError(f"Error al conectar con OpenAI: {str(e)}")
+
+
+def generar_esquema_openai_fallback(texto, tipo_esquema, client):
+    """
+    Función de respaldo con prompts más cortos y límites más estrictos
+    """
+    prompts_cortos = {
+        'jerarquico': "Crea un esquema jerárquico en JSON con nodos, niveles y jerarquía del siguiente texto:",
+        'conceptual': "Crea un mapa conceptual en JSON con concepto_central y conceptos relacionados del siguiente texto:",
+        'cronologico': "Crea una línea de tiempo en JSON con eventos cronológicos del siguiente texto:"
+    }
+    
+    try:
+        prompt = prompts_cortos.get(tipo_esquema, prompts_cortos['jerarquico'])
+        
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",  # Usar modelo más eficiente como respaldo
+            messages=[
+                {
+                    "role": "user", 
+                    "content": f"{prompt}\n\n{texto}"
+                }
+            ],
+            max_tokens=2000,
+            temperature=0.7
+        )
+        
+        contenido_respuesta = response.choices[0].message.content.strip()
+        
+        # Limpiar JSON
+        if contenido_respuesta.startswith('```json'):
+            contenido_respuesta = contenido_respuesta[7:]
+        if contenido_respuesta.startswith('```'):
+            contenido_respuesta = contenido_respuesta[3:]
+        if contenido_respuesta.endswith('```'):
+            contenido_respuesta = contenido_respuesta[:-3]
+        
+        return json.loads(contenido_respuesta)
+        
+    except Exception as e:
+        # Si todo falla, crear esquema básico
+        return crear_esquema_basico(texto, tipo_esquema)
+
+
+def crear_esquema_basico(texto, tipo_esquema):
+    """
+    Crea un esquema básico cuando OpenAI falla
+    """
+    titulo = "Esquema generado automáticamente"
+    
+    if tipo_esquema == 'jerarquico':
+        return {
+            "titulo": titulo,
+            "nodos": [
+                {
+                    "texto": "Contenido principal",
+                    "nivel": 1,
+                    "orden": 0,
+                    "detalles": "Información extraída del texto original",
+                    "palabras_clave": ["contenido", "principal"],
+                    "hijos": [
+                        {
+                            "texto": texto[:200] + "..." if len(texto) > 200 else texto,
+                            "nivel": 2,
+                            "orden": 0,
+                            "detalles": "Texto original procesado automáticamente",
+                            "palabras_clave": ["detalle"]
+                        }
+                    ]
+                }
+            ]
+        }
+    elif tipo_esquema == 'conceptual':
+        return {
+            "titulo": titulo,
+            "concepto_central": "Tema Principal",
+            "conceptos": [
+                {
+                    "texto": "Concepto 1",
+                    "descripcion": texto[:100] + "..." if len(texto) > 100 else texto,
+                    "es_central": False,
+                    "importancia": "media",
+                    "ejemplos": ["ejemplo básico"]
+                }
+            ]
+        }
+    elif tipo_esquema == 'cronologico':
+        return {
+            "titulo": titulo,
+            "eventos": [
+                {
+                    "fecha": "Periodo inicial",
+                    "titulo": "Evento principal",
+                    "descripcion": texto[:200] + "..." if len(texto) > 200 else texto,
+                    "orden": 0,
+                    "importancia": "media",
+                    "contexto": "Información procesada automáticamente"
+                }
+            ]
+        }
 
 
 def crear_nodos_desde_json(esquema, datos_json):
     """
     Crea nodos en la base de datos desde JSON para esquemas jerárquicos
-    Versión corregida que maneja mejor la jerarquía y el orden
+    Versión mejorada con información expandible
     """
     from .models import NodoEsquema
     
@@ -204,12 +338,21 @@ def crear_nodos_desde_json(esquema, datos_json):
     
     def crear_nodo_recursivo(datos_nodo, padre=None, orden_en_nivel=0):
         """Función recursiva que crea nodos manteniendo la jerarquía"""
+        
+        # Extraer información adicional
+        detalles = datos_nodo.get('detalles', '')
+        palabras_clave = datos_nodo.get('palabras_clave', [])
+        importancia = datos_nodo.get('importancia', 'media')
+        
         nodo = NodoEsquema.objects.create(
             esquema=esquema,
             texto=datos_nodo.get('texto', 'Sin texto'),
             nivel=datos_nodo.get('nivel', 1),
             orden=orden_en_nivel,
-            padre=padre
+            padre=padre,
+            detalles=detalles,
+            palabras_clave=palabras_clave,
+            importancia=importancia
         )
         
         # Crear nodos hijos si existen
@@ -232,7 +375,10 @@ def crear_nodos_desde_json(esquema, datos_json):
                     texto=datos_json.get('titulo', esquema.titulo),
                     nivel=1,
                     orden=0,
-                    padre=None
+                    padre=None,
+                    detalles="Nodo principal del esquema",
+                    palabras_clave=["principal"],
+                    importancia="alta"
                 )
                 return
         
@@ -249,14 +395,17 @@ def crear_nodos_desde_json(esquema, datos_json):
                 texto=f"Error al procesar esquema: {str(e)}",
                 nivel=1,
                 orden=0,
-                padre=None
+                padre=None,
+                detalles="Se produjo un error durante el procesamiento",
+                palabras_clave=["error"],
+                importancia="baja"
             )
 
 
 def crear_eventos_desde_json(esquema, datos_json):
     """
     Crea eventos en la base de datos desde JSON para líneas de tiempo
-    Versión mejorada con mejor manejo de errores
+    Versión mejorada con información expandible
     """
     from .models import EventoTimeline
     
@@ -272,7 +421,10 @@ def crear_eventos_desde_json(esquema, datos_json):
                 fecha=evento_datos.get('fecha', 'Fecha no especificada'),
                 titulo=evento_datos.get('titulo', 'Evento sin título'),
                 descripcion=evento_datos.get('descripcion', 'Sin descripción'),
-                orden=evento_datos.get('orden', i)
+                orden=evento_datos.get('orden', i),
+                importancia=evento_datos.get('importancia', 'media'),
+                contexto=evento_datos.get('contexto', ''),
+                consecuencias=evento_datos.get('consecuencias', [])
             )
             
     except Exception as e:
@@ -283,14 +435,16 @@ def crear_eventos_desde_json(esquema, datos_json):
             fecha='Error',
             titulo='Error al procesar línea de tiempo',
             descripcion=str(e),
-            orden=0
+            orden=0,
+            importancia='baja',
+            contexto='Error durante el procesamiento'
         )
 
 
 def crear_conceptos_desde_json(esquema, datos_json):
     """
     Crea conceptos en la base de datos desde JSON para mapas conceptuales
-    Versión mejorada con mejor manejo de errores
+    Versión mejorada con información expandible
     """
     from .models import ConceptoMapa
     
@@ -304,7 +458,10 @@ def crear_conceptos_desde_json(esquema, datos_json):
             esquema=esquema,
             texto=concepto_central_texto,
             es_central=True,
-            descripcion="Concepto central del mapa"
+            descripcion="Concepto central del mapa",
+            importancia='alta',
+            conexiones=[],
+            ejemplos=[]
         )
         
         # Crear conceptos relacionados
@@ -314,7 +471,10 @@ def crear_conceptos_desde_json(esquema, datos_json):
                 esquema=esquema,
                 texto=concepto_datos.get('texto', 'Concepto sin nombre'),
                 descripcion=concepto_datos.get('descripcion', ''),
-                es_central=concepto_datos.get('es_central', False)
+                es_central=concepto_datos.get('es_central', False),
+                importancia=concepto_datos.get('importancia', 'media'),
+                conexiones=concepto_datos.get('conexiones', []),
+                ejemplos=concepto_datos.get('ejemplos', [])
             )
             
     except Exception as e:
@@ -324,7 +484,8 @@ def crear_conceptos_desde_json(esquema, datos_json):
             esquema=esquema,
             texto='Error al procesar mapa conceptual',
             es_central=True,
-            descripcion=str(e)
+            descripcion=str(e),
+            importancia='baja'
         )
 
 
@@ -353,7 +514,9 @@ def debug_esquema_jerarquico(esquema):
             'nivel': nodo.nivel,
             'orden': nodo.orden,
             'padre_id': nodo.padre.id if nodo.padre else None,
-            'hijos_count': nodo.hijos.count()
+            'hijos_count': nodo.hijos.count(),
+            'tiene_detalles': nodo.tiene_detalles(),
+            'palabras_clave': nodo.get_palabras_clave_str()
         })
     
     return debug_info
@@ -431,7 +594,8 @@ def obtener_estadisticas_esquema(esquema):
             'total_nodos': nodos.count(),
             'niveles': list(nodos.values_list('nivel', flat=True).distinct().order_by('nivel')),
             'nodos_raiz': nodos.filter(padre=None).count(),
-            'nodos_con_hijos': nodos.filter(hijos__isnull=False).distinct().count()
+            'nodos_con_hijos': nodos.filter(hijos__isnull=False).distinct().count(),
+            'nodos_con_detalles': nodos.exclude(detalles='').count()
         })
         
     elif esquema.tipo == 'conceptual':
