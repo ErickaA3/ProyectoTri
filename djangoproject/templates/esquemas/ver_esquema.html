@@ -92,7 +92,7 @@
             margin: 2rem 0;
         }
 
-        /* Esquemas Jerárquicos */
+        /* Esquemas Jerárquicos con funcionalidad de colapso */
         .level-1 {
             margin: 1rem 0;
             padding-left: 0;
@@ -115,6 +115,7 @@
             background: white;
             border-radius: 10px;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .level-1 .node-content {
@@ -142,11 +143,44 @@
             margin-right: 0.75rem;
             color: #667eea;
             flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            user-select: none;
+        }
+
+        .node-icon:hover {
+            color: #5a6fd8;
+            transform: scale(1.2);
+        }
+
+        .node-icon.expandable {
+            cursor: pointer;
+        }
+
+        .node-icon.collapsed {
+            transform: rotate(-90deg);
         }
 
         .node-text {
             color: #2d3748;
             line-height: 1.6;
+            flex: 1;
+        }
+
+        .node-children {
+            margin-left: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .node-children.hidden {
+            display: none;
+        }
+
+        .collapse-indicator {
+            color: #667eea;
+            font-size: 0.8rem;
+            margin-left: auto;
+            opacity: 0.7;
         }
 
         /* Mapas Conceptuales */
@@ -439,22 +473,14 @@
         <!-- Contenido según el tipo de esquema -->
         {% if esquema.tipo == 'jerarquico' %}
             <div class="esquema-content">
-                {% for nodo in nodos %}
-                    <div class="level-{{ nodo.nivel }}">
-                        <div class="node-content">
-                            <span class="node-icon">
-                                {% if nodo.nivel == 1 %}📌
-                                {% elif nodo.nivel == 2 %}▶
-                                {% else %}•{% endif %}
-                            </span>
-                            <span class="node-text">{{ nodo.texto }}</span>
-                        </div>
-                    </div>
-                {% empty %}
+                <div id="esquema-jerarquico">
+                    <!-- Los nodos se renderizarán aquí con JavaScript -->
+                </div>
+                {% if not nodos %}
                     <div class="empty-content">
                         <p>No hay contenido disponible para este esquema.</p>
                     </div>
-                {% endfor %}
+                {% endif %}
             </div>
 
         {% elif esquema.tipo == 'conceptual' %}
@@ -515,6 +541,15 @@
 
         <!-- Acciones del esquema -->
         <div class="esquema-actions">
+            <a href="{% url 'esquemas:exportar_pdf' esquema.id %}" class="btn-export">
+                📄 Exportar PDF
+            </a>
+            <a href="{% url 'esquemas:exportar_txt' esquema.id %}" class="btn-export">
+                📝 Exportar TXT
+            </a>
+            <a href="{% url 'esquemas:home' %}" class="btn-secondary">
+                📂 Volver a Esquemas
+            </a>
             <a href="{% url 'esquemas:home' %}" class="btn-primary">
                 ✨ Crear Nuevo
             </a>
@@ -534,16 +569,105 @@
                 }, 300);
             });
         }, 5000);
+
+        // Construir esquema jerárquico con funcionalidad de colapso
+        {% if esquema.tipo == 'jerarquico' and nodos %}
+        document.addEventListener('DOMContentLoaded', function() {
+            const nodos = [
+                {% for nodo in nodos %}
+                {
+                    id: {{ nodo.id }},
+                    texto: "{{ nodo.texto|escapejs }}",
+                    nivel: {{ nodo.nivel }},
+                    orden: {{ nodo.orden }},
+                    padre_id: {% if nodo.padre %}{{ nodo.padre.id }}{% else %}null{% endif %}
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            function construirArbol(nodos) {
+                // Crear un mapa de nodos por ID para fácil acceso
+                const nodosMap = {};
+                nodos.forEach(nodo => {
+                    nodosMap[nodo.id] = { ...nodo, hijos: [] };
+                });
+
+                // Construir la estructura jerárquica
+                const raices = [];
+                nodos.forEach(nodo => {
+                    if (nodo.padre_id === null) {
+                        raices.push(nodosMap[nodo.id]);
+                    } else {
+                        if (nodosMap[nodo.padre_id]) {
+                            nodosMap[nodo.padre_id].hijos.push(nodosMap[nodo.id]);
+                        }
+                    }
+                });
+
+                return raices;
+            }
+
+            function renderNodo(nodo) {
+                const tieneHijos = nodo.hijos && nodo.hijos.length > 0;
+                const icono = tieneHijos ? 
+                    (nodo.nivel === 1 ? '📌' : '▶') : 
+                    (nodo.nivel === 1 ? '📌' : nodo.nivel === 2 ? '▶' : '•');
+                
+                const expandible = tieneHijos ? 'expandable' : '';
+                const collapseIndicator = tieneHijos ? `<span class="collapse-indicator">[${nodo.hijos.length}]</span>` : '';
+
+                let html = `
+                    <div class="level-${nodo.nivel}" data-node-id="${nodo.id}">
+                        <div class="node-content">
+                            <span class="node-icon ${expandible}" ${tieneHijos ? `onclick="toggleNode(${nodo.id})"` : ''}>
+                                ${icono}
+                            </span>
+                            <span class="node-text">${nodo.texto}</span>
+                            ${collapseIndicator}
+                        </div>`;
+
+                if (tieneHijos) {
+                    html += `<div class="node-children" id="children-${nodo.id}">`;
+                    nodo.hijos.forEach(hijo => {
+                        html += renderNodo(hijo);
+                    });
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+                return html;
+            }
+
+            function renderEsquema() {
+                const arbol = construirArbol(nodos);
+                const contenedor = document.getElementById('esquema-jerarquico');
+                
+                let html = '';
+                arbol.forEach(raiz => {
+                    html += renderNodo(raiz);
+                });
+                
+                contenedor.innerHTML = html;
+            }
+
+            // Función para toggle de nodos
+            window.toggleNode = function(nodeId) {
+                const children = document.getElementById(`children-${nodeId}`);
+                const icon = document.querySelector(`[data-node-id="${nodeId}"] .node-icon`);
+                
+                if (children.classList.contains('hidden')) {
+                    children.classList.remove('hidden');
+                    icon.classList.remove('collapsed');
+                } else {
+                    children.classList.add('hidden');
+                    icon.classList.add('collapsed');
+                }
+            };
+
+            // Renderizar el esquema
+            renderEsquema();
+        });
+        {% endif %}
     </script>
 </body>
-</html> url 'esquemas:exportar_pdf' esquema.id %}" class="btn-export">
-                📄 Exportar PDF
-            </a>
-            <a href="{% url 'esquemas:exportar_txt' esquema.id %}" class="btn-export">
-                📝 Exportar TXT
-            </a>
-            <a href="{% url 'esquemas:home' %}" class="btn-secondary">
-                📂 Volver a Esquemas
-            </a>
-            <a href="{%
-                
+</html>

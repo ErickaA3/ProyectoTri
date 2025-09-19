@@ -1,6 +1,9 @@
 # esquemas/utils.py
 import os
 import json
+import PyPDF2
+import docx
+from openai import OpenAI
 from django.conf import settings
 
 def extraer_texto_archivo(archivo):
@@ -9,14 +12,39 @@ def extraer_texto_archivo(archivo):
     """
     nombre_archivo = archivo.name.lower()
     
-    if nombre_archivo.endswith('.txt'):
-        return extraer_texto_txt(archivo)
-    elif nombre_archivo.endswith('.pdf'):
-        return "Contenido de ejemplo del PDF. Por favor instala PyPDF2 para funcionalidad completa."
+    if nombre_archivo.endswith('.pdf'):
+        return extraer_texto_pdf(archivo)
     elif nombre_archivo.endswith(('.doc', '.docx')):
-        return "Contenido de ejemplo del documento Word. Por favor instala python-docx para funcionalidad completa."
+        return extraer_texto_word(archivo)
+    elif nombre_archivo.endswith('.txt'):
+        return extraer_texto_txt(archivo)
     else:
         raise ValueError("Formato de archivo no soportado")
+
+
+def extraer_texto_pdf(archivo):
+    """Extrae texto de archivos PDF"""
+    try:
+        reader = PyPDF2.PdfReader(archivo)
+        texto = ""
+        for pagina in reader.pages:
+            texto += pagina.extract_text()
+        return texto
+    except Exception as e:
+        raise ValueError(f"Error al leer PDF: {str(e)}")
+
+
+def extraer_texto_word(archivo):
+    """Extrae texto de archivos Word"""
+    try:
+        doc = docx.Document(archivo)
+        texto = ""
+        for parrafo in doc.paragraphs:
+            texto += parrafo.text + "\n"
+        return texto
+    except Exception as e:
+        raise ValueError(f"Error al leer documento Word: {str(e)}")
+
 
 def extraer_texto_txt(archivo):
     """Extrae texto de archivos TXT"""
@@ -29,17 +57,22 @@ def extraer_texto_txt(archivo):
         except Exception as e:
             raise ValueError(f"Error al leer archivo TXT: {str(e)}")
 
+
 def generar_esquema_openai(texto, tipo_esquema):
     """
-    Genera un esquema usando OpenAI GPT - VERSION SIMPLIFICADA PARA TESTING
+    Genera un esquema usando OpenAI GPT
     """
-    # Para testing sin OpenAI, devolver datos de ejemplo
-    if tipo_esquema == 'jerarquico':
-        return {
-            "titulo": "Esquema Generado",
+    client = OpenAI(api_key=settings.OPENAI_API_KEY)
+    
+    prompts = {
+        'jerarquico': """
+        Analiza el siguiente texto y crea un esquema jerárquico bien estructurado.
+        Devuelve SOLO un JSON válido con esta estructura exacta:
+        {
+            "titulo": "Título principal del tema basado en el contenido",
             "nodos": [
                 {
-                    "texto": "Punto Principal 1",
+                    "texto": "Punto principal 1",
                     "nivel": 1,
                     "orden": 0,
                     "hijos": [
@@ -49,126 +82,372 @@ def generar_esquema_openai(texto, tipo_esquema):
                             "orden": 0,
                             "hijos": [
                                 {
-                                    "texto": "Detalle 1.1.1",
+                                    "texto": "Sub-subpunto 1.1.1",
                                     "nivel": 3,
                                     "orden": 0
                                 }
                             ]
                         }
                     ]
-                },
-                {
-                    "texto": "Punto Principal 2",
-                    "nivel": 1,
-                    "orden": 1,
-                    "hijos": [
-                        {
-                            "texto": "Subpunto 2.1",
-                            "nivel": 2,
-                            "orden": 0
-                        }
-                    ]
                 }
             ]
         }
-    
-    elif tipo_esquema == 'conceptual':
-        return {
-            "titulo": "Mapa Conceptual Generado",
-            "concepto_central": "Concepto Principal",
+        
+        Texto a analizar:
+        """,
+        
+        'conceptual': """
+        Analiza el siguiente texto y crea un mapa conceptual.
+        Devuelve SOLO un JSON válido con esta estructura exacta:
+        {
+            "titulo": "Título del mapa conceptual basado en el contenido",
+            "concepto_central": "Concepto principal extraído del texto",
             "conceptos": [
                 {
-                    "texto": "Concepto Relacionado 1",
-                    "descripcion": "Descripción del primer concepto",
-                    "es_central": False
+                    "texto": "Concepto relacionado 1",
+                    "descripcion": "Descripción o puntos clave del concepto",
+                    "es_central": false
                 },
                 {
-                    "texto": "Concepto Relacionado 2", 
+                    "texto": "Concepto relacionado 2",
                     "descripcion": "Descripción del segundo concepto",
-                    "es_central": False
+                    "es_central": false
                 }
             ]
         }
-    
-    elif tipo_esquema == 'cronologico':
-        return {
-            "titulo": "Línea de Tiempo Generada",
+        
+        Texto a analizar:
+        """,
+        
+        'cronologico': """
+        Analiza el siguiente texto y crea una línea de tiempo cronológica.
+        Devuelve SOLO un JSON válido con esta estructura exacta:
+        {
+            "titulo": "Título de la línea de tiempo basado en el contenido",
             "eventos": [
                 {
-                    "fecha": "2020",
-                    "titulo": "Evento Importante 1",
-                    "descripcion": "Descripción del primer evento",
+                    "fecha": "Año o fecha del evento",
+                    "titulo": "Nombre del evento importante",
+                    "descripcion": "Descripción detallada del evento",
                     "orden": 0
                 },
                 {
-                    "fecha": "2021",
-                    "titulo": "Evento Importante 2",
-                    "descripcion": "Descripción del segundo evento", 
+                    "fecha": "Siguiente año o fecha",
+                    "titulo": "Segundo evento importante",
+                    "descripcion": "Descripción del segundo evento",
                     "orden": 1
                 }
             ]
         }
+        
+        Texto a analizar:
+        """
+    }
+    
+    try:
+        prompt = prompts.get(tipo_esquema, prompts['jerarquico'])
+        
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "Eres un experto en crear esquemas educativos. Responde ÚNICAMENTE con JSON válido, sin texto adicional antes o después del JSON."
+                },
+                {
+                    "role": "user", 
+                    "content": f"{prompt}\n\n{texto}"
+                }
+            ],
+            max_tokens=8000,
+            temperature=0.7
+        )
+        
+        contenido_respuesta = response.choices[0].message.content.strip()
+        
+        # Limpiar la respuesta para asegurar que sea JSON válido
+        if contenido_respuesta.startswith('```json'):
+            contenido_respuesta = contenido_respuesta[7:]
+        if contenido_respuesta.startswith('```'):
+            contenido_respuesta = contenido_respuesta[3:]
+        if contenido_respuesta.endswith('```'):
+            contenido_respuesta = contenido_respuesta[:-3]
+            
+        # Intentar parsear como JSON
+        datos_esquema = json.loads(contenido_respuesta)
+        
+        # Validar que tiene la estructura mínima necesaria
+        if tipo_esquema == 'jerarquico' and 'nodos' not in datos_esquema:
+            raise ValueError("El esquema jerárquico no tiene la estructura correcta")
+        elif tipo_esquema == 'conceptual' and 'concepto_central' not in datos_esquema:
+            raise ValueError("El mapa conceptual no tiene la estructura correcta")
+        elif tipo_esquema == 'cronologico' and 'eventos' not in datos_esquema:
+            raise ValueError("La línea de tiempo no tiene la estructura correcta")
+            
+        return datos_esquema
+        
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Error al procesar respuesta de OpenAI como JSON: {str(e)}")
+    except Exception as e:
+        raise ValueError(f"Error al conectar con OpenAI: {str(e)}")
+
 
 def crear_nodos_desde_json(esquema, datos_json):
     """
     Crea nodos en la base de datos desde JSON para esquemas jerárquicos
+    Versión corregida que maneja mejor la jerarquía y el orden
     """
     from .models import NodoEsquema
     
-    def crear_nodo_recursivo(datos_nodo, padre=None):
+    # Limpiar nodos existentes para evitar duplicados
+    NodoEsquema.objects.filter(esquema=esquema).delete()
+    
+    def crear_nodo_recursivo(datos_nodo, padre=None, orden_en_nivel=0):
+        """Función recursiva que crea nodos manteniendo la jerarquía"""
         nodo = NodoEsquema.objects.create(
             esquema=esquema,
-            texto=datos_nodo['texto'],
-            nivel=datos_nodo['nivel'],
-            orden=datos_nodo.get('orden', 0),
+            texto=datos_nodo.get('texto', 'Sin texto'),
+            nivel=datos_nodo.get('nivel', 1),
+            orden=orden_en_nivel,
             padre=padre
         )
         
         # Crear nodos hijos si existen
-        if 'hijos' in datos_nodo:
-            for hijo_datos in datos_nodo['hijos']:
-                crear_nodo_recursivo(hijo_datos, nodo)
+        if 'hijos' in datos_nodo and datos_nodo['hijos']:
+            for i, hijo_datos in enumerate(datos_nodo['hijos']):
+                crear_nodo_recursivo(hijo_datos, nodo, i)
         
         return nodo
     
-    # Crear todos los nodos desde el JSON
-    for nodo_datos in datos_json.get('nodos', []):
-        crear_nodo_recursivo(nodo_datos)
+    try:
+        # Verificar que el JSON tiene la estructura correcta
+        nodos_data = datos_json.get('nodos', [])
+        
+        if not nodos_data:
+            # Si no hay estructura 'nodos', intentar crear desde el JSON completo
+            if 'titulo' in datos_json:
+                # Crear un nodo raíz con el título
+                nodo_raiz = NodoEsquema.objects.create(
+                    esquema=esquema,
+                    texto=datos_json.get('titulo', esquema.titulo),
+                    nivel=1,
+                    orden=0,
+                    padre=None
+                )
+                return
+        
+        # Crear todos los nodos principales desde el JSON
+        for i, nodo_datos in enumerate(nodos_data):
+            crear_nodo_recursivo(nodo_datos, None, i)
+            
+    except Exception as e:
+        # Si hay error, al menos crear un nodo básico para que no esté vacío
+        print(f"Error creando nodos desde JSON: {e}")
+        if not NodoEsquema.objects.filter(esquema=esquema).exists():
+            NodoEsquema.objects.create(
+                esquema=esquema,
+                texto=f"Error al procesar esquema: {str(e)}",
+                nivel=1,
+                orden=0,
+                padre=None
+            )
+
 
 def crear_eventos_desde_json(esquema, datos_json):
     """
     Crea eventos en la base de datos desde JSON para líneas de tiempo
+    Versión mejorada con mejor manejo de errores
     """
     from .models import EventoTimeline
     
-    for evento_datos in datos_json.get('eventos', []):
+    # Limpiar eventos existentes
+    EventoTimeline.objects.filter(esquema=esquema).delete()
+    
+    try:
+        eventos_data = datos_json.get('eventos', [])
+        
+        for i, evento_datos in enumerate(eventos_data):
+            EventoTimeline.objects.create(
+                esquema=esquema,
+                fecha=evento_datos.get('fecha', 'Fecha no especificada'),
+                titulo=evento_datos.get('titulo', 'Evento sin título'),
+                descripcion=evento_datos.get('descripcion', 'Sin descripción'),
+                orden=evento_datos.get('orden', i)
+            )
+            
+    except Exception as e:
+        print(f"Error creando eventos desde JSON: {e}")
+        # Crear un evento por defecto
         EventoTimeline.objects.create(
             esquema=esquema,
-            fecha=evento_datos['fecha'],
-            titulo=evento_datos['titulo'],
-            descripcion=evento_datos['descripcion'],
-            orden=evento_datos.get('orden', 0)
+            fecha='Error',
+            titulo='Error al procesar línea de tiempo',
+            descripcion=str(e),
+            orden=0
         )
+
 
 def crear_conceptos_desde_json(esquema, datos_json):
     """
     Crea conceptos en la base de datos desde JSON para mapas conceptuales
+    Versión mejorada con mejor manejo de errores
     """
     from .models import ConceptoMapa
     
-    # Crear concepto central
-    ConceptoMapa.objects.create(
-        esquema=esquema,
-        texto=datos_json['concepto_central'],
-        es_central=True,
-        descripcion="Concepto central del mapa"
-    )
+    # Limpiar conceptos existentes
+    ConceptoMapa.objects.filter(esquema=esquema).delete()
     
-    # Crear conceptos relacionados
-    for concepto_datos in datos_json.get('conceptos', []):
+    try:
+        # Crear concepto central
+        concepto_central_texto = datos_json.get('concepto_central', 'Concepto Principal')
         ConceptoMapa.objects.create(
             esquema=esquema,
-            texto=concepto_datos['texto'],
-            descripcion=concepto_datos.get('descripcion', ''),
-            es_central=concepto_datos.get('es_central', False)
+            texto=concepto_central_texto,
+            es_central=True,
+            descripcion="Concepto central del mapa"
         )
+        
+        # Crear conceptos relacionados
+        conceptos_data = datos_json.get('conceptos', [])
+        for concepto_datos in conceptos_data:
+            ConceptoMapa.objects.create(
+                esquema=esquema,
+                texto=concepto_datos.get('texto', 'Concepto sin nombre'),
+                descripcion=concepto_datos.get('descripcion', ''),
+                es_central=concepto_datos.get('es_central', False)
+            )
+            
+    except Exception as e:
+        print(f"Error creando conceptos desde JSON: {e}")
+        # Crear conceptos por defecto
+        ConceptoMapa.objects.create(
+            esquema=esquema,
+            texto='Error al procesar mapa conceptual',
+            es_central=True,
+            descripcion=str(e)
+        )
+
+
+def debug_esquema_jerarquico(esquema):
+    """
+    Función de debug para esquemas jerárquicos
+    Útil para identificar problemas en la estructura
+    """
+    from .models import NodoEsquema
+    
+    debug_info = {
+        'esquema_id': esquema.id,
+        'titulo': esquema.titulo,
+        'tipo': esquema.tipo,
+        'nodos_en_bd': NodoEsquema.objects.filter(esquema=esquema).count(),
+        'json_original': esquema.contenido_procesado,
+        'estructura_nodos': []
+    }
+    
+    # Analizar estructura de nodos
+    nodos = NodoEsquema.objects.filter(esquema=esquema).order_by('nivel', 'orden')
+    for nodo in nodos:
+        debug_info['estructura_nodos'].append({
+            'id': nodo.id,
+            'texto': nodo.texto[:50] + '...' if len(nodo.texto) > 50 else nodo.texto,
+            'nivel': nodo.nivel,
+            'orden': nodo.orden,
+            'padre_id': nodo.padre.id if nodo.padre else None,
+            'hijos_count': nodo.hijos.count()
+        })
+    
+    return debug_info
+
+
+def regenerar_nodos_esquema(esquema):
+    """
+    Regenera los nodos de un esquema desde su JSON almacenado
+    Útil para corregir problemas de estructura
+    """
+    if esquema.tipo != 'jerarquico':
+        return False
+        
+    if not esquema.contenido_procesado:
+        return False
+    
+    try:
+        crear_nodos_desde_json(esquema, esquema.contenido_procesado)
+        return True
+    except Exception as e:
+        print(f"Error regenerando nodos: {e}")
+        return False
+
+
+def validar_estructura_json(datos_json, tipo_esquema):
+    """
+    Valida que el JSON tenga la estructura correcta según el tipo de esquema
+    """
+    try:
+        if tipo_esquema == 'jerarquico':
+            if 'nodos' not in datos_json:
+                return False, "Falta la clave 'nodos'"
+            
+            for nodo in datos_json['nodos']:
+                if 'texto' not in nodo or 'nivel' not in nodo:
+                    return False, "Nodos deben tener 'texto' y 'nivel'"
+                    
+        elif tipo_esquema == 'conceptual':
+            if 'concepto_central' not in datos_json:
+                return False, "Falta 'concepto_central'"
+            if 'conceptos' not in datos_json:
+                return False, "Falta la clave 'conceptos'"
+                
+        elif tipo_esquema == 'cronologico':
+            if 'eventos' not in datos_json:
+                return False, "Falta la clave 'eventos'"
+            
+            for evento in datos_json['eventos']:
+                if 'fecha' not in evento or 'titulo' not in evento:
+                    return False, "Eventos deben tener 'fecha' y 'titulo'"
+        
+        return True, "Estructura válida"
+        
+    except Exception as e:
+        return False, f"Error validando JSON: {str(e)}"
+
+
+def obtener_estadisticas_esquema(esquema):
+    """
+    Obtiene estadísticas detalladas de un esquema
+    """
+    from .models import NodoEsquema, EventoTimeline, ConceptoMapa
+    
+    stats = {
+        'id': esquema.id,
+        'titulo': esquema.titulo,
+        'tipo': esquema.tipo,
+        'fecha_creacion': esquema.fecha_creacion,
+        'tiene_json': bool(esquema.contenido_procesado),
+    }
+    
+    if esquema.tipo == 'jerarquico':
+        nodos = NodoEsquema.objects.filter(esquema=esquema)
+        stats.update({
+            'total_nodos': nodos.count(),
+            'niveles': list(nodos.values_list('nivel', flat=True).distinct().order_by('nivel')),
+            'nodos_raiz': nodos.filter(padre=None).count(),
+            'nodos_con_hijos': nodos.filter(hijos__isnull=False).distinct().count()
+        })
+        
+    elif esquema.tipo == 'conceptual':
+        conceptos = ConceptoMapa.objects.filter(esquema=esquema)
+        stats.update({
+            'total_conceptos': conceptos.count(),
+            'conceptos_centrales': conceptos.filter(es_central=True).count(),
+            'conceptos_relacionados': conceptos.filter(es_central=False).count()
+        })
+        
+    elif esquema.tipo == 'cronologico':
+        eventos = EventoTimeline.objects.filter(esquema=esquema)
+        stats.update({
+            'total_eventos': eventos.count(),
+            'primer_evento': eventos.order_by('orden').first(),
+            'ultimo_evento': eventos.order_by('-orden').first()
+        })
+    
+    return stats

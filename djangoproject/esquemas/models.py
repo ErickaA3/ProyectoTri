@@ -27,6 +27,8 @@ class Esquema(models.Model):
     
     class Meta:
         ordering = ['-fecha_creacion']
+        verbose_name = 'Esquema'
+        verbose_name_plural = 'Esquemas'
         
     def __str__(self):
         return f"{self.titulo} ({self.get_tipo_display()})"
@@ -36,6 +38,24 @@ class Esquema(models.Model):
         if isinstance(self.contenido_procesado, dict):
             return self.contenido_procesado
         return json.loads(self.contenido_procesado) if self.contenido_procesado else {}
+    
+    def tiene_nodos(self):
+        """Verifica si el esquema jerárquico tiene nodos en la BD"""
+        if self.tipo == 'jerarquico':
+            return self.nodos.exists()
+        return False
+    
+    def tiene_eventos(self):
+        """Verifica si el esquema cronológico tiene eventos en la BD"""
+        if self.tipo == 'cronologico':
+            return self.eventos.exists()
+        return False
+    
+    def tiene_conceptos(self):
+        """Verifica si el esquema conceptual tiene conceptos en la BD"""
+        if self.tipo == 'conceptual':
+            return self.conceptos.exists()
+        return False
 
 
 class NodoEsquema(models.Model):
@@ -48,9 +68,28 @@ class NodoEsquema(models.Model):
     
     class Meta:
         ordering = ['nivel', 'orden']
+        verbose_name = 'Nodo de Esquema'
+        verbose_name_plural = 'Nodos de Esquema'
         
     def __str__(self):
         return f"Nivel {self.nivel}: {self.texto[:50]}"
+    
+    def es_raiz(self):
+        """Verifica si es un nodo raíz (sin padre)"""
+        return self.padre is None
+    
+    def tiene_hijos(self):
+        """Verifica si el nodo tiene hijos"""
+        return self.hijos.exists()
+    
+    def get_ruta_completa(self):
+        """Obtiene la ruta completa desde la raíz hasta este nodo"""
+        ruta = []
+        nodo_actual = self
+        while nodo_actual:
+            ruta.insert(0, nodo_actual.texto)
+            nodo_actual = nodo_actual.padre
+        return ' > '.join(ruta)
 
 
 class EventoTimeline(models.Model):
@@ -63,6 +102,8 @@ class EventoTimeline(models.Model):
     
     class Meta:
         ordering = ['orden']
+        verbose_name = 'Evento de Timeline'
+        verbose_name_plural = 'Eventos de Timeline'
         
     def __str__(self):
         return f"{self.fecha}: {self.titulo}"
@@ -77,5 +118,10 @@ class ConceptoMapa(models.Model):
     posicion_x = models.IntegerField(default=0)
     posicion_y = models.IntegerField(default=0)
     
+    class Meta:
+        verbose_name = 'Concepto de Mapa'
+        verbose_name_plural = 'Conceptos de Mapa'
+    
     def __str__(self):
-        return self.texto
+        tipo = "Central" if self.es_central else "Relacionado"
+        return f"{self.texto} ({tipo})"

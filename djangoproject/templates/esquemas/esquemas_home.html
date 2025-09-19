@@ -248,6 +248,16 @@
             background-clip: text;
         }
 
+        /* Emojis mantienen sus colores originales */
+        .emoji-icon {
+            background: none !important;
+            -webkit-background-clip: initial !important;
+            -webkit-text-fill-color: initial !important;
+            background-clip: initial !important;
+            color: initial !important;
+            margin-right: 0.5rem;
+        }
+
         .form-header p {
             color: #718096;
             font-size: 1.1rem;
@@ -256,32 +266,43 @@
 
         /* Estilos específicos para la sección de archivos */
         #crear-archivo .form-header h2 {
-            color: #ffffff;
-            background: none;
-            -webkit-text-fill-color: #ffffff;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+        }
+
+        /* El emoji en la sección de archivos también mantiene sus colores */
+        #crear-archivo .emoji-icon {
+            background: none !important;
+            -webkit-background-clip: initial !important;
+            -webkit-text-fill-color: initial !important;
+            background-clip: initial !important;
+            color: initial !important;
         }
 
         #crear-archivo .form-header p {
-            color: #ffffff;
+            color: #718096;
             font-weight: 500;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            text-shadow: none;
         }
 
         #crear-archivo .form-text {
-            color: #ffffff !important;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            color: #667eea !important;
+            text-shadow: none;
         }
 
-        /* Textos del área de archivo en blanco */
+        /* Textos del área de archivo en morado */
         #crear-archivo .file-upload-text {
-            color: #ffffff !important;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            color: #667eea !important;
+            text-shadow: none;
         }
 
         #crear-archivo .file-upload-hint {
-            color: #ffffff !important;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            color: #667eea !important;
+            text-shadow: none;
         }
 
         .form-group {
@@ -433,6 +454,17 @@
             font-weight: 700 !important;
         }
 
+        /* También los textos específicos de la sección de archivos se vuelven verdes */
+        #crear-archivo .file-input:valid + .file-upload-content .file-upload-text {
+            color: #2f855a !important;
+            font-weight: 700 !important;
+        }
+
+        #crear-archivo .file-input:valid + .file-upload-content .file-upload-hint {
+            color: #2f855a !important;
+            font-weight: 600 !important;
+        }
+
         /* Agrega confirmación */
         .file-input:valid + .file-upload-content .file-upload-text::after {
             content: "\A✅ Archivo seleccionado correctamente";
@@ -463,6 +495,12 @@
         .file-upload-area:has(.file-input:valid) {
             border-color: #48bb78 !important;
             background: rgba(72, 187, 120, 0.1) !important;
+        }
+
+        /* También cambiar el texto de ayuda abajo del área */
+        #crear-archivo .file-input:valid ~ .form-text {
+            color: #2f855a !important;
+            font-weight: 600 !important;
         }
 
         /* Indicador de éxito */
@@ -766,10 +804,19 @@
             color: white;
         }
 
-        .btn-primary-small:hover, .btn-success-small:hover {
+        .btn-danger-small {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-primary-small:hover, .btn-success-small:hover, .btn-danger-small:hover {
             transform: scale(1.05);
             color: white;
             text-decoration: none;
+        }
+
+        .btn-danger-small:hover {
+            background: #e53e3e;
         }
 
         /* Responsive */
@@ -903,6 +950,9 @@
                         <div class="scheme-actions">
                             <a href="{% url 'esquemas:ver_esquema' esquema.id %}" class="btn-small btn-primary-small">Ver</a>
                             <a href="{% url 'esquemas:exportar_pdf' esquema.id %}" class="btn-small btn-success-small">PDF</a>
+                            <a href="{% url 'esquemas:eliminar_esquema' esquema.id %}" 
+                               class="btn-small btn-danger-small"
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar el esquema &quot;{{ esquema.titulo }}&quot;?')">Eliminar</a>
                         </div>
                     </div>
                     {% endfor %}
@@ -940,7 +990,7 @@
         <div id="crear-texto" class="view-section">
             <div class="form-container">
                 <div class="form-header">
-                    <h2>✏️ Crear Esquema desde Texto</h2>
+                    <h2><span class="emoji-icon">✏️</span> Crear Esquema desde Texto</h2>
                     <p>Pega o escribe tu contenido para generar esquemas organizados al instante</p>
                 </div>
 
@@ -984,95 +1034,6 @@
                         <button type="button" class="btn btn-secondary" onclick="showView('home')">
                             ← Cancelar
                         </button>
-                        <button type="submit" class="btn btn-primary" id="submitArchivoBtn">
-                            🚀 Procesar Archivo
-                        </button>
-                    </div>
-                </form>
-
-                <div class="loading-spinner" id="loadingArchivoSpinner">
-                    <div class="spinner"></div>
-                    <p>Extrayendo texto y generando esquema...</p>
-                </div>
-            </div>
-        </div>
-
-        <a href="{% url 'home' %}" class="boton-volver">← Volver al Inicio</a>
-    </div>
-
-    <script>
-        function showView(viewId) {
-            // Ocultar todas las vistas
-            document.querySelectorAll('.view-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Remover active de todos los tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Mostrar la vista seleccionada
-            document.getElementById(viewId).classList.add('active');
-            
-            // Activar el tab correspondiente
-            const activeBtn = document.querySelector(`[onclick="showView('${viewId}')"]`);
-            if (activeBtn) {
-                activeBtn.classList.add('active');
-            }
-        }
-
-        // Manejo del formulario de texto
-        document.getElementById('esquemaTextoForm').addEventListener('submit', function() {
-            document.getElementById('submitTextoBtn').disabled = true;
-            document.getElementById('loadingTextoSpinner').style.display = 'block';
-            document.getElementById('submitTextoBtn').innerHTML = '⏳ Generando...';
-        });
-
-        // Drag and drop funcionalidad
-        const fileUploadArea = document.getElementById('fileUploadArea');
-
-        fileUploadArea.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            fileUploadArea.classList.add('dragover');
-        });
-
-        fileUploadArea.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            fileUploadArea.classList.remove('dragover');
-        });
-
-        fileUploadArea.addEventListener('drop', function(e) {
-            e.preventDefault();
-            fileUploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                document.getElementById('archivo').files = files;
-            }
-        });
-
-        // Manejo del formulario de archivo
-        document.getElementById('esquemaArchivoForm').addEventListener('submit', function() {
-            document.getElementById('submitArchivoBtn').disabled = true;
-            document.getElementById('loadingArchivoSpinner').style.display = 'block';
-            document.getElementById('submitArchivoBtn').innerHTML = '⏳ Procesando...';
-        });
-
-        // Cerrar alertas automáticamente
-        setTimeout(function() {
-            var alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                alert.style.opacity = '0';
-                setTimeout(function() {
-                    alert.style.display = 'none';
-                }, 300);
-            });
-        }, 5000);
-    </script>
-</body>
-</html><button type="button" class="btn btn-secondary" onclick="showView('home')">
-                            ← Cancelar
-                        </button>
                         <button type="submit" class="btn btn-primary" id="submitTextoBtn">
                             🚀 Generar Esquema
                         </button>
@@ -1090,7 +1051,7 @@
         <div id="crear-archivo" class="view-section">
             <div class="form-container">
                 <div class="form-header">
-                    <h2>📁 Crear Esquema desde Archivo</h2>
+                    <h2><span class="emoji-icon">📁</span> Crear Esquema desde Archivo</h2>
                     <p>Sube un documento y genera esquemas automáticamente</p>
                 </div>
 
@@ -1158,3 +1119,106 @@
                     </div>
 
                     <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showView('home')">
+                            ← Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitArchivoBtn">
+                            🚀 Procesar Archivo
+                        </button>
+                    </div>
+                </form>
+
+                <div class="loading-spinner" id="loadingArchivoSpinner">
+                    <div class="spinner"></div>
+                    <p>Extrayendo texto y generando esquema...</p>
+                </div>
+            </div>
+        </div>
+
+        <a href="{% url 'home' %}" class="boton-volver">← Volver al Inicio</a>
+    </div>
+
+    <script>
+        function showView(viewId) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remover active de todos los tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar la vista seleccionada
+            document.getElementById(viewId).classList.add('active');
+            
+            // Activar el tab correspondiente
+            const activeBtn = document.querySelector(`[onclick="showView('${viewId}')"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
+
+        // Manejo del formulario de texto
+        document.getElementById('esquemaTextoForm').addEventListener('submit', function() {
+            document.getElementById('submitTextoBtn').disabled = true;
+            document.getElementById('loadingTextoSpinner').style.display = 'block';
+            document.getElementById('submitTextoBtn').innerHTML = '⏳ Generando...';
+        });
+
+        // JavaScript para mostrar el nombre del archivo seleccionado
+        document.getElementById('archivo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileUploadText = document.querySelector('#crear-archivo .file-upload-text strong');
+                if (fileUploadText) {
+                    fileUploadText.innerHTML = `Archivo seleccionado: <br><span style="font-size: 0.9rem; font-weight: normal;">${file.name}</span>`;
+                }
+            }
+        });
+
+        // Drag and drop funcionalidad
+        const fileUploadArea = document.getElementById('fileUploadArea');
+
+        fileUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('archivo').files = files;
+                // Trigger change event manually for drag and drop
+                document.getElementById('archivo').dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Manejo del formulario de archivo
+        document.getElementById('esquemaArchivoForm').addEventListener('submit', function() {
+            document.getElementById('submitArchivoBtn').disabled = true;
+            document.getElementById('loadingArchivoSpinner').style.display = 'block';
+            document.getElementById('submitArchivoBtn').innerHTML = '⏳ Procesando...';
+        });
+
+        // Cerrar alertas automáticamente
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
