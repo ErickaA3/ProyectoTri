@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ collection.title }} - Flashcards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        .navbar h1 {
+            color: #4a5568;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .collection-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .collection-title {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        .collection-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #718096;
+            font-size: 1.1rem;
+        }
+        .difficulty-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .difficulty-facil {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+        .difficulty-intermedio {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+        }
+        .difficulty-avanzado {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+            color: white;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .flashcards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        .flashcard {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .flashcard:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        .card-number {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .card-question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        .card-answer {
+            color: #718096;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        .back-button {
+            display: inline-block;
+            margin: 2rem auto;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .back-button:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+        .empty-state h3 {
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+        .study-stats {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .study-stats h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .stat-card {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 0.3rem;
+        }
+        .no-study-stats {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #718096;
+        }
+        @media (max-width: 768px) {
+            .collection-info {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .flashcards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>FocusPy</h1>
+    </nav>
+
+    <div class="container">
+        <div class="collection-header">
+            <h1 class="collection-title">{{ collection.title }}</h1>
+            
+            <div class="collection-info">
+                <div class="info-item">
+                    <span>📚</span>
+                    <span>{{ total_cards }} tarjetas</span>
+                </div>
+                <div class="info-item">
+                    <span>📅</span>
+                    <span>{{ collection.created_at|date:"d M Y" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="difficulty-badge difficulty-{{ collection.difficulty }}">
+                        {{ collection.get_difficulty_display }}
+                    </span>
+                </div>
+            </div>
+
+            {% if total_sessions > 0 %}
+            <div class="study-stats">
+                <h3>📊 Estadísticas de Estudio</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">{{ total_sessions }}</div>
+                        <div class="stat-label">Sesiones completadas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ avg_accuracy }}%</div>
+                        <div class="stat-label">Precisión promedio</div>
+                    </div>
+                    {% if last_session %}
+                    <div class="stat-card">
+                        <div class="stat-number">{{ last_session.accuracy }}%</div>
+                        <div class="stat-label">Última sesión</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ last_session.completed_at|date:"d/m" }}</div>
+                        <div class="stat-label">Último estudio</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="no-study-stats">
+                <p>🎯 Aún no has estudiado esta colección. ¡Comienza tu primera sesión!</p>
+            </div>
+            {% endif %}
+
+            <div class="action-buttons">
+                <a href="{% url 'flashcards:study_collection' collection.id %}" class="btn btn-primary">
+                    🎯 Estudiar Ahora
+                </a>
+                <a href="{% url 'flashcards:my_flashcards' %}" class="btn btn-secondary">
+                    📋 Mis Colecciones
+                </a>
+                <button class="btn btn-danger" onclick="deleteCollection()">
+                    🗑️ Eliminar
+                </button>
+            </div>
+        </div>
+
+        {% if flashcards %}
+        <div class="flashcards-grid">
+            {% for card in flashcards %}
+            <div class="flashcard">
+                <div class="card-number">Tarjeta {{ card.order }}</div>
+                <div class="card-question">{{ card.question }}</div>
+                <div class="card-answer">{{ card.answer }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No hay flashcards en esta colección</h3>
+            <p>Parece que algo salió mal durante la creación.</p>
+        </div>
+        {% endif %}
+
+        <div style="text-align: center;">
+            <a href="{% url 'flashcards:flashcards_home' %}" class="back-button">
+                ← Volver a Flashcards
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function deleteCollection() {
+            if (confirm('¿Estás seguro de que quieres eliminar esta colección? Esta acción no se puede deshacer.')) {
+                fetch(`/flashcards/collection/{{ collection.id }}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Colección eliminada correctamente');
+                        window.location.href = '{% url "flashcards:my_flashcards" %}';
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('Error al eliminar la colección: ' + error.message);
+                });
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
