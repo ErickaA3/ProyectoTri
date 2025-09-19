@@ -132,5 +132,5 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-
+STATIC_ROOT = BASE_DIR / 'staticfiles' 
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')

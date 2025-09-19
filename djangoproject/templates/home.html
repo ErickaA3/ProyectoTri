@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -18,20 +19,30 @@
         }
 
         .navbar {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 254, 254, 1);
             backdrop-filter: blur(10px);
             padding: 1rem 2rem;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar .logo-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 0px;
+            object-fit: cover;
         }
 
         .navbar h1 {
-            color: #4a5568;
+            color: #1a1919d8;
             font-size: 1.8rem;
             font-weight: 700;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
             padding: 3rem 2rem;
         }
@@ -144,6 +155,12 @@
         @media (max-width: 768px) {
             .navbar {
                 padding: 1rem;
+                gap: 0.5rem;
+            }
+
+            .navbar .logo-img {
+                width: 35px;
+                height: 35px;
             }
 
             .navbar h1 {
@@ -176,7 +193,8 @@
 <body>
     <!-- Barra de navegación -->
     <nav class="navbar">
-        <h1>FocusPy </h1>
+        <img src="{% static 'images/logo.png' %}" alt="FocusPy Logo" class="logo-img">
+        <h1>FocusPy</h1>
     </nav>
 
     <!-- Contenido principal -->
