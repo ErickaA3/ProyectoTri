@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Flashcards - FocusPy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        .navbar h1 {
+            color: #4a5568;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        .create-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .create-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .collections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .collection-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        .collection-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        .collection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        .collection-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+            flex-grow: 1;
+            margin-right: 1rem;
+        }
+        .difficulty-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        .difficulty-facil {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+        .difficulty-intermedio {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+        }
+        .difficulty-avanzado {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+            color: white;
+        }
+        .collection-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        .collection-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .progress-section {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .progress-label span:first-child {
+            color: #4a5568;
+            font-weight: 600;
+        }
+        .progress-status {
+            color: #667eea;
+            font-weight: 600;
+        }
+        .progress-bar-container {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+        .progress-bar-empty {
+            background: #cbd5e0;
+        }
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        .empty-state {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 4rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .back-button {
+            display: inline-block;
+            margin: 2rem auto;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .back-button:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        @media (max-width: 768px) {
+            .collection-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .difficulty-badge {
+                margin-top: 0.5rem;
+            }
+            .collection-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .collection-actions {
+                justify-content: center;
+            }
+            .collections-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>FocusPy</h1>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Mis Flashcards</h1>
+            <p>Todas tus colecciones de estudio en un solo lugar</p>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_collections }}</span>
+                    <span class="stat-label">Colecciones</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ collections|length|add:"0" }}</span>
+                    <span class="stat-label">Total Tarjetas</span>
+                </div>
+            </div>
+            
+            <a href="{% url 'flashcards:flashcards_home' %}" class="create-button">
+                ➕ Crear Nueva Colección
+            </a>
+        </div>
+
+        {% if collections %}
+        <div class="collections-grid">
+            {% for item in collections_with_stats %}
+            <div class="collection-card" onclick="viewCollection('{{ item.collection.id }}')">
+                <div class="collection-header">
+                    <div class="collection-title">{{ item.collection.title }}</div>
+                    <div class="difficulty-badge difficulty-{{ item.collection.difficulty }}">
+                        {{ item.collection.get_difficulty_display }}
+                    </div>
+                </div>
+                
+                <div class="collection-info">
+                    <div class="info-item">
+                        <span>📚</span>
+                        <span>{{ item.collection.total_cards }} tarjetas</span>
+                    </div>
+                    <div class="info-item">
+                        <span>📅</span>
+                        <span>{{ item.collection.created_at|date:"d M Y" }}</span>
+                    </div>
+                </div>
+
+                <!-- Barra de progreso de aprendizaje -->
+                <div class="progress-section">
+                    {% if item.has_been_studied %}
+                        <div class="progress-label">
+                            <span>Dominio: {{ item.last_accuracy }}%</span>
+                            <span class="progress-status">
+                                {% if item.progress_percentage >= 80 %}
+                                    🎯 Dominado
+                                {% elif item.progress_percentage >= 60 %}
+                                    📚 En progreso
+                                {% elif item.progress_percentage >= 30 %}
+                                    🔄 Practicando
+                                {% else %}
+                                    🚀 Comenzando
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: {{ item.progress_percentage }}%"></div>
+                        </div>
+                    {% else %}
+                        <div class="progress-label">
+                            <span>Sin estudiar</span>
+                            <span class="progress-status">🎯 ¡Empezar!</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar progress-bar-empty" style="width: 0%"></div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="collection-actions">
+                    <a href="{% url 'flashcards:study_collection' item.collection.id %}" 
+                       class="btn btn-primary" onclick="event.stopPropagation()">
+                        🎯 Estudiar
+                    </a>
+                    <a href="{% url 'flashcards:view_collection' item.collection.id %}" 
+                       class="btn btn-secondary" onclick="event.stopPropagation()">
+                        👁️ Ver
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>🎯 ¡Aún no tienes flashcards!</h3>
+            <p>Comienza creando tu primera colección de flashcards.<br>
+            Sube archivos o ingresa texto para generar tarjetas de estudio automáticamente con IA.</p>
+            <a href="{% url 'flashcards:flashcards_home' %}" class="create-button">
+                Crear Mi Primera Colección
+            </a>
+        </div>
+        {% endif %}
+
+        <div style="text-align: center;">
+            <a href="{% url 'home' %}" class="back-button">
+                ← Volver al Inicio
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function viewCollection(collectionId) {
+            window.location.href = `/flashcards/collection/${collectionId}/`;
+        }
+        
+        // Calcular total de tarjetas para las estadísticas
+        document.addEventListener('DOMContentLoaded', function() {
+            let totalCards = 0;
+            
+            {% for item in collections_with_stats %}
+            totalCards += {{ item.collection.total_cards }};
+            {% endfor %}
+            
+            const totalCardsElement = document.querySelector('.stat-item:last-child .stat-number');
+            if (totalCardsElement) {
+                totalCardsElement.textContent = totalCards;
+            }
+        });
+    </script>
+</body>
+</html>

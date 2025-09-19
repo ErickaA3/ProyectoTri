@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudiar: {{ collection.title }} - FocusPy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        .navbar h1 {
+            color: #4a5568;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .study-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .collection-title {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .progress-container {
+            background: #e2e8f0;
+            border-radius: 25px;
+            height: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 25px;
+        }
+        .progress-text {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .flashcard-container {
+            perspective: 1000px;
+            margin-bottom: 2rem;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+            max-width: 600px;
+        }
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+        }
+        .flashcard:hover .card-face {
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+        .card-front {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .card-back {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            transform: rotateY(180deg);
+        }
+        .card-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .card-content {
+            font-size: 1.4rem;
+            line-height: 1.5;
+            font-weight: 600;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .flip-hint {
+            position: absolute;
+            bottom: 1rem;
+            font-size: 0.8rem;
+            opacity: 0.8;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+            color: white;
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .study-complete {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        .study-complete.active {
+            display: block;
+            animation: slideInUp 0.5s ease;
+        }
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .complete-title {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+        }
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        .back-link {
+            display: inline-block;
+            margin: 1rem 0.5rem;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .back-link:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .keyboard-hints {
+            margin-top: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .flashcard-container {
+                height: 350px;
+            }
+            .card-content {
+                font-size: 1.2rem;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            .btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>FocusPy</h1>
+    </nav>
+
+    <div class="container">
+        <div class="study-header">
+            <h1 class="collection-title">{{ collection.title }}</h1>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-text" id="progressText">Tarjeta 1 de {{ total_cards }}</div>
+        </div>
+
+        <div id="studyArea">
+            <div class="flashcard-container">
+                <div class="flashcard" id="flashcard" onclick="flipCard()">
+                    <div class="card-face card-front">
+                        <div class="card-label">Pregunta</div>
+                        <div class="card-content" id="questionText">Cargando...</div>
+                        <div class="flip-hint">Haz clic para ver la respuesta</div>
+                    </div>
+                    <div class="card-face card-back">
+                        <div class="card-label">Respuesta</div>
+                        <div class="card-content" id="answerText">Cargando...</div>
+                        <div class="flip-hint">¿La supiste?</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-danger" id="incorrectBtn" onclick="markIncorrect()" disabled>
+                    ❌ No la sabía
+                </button>
+                <button class="btn btn-secondary" id="flipBtn" onclick="flipCard()">
+                    🔄 Voltear
+                </button>
+                <button class="btn btn-success" id="correctBtn" onclick="markCorrect()" disabled>
+                    ✅ La sabía
+                </button>
+            </div>
+
+            <div class="keyboard-hints">
+                Atajos: Espacio = Voltear | 1 = No la sabía | 2 = La sabía
+            </div>
+        </div>
+
+        <div id="studyComplete" class="study-complete">
+            <h2 class="complete-title">🎉 ¡Estudio Completado!</h2>
+            <p>Has terminado de estudiar toda la colección</p>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalCards">{{ total_cards }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="correctCount">0</span>
+                    <span class="stat-label">Correctas</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="incorrectCount">0</span>
+                    <span class="stat-label">Incorrectas</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="accuracyPercent">0%</span>
+                    <span class="stat-label">Precisión</span>
+                </div>
+            </div>
+
+            <div>
+                <a href="{% url 'flashcards:view_collection' collection.id %}" class="back-link">
+                    📋 Ver Colección
+                </a>
+                <a href="{% url 'flashcards:study_collection' collection.id %}" class="back-link">
+                    🔄 Estudiar de Nuevo
+                </a>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="{% url 'flashcards:my_flashcards' %}" class="back-link">
+                ← Volver a Mis Colecciones
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Datos de las flashcards desde Django
+        const flashcardsData = {{ flashcards|safe }};
+        const sessionId = {{ session_id }};
+        
+        let currentCardIndex = 0;
+        let correctAnswers = 0;
+        let isFlipped = false;
+        let cardAnswered = false;
+
+        // Inicializar cuando la página carga
+        document.addEventListener('DOMContentLoaded', function() {
+            if (flashcardsData && flashcardsData.length > 0) {
+                showCard(currentCardIndex);
+                updateProgress();
+            } else {
+                document.getElementById('questionText').textContent = 'No hay flashcards disponibles';
+                document.getElementById('answerText').textContent = 'Esta colección está vacía';
+            }
+        });
+
+        function showCard(index) {
+            if (index >= flashcardsData.length) {
+                completeStudy();
+                return;
+            }
+
+            const card = flashcardsData[index];
+            document.getElementById('questionText').textContent = card.fields.question;
+            document.getElementById('answerText').textContent = card.fields.answer;
+            
+            // Reset card state
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.remove('flipped');
+            isFlipped = false;
+            cardAnswered = false;
+            
+            // Disable answer buttons
+            document.getElementById('correctBtn').disabled = true;
+            document.getElementById('incorrectBtn').disabled = true;
+            
+            updateProgress();
+        }
+
+        function flipCard() {
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.toggle('flipped');
+            isFlipped = !isFlipped;
+            
+            // Enable answer buttons when card is flipped to show answer
+            if (isFlipped && !cardAnswered) {
+                document.getElementById('correctBtn').disabled = false;
+                document.getElementById('incorrectBtn').disabled = false;
+            }
+        }
+
+        function markCorrect() {
+            if (!isFlipped || cardAnswered) return;
+            
+            correctAnswers++;
+            cardAnswered = true;
+            nextCard();
+        }
+
+        function markIncorrect() {
+            if (!isFlipped || cardAnswered) return;
+            
+            cardAnswered = true;
+            nextCard();
+        }
+
+        function nextCard() {
+            // Disable buttons immediately
+            document.getElementById('correctBtn').disabled = true;
+            document.getElementById('incorrectBtn').disabled = true;
+            
+            currentCardIndex++;
+            
+            if (currentCardIndex >= flashcardsData.length) {
+                setTimeout(completeStudy, 500);
+            } else {
+                setTimeout(() => {
+                    showCard(currentCardIndex);
+                }, 500);
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentCardIndex / flashcardsData.length) * 100;
+            const remaining = flashcardsData.length - currentCardIndex;
+            const completed = currentCardIndex;
+            
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = 
+                `Tarjeta ${currentCardIndex + 1} de ${flashcardsData.length}`;
+            document.getElementById('remainingCount').textContent = remaining;
+            document.getElementById('completedCount').textContent = completed;
+        }
+
+        async function completeStudy() {
+            const incorrectAnswers = flashcardsData.length - correctAnswers;
+            const accuracy = flashcardsData.length > 0 ? 
+                Math.round((correctAnswers / flashcardsData.length) * 100) : 0;
+
+            // Update UI
+            document.getElementById('studyArea').style.display = 'none';
+            document.getElementById('studyComplete').classList.add('active');
+            
+            document.getElementById('correctCount').textContent = correctAnswers;
+            document.getElementById('incorrectCount').textContent = incorrectAnswers;
+            document.getElementById('accuracyPercent').textContent = accuracy + '%';
+            
+            // Update progress to 100%
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('progressText').textContent = '¡Completado!';
+
+            // Send results to server
+            try {
+                await fetch(`/flashcards/session/${sessionId}/complete/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        correct_answers: correctAnswers
+                    })
+                });
+            } catch (error) {
+                console.error('Error saving study session:', error);
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            switch(event.key) {
+                case ' ':
+                case 'Enter':
+                    event.preventDefault();
+                    flipCard();
+                    break;
+                case 'ArrowLeft':
+                case '1':
+                    event.preventDefault();
+                    if (!document.getElementById('incorrectBtn').disabled) {
+                        markIncorrect();
+                    }
+                    break;
+                case 'ArrowRight':
+                case '2':
+                    event.preventDefault();
+                    if (!document.getElementById('correctBtn').disabled) {
+                        markCorrect();
+                    }
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>
