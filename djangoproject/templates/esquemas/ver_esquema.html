@@ -610,7 +610,7 @@
             <div class="esquema-controls">
                 <button class="control-btn" onclick="expandAll()">Expandir Todo</button>
                 <button class="control-btn" onclick="collapseAll()">Colapsar Todo</button>
-                <button class="control-btn" onclick="toggleDetails()">Mostrar/Ocultar Detalles</button>
+                <button class="control-btn" onclick="toggleAllDetails()" id="toggleAllBtn">Mostrar Todos los Detalles</button>
             </div>
             
             <div class="esquema-content">
@@ -720,6 +720,48 @@
         let hierarchyTree = [];
         let showDetails = false;
 
+        // Función para toggle individual de detalles (para el ℹ️)
+        function toggleNodeDetails(nodeId) {
+            console.log('Toggle individual para nodo:', nodeId);
+            const details = document.getElementById(`details-${nodeId}`);
+            if (details) {
+                details.classList.toggle('expanded');
+                console.log('Detalles del nodo', nodeId, 'toggled');
+            } else {
+                console.error('No se encontró details-' + nodeId);
+            }
+        }
+
+        // Función para toggle global de todos los detalles (para el botón)
+        function toggleAllDetails() {
+            const allDetails = document.querySelectorAll('.node-details');
+            const button = document.getElementById('toggleAllBtn');
+            
+            if (allDetails.length === 0) {
+                console.log('No hay detalles para mostrar');
+                return;
+            }
+
+            // Verificar si alguno está expandido
+            const anyExpanded = Array.from(allDetails).some(detail => detail.classList.contains('expanded'));
+            
+            if (anyExpanded) {
+                // Ocultar todos
+                allDetails.forEach(details => {
+                    details.classList.remove('expanded');
+                });
+                if (button) button.textContent = 'Mostrar Todos los Detalles';
+                showDetails = false;
+            } else {
+                // Mostrar todos
+                allDetails.forEach(details => {
+                    details.classList.add('expanded');
+                });
+                if (button) button.textContent = 'Ocultar Todos los Detalles';
+                showDetails = true;
+            }
+        }
+
         // Cerrar alertas automáticamente
         setTimeout(function() {
             var alerts = document.querySelectorAll('.alert');
@@ -750,6 +792,7 @@
                 {% endfor %}
             ];
 
+            console.log('Nodos cargados:', nodesData);
             buildHierarchyTree();
             renderHierarchy();
         });
@@ -790,7 +833,7 @@
                         <span class="node-title">${node.texto}</span>
                         <div class="node-meta">
                             ${hasChildren ? `<span class="children-count">${node.children.length}</span>` : ''}
-                            ${node.tiene_detalles ? '<span onclick="toggleDetails(' + node.id + '); event.stopPropagation();" style="cursor: pointer; color: #667eea; font-size: 1.1rem;">ℹ️</span>' : ''}
+                            ${node.tiene_detalles ? '<span onclick="toggleNodeDetails(' + node.id + '); event.stopPropagation();" style="cursor: pointer; color: #667eea; font-size: 1.1rem;" title="Ver detalles">ℹ️</span>' : ''}
                         </div>
                     </div>`;
 
@@ -852,13 +895,6 @@
             }
         }
 
-        function toggleDetails(nodeId) {
-            const details = document.getElementById(`details-${nodeId}`);
-            if (details) {
-                details.classList.toggle('expanded');
-            }
-        }
-
         function expandAll() {
             document.querySelectorAll('.node-children').forEach(children => {
                 children.classList.add('expanded');
@@ -882,17 +918,6 @@
             });
             document.querySelectorAll('.node-header').forEach(header => {
                 header.classList.remove('expanded');
-            });
-        }
-
-        function toggleDetails() {
-            showDetails = !showDetails;
-            document.querySelectorAll('.node-details').forEach(details => {
-                if (showDetails) {
-                    details.classList.add('expanded');
-                } else {
-                    details.classList.remove('expanded');
-                }
             });
         }
         {% endif %}

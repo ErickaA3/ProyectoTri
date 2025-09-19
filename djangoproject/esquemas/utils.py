@@ -88,7 +88,7 @@ def generar_esquema_openai(texto, tipo_esquema):
     
     prompts = {
         'jerarquico': """
-Analiza el siguiente texto y crea un esquema jerárquico detallado con información expandible.
+Analiza el siguiente texto y crea un esquema jerárquico muy detallado con información expandible rica.
 Devuelve SOLO un JSON válido con esta estructura exacta:
 {
     "titulo": "Título principal del tema",
@@ -97,22 +97,22 @@ Devuelve SOLO un JSON válido con esta estructura exacta:
             "texto": "Punto principal 1",
             "nivel": 1,
             "orden": 0,
-            "detalles": "Información adicional expandible sobre este punto",
-            "palabras_clave": ["palabra1", "palabra2", "palabra3"],
+            "detalles": "Información detallada expandible de al menos 2-3 oraciones que explique este punto en profundidad, incluyendo contexto, importancia, relaciones con otros conceptos, ejemplos específicos o aplicaciones prácticas. Debe ser información valiosa que complemente el título principal.",
+            "palabras_clave": ["palabra1", "palabra2", "palabra3", "palabra4"],
             "hijos": [
                 {
                     "texto": "Subpunto 1.1",
                     "nivel": 2,
                     "orden": 0,
-                    "detalles": "Detalles específicos del subpunto",
-                    "palabras_clave": ["concepto", "ejemplo"],
+                    "detalles": "Explicación específica de este subpunto con detalles técnicos, metodologías, características particulares, beneficios, limitaciones o ejemplos concretos. Debe proporcionar información que ayude a entender mejor este aspecto específico.",
+                    "palabras_clave": ["concepto", "ejemplo", "método"],
                     "hijos": [
                         {
                             "texto": "Sub-subpunto 1.1.1",
                             "nivel": 3,
                             "orden": 0,
-                            "detalles": "Información detallada del punto específico",
-                            "palabras_clave": ["detalle"]
+                            "detalles": "Información muy específica sobre este punto particular, incluyendo datos precisos, casos de uso, procedimientos detallados, o análisis profundo del tema.",
+                            "palabras_clave": ["detalle", "específico"]
                         }
                     ]
                 }
@@ -122,10 +122,12 @@ Devuelve SOLO un JSON válido con esta estructura exacta:
 }
 
 IMPORTANTE: 
-- Para cada nodo, incluye detalles específicos en "detalles" que expliquen más sobre ese punto
-- Las palabras_clave deben ser conceptos relevantes de 1-3 palabras
-- Los detalles deben ser informativos y complementar el texto principal
+- CADA nodo DEBE tener detalles extensos y específicos (mínimo 100 caracteres por detalle)
+- Los detalles deben ser informativos, específicos y valiosos, no repetir el título
+- Las palabras_clave deben ser conceptos relevantes y específicos (3-5 palabras por nodo)
+- Los detalles deben incluir: contexto, ejemplos, aplicaciones, características, beneficios, etc.
 - Máximo 3 niveles de profundidad
+- Prioriza calidad y especificidad sobre cantidad
 
 Texto a analizar:
 """,
@@ -270,27 +272,37 @@ def generar_esquema_openai_fallback(texto, tipo_esquema, client):
 
 def crear_esquema_basico(texto, tipo_esquema):
     """
-    Crea un esquema básico cuando OpenAI falla
+    Crea un esquema básico más detallado cuando OpenAI falla
     """
     titulo = "Esquema generado automáticamente"
+    
+    # Crear detalles más ricos basados en el texto original
+    texto_resumen = texto[:300] if len(texto) > 300 else texto
     
     if tipo_esquema == 'jerarquico':
         return {
             "titulo": titulo,
             "nodos": [
                 {
-                    "texto": "Contenido principal",
+                    "texto": "Tema Principal del Contenido",
                     "nivel": 1,
                     "orden": 0,
-                    "detalles": "Información extraída del texto original",
-                    "palabras_clave": ["contenido", "principal"],
+                    "detalles": f"Este es el tema central extraído del contenido proporcionado. El texto analizado aborda diversos aspectos y conceptos relacionados con este tema principal. La información incluye múltiples perspectivas y enfoques que se desarrollan a lo largo del contenido, proporcionando una visión integral del tema tratado.",
+                    "palabras_clave": ["tema central", "contenido principal", "análisis", "conceptos", "información"],
                     "hijos": [
                         {
-                            "texto": texto[:200] + "..." if len(texto) > 200 else texto,
+                            "texto": "Aspectos Específicos del Contenido",
                             "nivel": 2,
                             "orden": 0,
-                            "detalles": "Texto original procesado automáticamente",
-                            "palabras_clave": ["detalle"]
+                            "detalles": f"Esta sección desarrolla los aspectos más relevantes identificados en el texto original. Incluye detalles específicos, ejemplos concretos y explicaciones detalladas que complementan el tema principal. El contenido original menciona: {texto_resumen}...",
+                            "palabras_clave": ["aspectos específicos", "detalles", "ejemplos", "desarrollo"]
+                        },
+                        {
+                            "texto": "Información Complementaria",
+                            "nivel": 2,
+                            "orden": 1,
+                            "detalles": "Información adicional que enriquece la comprensión del tema principal. Esta sección incluye contexto adicional, relaciones entre conceptos, y perspectivas que ayudan a tener una visión más completa del contenido analizado.",
+                            "palabras_clave": ["información adicional", "contexto", "relaciones", "perspectivas"]
                         }
                     ]
                 }
@@ -302,11 +314,20 @@ def crear_esquema_basico(texto, tipo_esquema):
             "concepto_central": "Tema Principal",
             "conceptos": [
                 {
-                    "texto": "Concepto 1",
-                    "descripcion": texto[:100] + "..." if len(texto) > 100 else texto,
+                    "texto": "Concepto Clave 1",
+                    "descripcion": f"Concepto fundamental extraído del contenido analizado. Este concepto representa una idea central que se desarrolla a lo largo del texto y que es esencial para la comprensión del tema. El texto original proporciona evidencia y ejemplos que respaldan este concepto.",
+                    "es_central": False,
+                    "importancia": "alta",
+                    "ejemplos": ["ejemplo del texto", "aplicación práctica", "caso específico"],
+                    "conexiones": ["Concepto Clave 2", "Tema Principal"]
+                },
+                {
+                    "texto": "Concepto Clave 2", 
+                    "descripcion": "Segundo concepto importante identificado en el análisis del contenido. Este concepto complementa y se relaciona con otros elementos del texto, formando parte de una red conceptual más amplia que facilita la comprensión integral del tema.",
                     "es_central": False,
                     "importancia": "media",
-                    "ejemplos": ["ejemplo básico"]
+                    "ejemplos": ["ejemplo relacionado", "aplicación específica"],
+                    "conexiones": ["Concepto Clave 1"]
                 }
             ]
         }
@@ -316,11 +337,12 @@ def crear_esquema_basico(texto, tipo_esquema):
             "eventos": [
                 {
                     "fecha": "Periodo inicial",
-                    "titulo": "Evento principal",
-                    "descripcion": texto[:200] + "..." if len(texto) > 200 else texto,
+                    "titulo": "Evento o Proceso Principal",
+                    "descripcion": f"Evento o proceso principal identificado en el contenido analizado. Este elemento temporal representa un momento o desarrollo significativo dentro del contexto del texto. La información incluye detalles sobre causas, desarrollo y efectos del evento descrito.",
                     "orden": 0,
-                    "importancia": "media",
-                    "contexto": "Información procesada automáticamente"
+                    "importancia": "alta",
+                    "contexto": f"El contexto de este evento se basa en la información proporcionada en el texto original, que incluye circunstancias, antecedentes y factores relevantes para la comprensión completa del proceso.",
+                    "consecuencias": ["efecto directo", "impacto a largo plazo", "cambios resultantes"]
                 }
             ]
         }
