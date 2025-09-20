@@ -37,6 +37,13 @@
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
             gap: 1rem;
         }
 
@@ -55,6 +62,226 @@
             font-size: 2.4rem;
             font-weight: 400;
             font-family: "Fugaz One", sans-serif;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .historial-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .historial-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .historial-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Modal del historial */
+        .historial-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .historial-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .historial-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .historial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .historial-header h2 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: #f7fafc;
+            color: #2d3748;
+        }
+
+        .historial-timeline {
+            position: relative;
+        }
+
+        .timeline-day {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .day-date {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .day-count {
+            background: #667eea;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .activities-list {
+            margin-left: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .activity-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .activity-item.resumenes {
+            border-left-color: #667eea;
+        }
+
+        .activity-item.esquemas {
+            border-left-color: #f093fb;
+        }
+
+        .activity-item.flashcards {
+            border-left-color: #4facfe;
+        }
+
+        .activity-item.cuestionarios {
+            border-left-color: #43e97b;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .activity-type {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .activity-title {
+            color: #4a5568;
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .activity-description {
+            color: #718096;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .empty-historial {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .empty-historial h3 {
+            margin-bottom: 1rem;
+            color: #4a5568;
         }
 
         .container {
@@ -183,6 +410,17 @@
                 font-size: 1.5rem;
             }
 
+            .historial-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .historial-content {
+                width: 95%;
+                padding: 1.5rem;
+                max-height: 85vh;
+            }
+
             .container {
                 padding: 2rem 1rem;
             }
@@ -203,15 +441,143 @@
             .card {
                 padding: 1.5rem;
             }
+
+            .activities-list {
+                margin-left: 0;
+            }
+
+            .activity-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.3rem;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Barra de navegación -->
     <nav class="navbar">
-        <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
-        <h1 class="paytone-one-regular">FocusPy</h1>
+        <div class="navbar-left">
+            <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
+            <h1 class="paytone-one-regular">FocusPy</h1>
+        </div>
+        
+        <div class="navbar-right">
+            <button class="historial-btn" onclick="openHistorial()">
+                <span class="historial-icon">📚</span>
+                Historial
+            </button>
+        </div>
     </nav>
+
+    <!-- Modal del historial -->
+    <div class="historial-modal" id="historialModal">
+        <div class="historial-content">
+            <div class="historial-header">
+                <h2>📚 Tu Historial de Estudio</h2>
+                <button class="close-btn" onclick="closeHistorial()">×</button>
+            </div>
+            
+            <div class="historial-timeline" id="historialTimeline">
+                <!-- Actividades de ejemplo - esto se llenará con datos reales -->
+                <div class="timeline-day">
+                    <div class="day-header">
+                        <span class="day-date">Hoy - 19 de Septiembre</span>
+                        <span class="day-count">3 actividades</span>
+                    </div>
+                    <div class="activities-list">
+                        <div class="activity-item cuestionarios">
+                            <div class="activity-header">
+                                <div class="activity-type">
+                                    <span>❓</span>
+                                    Cuestionario creado
+                                </div>
+                                <span class="activity-time">14:30</span>
+                            </div>
+                            <div class="activity-title">Cuestionario de Historia Universal</div>
+                            <div class="activity-description">10 preguntas • Dificultad media • 85% completado</div>
+                        </div>
+                        
+                        <div class="activity-item esquemas">
+                            <div class="activity-header">
+                                <div class="activity-type">
+                                    <span>🗂️</span>
+                                    Esquema generado
+                                </div>
+                                <span class="activity-time">12:15</span>
+                            </div>
+                            <div class="activity-title">Esquema jerárquico - Revolución Francesa</div>
+                            <div class="activity-description">Desde archivo PDF • 15 nodos principales</div>
+                        </div>
+                        
+                        <div class="activity-item resumenes">
+                            <div class="activity-header">
+                                <div class="activity-type">
+                                    <span>📄</span>
+                                    Resumen creado
+                                </div>
+                                <span class="activity-time">10:45</span>
+                            </div>
+                            <div class="activity-title">Resumen de Matemáticas</div>
+                            <div class="activity-description">Desde texto • Ecuaciones cuadráticas</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-day">
+                    <div class="day-header">
+                        <span class="day-date">Ayer - 18 de Septiembre</span>
+                        <span class="day-count">2 actividades</span>
+                    </div>
+                    <div class="activities-list">
+                        <div class="activity-item flashcards">
+                            <div class="activity-header">
+                                <div class="activity-type">
+                                    <span>🎴</span>
+                                    Flashcards practicadas
+                                </div>
+                                <span class="activity-time">16:20</span>
+                            </div>
+                            <div class="activity-title">Vocabulario en Inglés</div>
+                            <div class="activity-description">25 tarjetas • 80% de aciertos</div>
+                        </div>
+                        
+                        <div class="activity-item cuestionarios">
+                            <div class="activity-header">
+                                <div class="activity-type">
+                                    <span>❓</span>
+                                    Cuestionario completado
+                                </div>
+                                <span class="activity-time">14:10</span>
+                            </div>
+                            <div class="activity-title">Examen de Biología</div>
+                            <div class="activity-description">15 preguntas • Dificultad alta • 92% de aciertos</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-day">
+                    <div class="day-header">
+                        <span class="day-date">17 de Septiembre</span>
+                        <span class="day-count">1 actividad</span>
+                    </div>
+                    <div class="activities-list">
+                        <div class="activity-item esquemas">
+                            <div class="activity-header">
+                                <div class="activity-type">
+                                    <span>🗂️</span>
+                                    Mapa conceptual
+                                </div>
+                                <span class="activity-time">11:30</span>
+                            </div>
+                            <div class="activity-title">Sistema Solar</div>
+                            <div class="activity-description">Desde texto • 8 conceptos relacionados</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Contenido principal -->
     <div class="container">
@@ -255,5 +621,42 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function openHistorial() {
+            const modal = document.getElementById('historialModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeHistorial() {
+            const modal = document.getElementById('historialModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Cerrar modal al hacer click fuera de él
+        document.getElementById('historialModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeHistorial();
+            }
+        });
+
+        // Cerrar modal con tecla Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeHistorial();
+            }
+        });
+
+        // Simular click en actividades para mostrar más detalles (opcional)
+        document.querySelectorAll('.activity-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Aquí podrías agregar funcionalidad para mostrar más detalles
+                // o navegar a la actividad específica
+                console.log('Clicked on activity:', this.querySelector('.activity-title').textContent);
+            });
+        });
+    </script>
 </body>
 </html>
