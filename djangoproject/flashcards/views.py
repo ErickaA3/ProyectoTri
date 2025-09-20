@@ -1,4 +1,5 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
@@ -14,8 +15,37 @@ from .utils import (
 )
 
 def flashcards_home(request):
-    """Vista principal de flashcards"""
-    return render(request, 'flashcards/flashcards_home.html')
+    """Vista principal de flashcards con colecciones recientes"""
+    # Obtener las 6 colecciones más recientes con estadísticas
+    collections = FlashcardCollection.objects.all()[:6]
+    
+    collections_with_stats = []
+    for collection in collections:
+        # Obtener la última sesión completada
+        last_session = StudySession.objects.filter(
+            collection=collection,
+            completed_at__isnull=False
+        ).order_by('-completed_at').first()
+        
+        # Calcular progreso basado en la última sesión
+        if last_session and last_session.total_cards > 0:
+            accuracy = last_session.accuracy
+            progress_percentage = min(accuracy, 100)  # Cap at 100%
+        else:
+            accuracy = 0
+            progress_percentage = 0
+        
+        collections_with_stats.append({
+            'collection': collection,
+            'last_accuracy': accuracy,
+            'progress_percentage': progress_percentage,
+            'has_been_studied': last_session is not None
+        })
+    
+    context = {
+        'collections_with_stats': collections_with_stats
+    }
+    return render(request, 'flashcards/flashcards_home.html', context)
 
 @csrf_exempt
 def process_file(request):
@@ -316,9 +346,28 @@ def complete_study_session(request, session_id):
             'error': f'Error al completar sesión: {str(e)}'
         })
 
+def confirmar_eliminar_collection(request, collection_id):
+    """Vista para confirmar eliminación de colección"""
+    collection = get_object_or_404(FlashcardCollection, id=collection_id)
+    
+    if request.method == 'POST':
+        # Si confirma, eliminar
+        titulo = collection.title
+        collection.delete()  # Esto eliminará también las flashcards y sesiones por CASCADE
+        
+        messages.success(request, f'Colección "{titulo}" eliminada correctamente')
+        return redirect('flashcards:my_flashcards')
+    
+    # Mostrar página de confirmación
+    context = {
+        'collection': collection
+    }
+    return render(request, 'flashcards/confirmar_eliminar_flashcards.html', context)
+
+# Mantener la función original para compatibilidad con AJAX
 @csrf_exempt
 def delete_collection(request, collection_id):
-    """Elimina una colección de flashcards"""
+    """Elimina una colección de flashcards (función AJAX)"""
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Método no permitido'})
     
