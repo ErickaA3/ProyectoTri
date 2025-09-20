@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ cuestionario.titulo }} - FocusPy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            color: #4a5568;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border-left: 4px solid #48bb78;
+        }
+
+        .cuestionario-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .cuestionario-header h2 {
+            color: #2d3748;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cuestionario-meta {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .resultado-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .score-message {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .preguntas-resumen {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .preguntas-resumen h3 {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .pregunta-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #e2e8f0;
+        }
+
+        .pregunta-item.correcta {
+            border-left-color: #48bb78;
+            background: rgba(72, 187, 120, 0.05);
+        }
+
+        .pregunta-item.incorrecta {
+            border-left-color: #f56565;
+            background: rgba(245, 101, 101, 0.05);
+        }
+
+        .pregunta-numero {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .respuesta-status {
+            font-size: 0.9rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .respuesta-status.correcta {
+            background: rgba(72, 187, 120, 0.2);
+            color: #2f855a;
+        }
+
+        .respuesta-status.incorrecta {
+            background: rgba(245, 101, 101, 0.2);
+            color: #c53030;
+        }
+
+        .cuestionario-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            color: #4a5568;
+            text-decoration: none;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+            color: white;
+            text-decoration: none;
+        }
+
+        .boton-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 25px;
+            transition: background 0.3s;
+        }
+
+        .boton-volver:hover {
+            background: #5a6fd8;
+            color: white;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+
+            .cuestionario-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cuestionario-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>FocusPy - Cuestionarios</h1>
+    </nav>
+
+    <div class="container">
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="cuestionario-header">
+            <h2>{{ cuestionario.titulo }}</h2>
+            <p class="cuestionario-meta">
+                Dificultad: {{ cuestionario.get_dificultad_display }} | 
+                Creado: {{ cuestionario.fecha_creacion|date:"d/m/Y H:i" }} |
+                {{ cuestionario.num_preguntas }} preguntas
+            </p>
+        </div>
+
+        {% if resultado %}
+        <div class="resultado-card">
+            <div class="score-display">{{ resultado.puntuacion|floatformat:0 }}%</div>
+            <div class="score-message">
+                {% if resultado.puntuacion >= 90 %}
+                    ¡Excelente trabajo! 🎉
+                {% elif resultado.puntuacion >= 70 %}
+                    ¡Muy bien! 👏
+                {% elif resultado.puntuacion >= 50 %}
+                    Buen intento 👍
+                {% else %}
+                    Sigue practicando 💪
+                {% endif %}
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ resultado.respuestas_correctas }}</div>
+                    <div class="stat-label">Correctas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ resultado.respuestas_incorrectas }}</div>
+                    <div class="stat-label">Incorrectas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ resultado.total_preguntas }}</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen de preguntas -->
+        <div class="preguntas-resumen">
+            <h3>📋 Resumen de Respuestas</h3>
+            
+            {% for respuesta in respuestas %}
+            <div class="pregunta-item {% if respuesta.es_correcta %}correcta{% else %}incorrecta{% endif %}">
+                <div class="pregunta-numero">
+                    Pregunta {{ respuesta.pregunta.numero }}
+                    <span class="respuesta-status {% if respuesta.es_correcta %}correcta{% else %}incorrecta{% endif %}">
+                        {% if respuesta.es_correcta %}✅ Correcta{% else %}❌ Incorrecta{% endif %}
+                    </span>
+                </div>
+                <p><strong>{{ respuesta.pregunta.texto }}</strong></p>
+                {% if respuesta.respuesta_seleccionada is not None %}
+                    <p>Tu respuesta: {{ respuesta.pregunta.opciones|slice:respuesta.respuesta_seleccionada|slice:":1"|first }}</p>
+                {% else %}
+                    <p>No respondiste esta pregunta</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            Este cuestionario aún no ha sido completado.
+        </div>
+        {% endif %}
+
+        <div class="cuestionario-actions">
+            {% if not resultado %}
+                <a href="{% url 'cuestionarios:quiz' cuestionario.id %}" class="btn btn-primary">
+                    Continuar Cuestionario
+                </a>
+            {% else %}
+                <a href="{% url 'cuestionarios:exportar_pdf' cuestionario.id %}" class="btn btn-success">
+                    📄 Exportar PDF
+                </a>
+            {% endif %}
+            <a href="{% url 'cuestionarios:home' %}" class="btn btn-secondary">
+                🏠 Volver a Cuestionarios
+            </a>
+            <a href="{% url 'cuestionarios:home' %}" class="btn btn-primary">
+                ➕ Crear Nuevo
+            </a>
+        </div>
+
+        <a href="{% url 'cuestionarios:home' %}" class="boton-volver">← Volver a Cuestionarios</a>
+    </div>
+</body>
+</html>

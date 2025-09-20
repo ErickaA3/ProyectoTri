@@ -1,9 +1,7 @@
-# cuestionarios/views.py - CÓDIGO COMPLETO
+# cuestionarios/views.py - CÓDIGO COMPLETO ACTUALIZADO
 from django.shortcuts import render, redirect, get_object_or_404
-# from django.contrib.auth.decorators import login_required  # Comentado temporalmente
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
 from django.conf import settings
 import json
 import openai
@@ -17,12 +15,24 @@ from .utils import generar_preguntas_openai, extraer_texto_archivo
 openai.api_key = settings.OPENAI_API_KEY
 
 def cuestionarios_home(request):
-    """Vista principal de cuestionarios"""
-    return render(request, 'cuestionarios/cuestionarios_home.html', {
+    """Vista principal de cuestionarios con cuestionarios recientes"""
+    
+    # Obtener cuestionarios recientes (los últimos 6)
+    cuestionarios_recientes = Cuestionario.objects.all().order_by('-fecha_creacion')[:6]
+    
+    # Debug: imprimir en consola para verificar
+    print(f"DEBUG: Cuestionarios encontrados: {cuestionarios_recientes.count()}")
+    for c in cuestionarios_recientes:
+        print(f"- ID: {c.id}, Título: {c.titulo}, Completado: {c.completado}")
+    
+    context = {
         'show_config': False,
         'show_quiz': False,
-        'show_results': False
-    })
+        'show_results': False,
+        'cuestionarios_recientes': cuestionarios_recientes
+    }
+    
+    return render(request, 'cuestionarios/cuestionarios_home.html', context)
 
 def config_cuestionario(request):
     """Vista de configuración según el método seleccionado"""
@@ -278,6 +288,161 @@ def revisar_respuestas(request):
     }
     
     return render(request, 'cuestionarios/cuestionarios_home.html', context)
+
+def ver_cuestionario(request, cuestionario_id):
+    """Ver detalles de un cuestionario completado"""
+    cuestionario = get_object_or_404(Cuestionario, id=cuestionario_id)
+    
+    # Verificar si hay resultados
+    try:
+        resultado = ResultadoCuestionario.objects.get(cuestionario=cuestionario)
+    except ResultadoCuestionario.DoesNotExist:
+        # Si no hay resultado, redirigir al quiz
+        return redirect('cuestionarios:quiz', quiz_id=cuestionario_id)
+    
+    # Obtener todas las respuestas para mostrar resumen
+    respuestas = RespuestaUsuario.objects.filter(cuestionario=cuestionario)
+    
+    context = {
+        'cuestionario': cuestionario,
+        'resultado': resultado,
+        'respuestas': respuestas,
+        'total_preguntas': cuestionario.preguntas.count()
+    }
+    
+    return render(request, 'cuestionarios/ver_cuestionario.html', context)
+
+def eliminar_cuestionario(request, cuestionario_id):
+    """Eliminar un cuestionario con confirmación"""
+    cuestionario = get_object_or_404(Cuestionario, id=cuestionario_id)
+    
+    # Verificar permisos (opcional si tienes autenticación)
+    if request.user.is_authenticated and cuestionario.usuario != request.user:
+        messages.error(request, 'No tienes permisos para eliminar este cuestionario.')
+        return redirect('cuestionarios:home')
+    
+    if request.method == 'POST':
+        titulo = cuestionario.titulo
+        cuestionario.delete()
+        messages.success(request, f'Cuestionario "{titulo}" eliminado correctamente.')
+        return redirect('cuestionarios:home')
+    
+    # Mostrar página de confirmación
+    return render(request, 'cuestionarios/confirmar_eliminar.html', {'cuestionario': cuestionario})
+
+def exportar_pdf_cuestionario(request, cuestionario_id):
+    """Exportar cuestionario a PDF"""
+    cuestionario = get_object_or_404(Cuestionario, id=cuestionario_id)
+    
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import cm
+        import io
+        
+        # Crear buffer para el PDF
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm)
+        styles = getSampleStyleSheet()
+        story = []
+        
+        # Título principal
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            spaceAfter=30,
+        )
+        story.append(Paragraph(cuestionario.titulo, title_style))
+        story.append(Spacer(1, 12))
+        
+        # Metadatos
+        story.append(Paragraph(f"<b>Dificultad:</b> {cuestionario.get_dificultad_display()}", styles['Normal']))
+        story.append(Paragraph(f"<b>Número de preguntas:</b> {cuestionario.num_preguntas}", styles['Normal']))
+        story.append(Paragraph(f"<b>Creado:</b> {cuestionario.fecha_creacion.strftime('%d/%m/%Y %H:%M')}", styles['Normal']))
+        
+        # Verificar si hay resultado
+        try:
+            resultado = ResultadoCuestionario.objects.get(cuestionario=cuestionario)
+            story.append(Paragraph(f"<b>Puntuación:</b> {resultado.puntuacion:.0f}%", styles['Normal']))
+            story.append(Paragraph(f"<b>Respuestas correctas:</b> {resultado.respuestas_correctas}/{resultado.total_preguntas}", styles['Normal']))
+        except ResultadoCuestionario.DoesNotExist:
+            story.append(Paragraph("<b>Estado:</b> Cuestionario no completado", styles['Normal']))
+        
+        story.append(Spacer(1, 20))
+        
+        # Preguntas y respuestas
+        story.append(Paragraph("Preguntas y Respuestas", styles['Heading2']))
+        story.append(Spacer(1, 12))
+        
+        preguntas = cuestionario.preguntas.all().order_by('numero')
+        for pregunta in preguntas:
+            # Pregunta
+            pregunta_style = ParagraphStyle(
+                'PreguntaStyle',
+                parent=styles['Normal'],
+                fontSize=12,
+                fontName='Helvetica-Bold',
+                spaceAfter=6
+            )
+            story.append(Paragraph(f"Pregunta {pregunta.numero}: {pregunta.texto}", pregunta_style))
+            
+            # Opciones
+            for i, opcion in enumerate(pregunta.opciones):
+                opcion_letra = chr(65 + i)  # A, B, C, D
+                es_correcta = i == pregunta.respuesta_correcta
+                if es_correcta:
+                    opcion_style = ParagraphStyle(
+                        'OpcionCorrectaStyle',
+                        parent=styles['Normal'],
+                        fontSize=10,
+                        fontName='Helvetica-Bold'
+                    )
+                    story.append(Paragraph(f"{opcion_letra}) {opcion} ✓", opcion_style))
+                else:
+                    story.append(Paragraph(f"{opcion_letra}) {opcion}", styles['Normal']))
+            
+            # Verificar respuesta del usuario si existe
+            try:
+                respuesta_usuario = RespuestaUsuario.objects.get(cuestionario=cuestionario, pregunta=pregunta)
+                if respuesta_usuario.respuesta_seleccionada is not None:
+                    respuesta_letra = chr(65 + respuesta_usuario.respuesta_seleccionada)
+                    if respuesta_usuario.es_correcta:
+                        story.append(Paragraph(f"<b>Tu respuesta:</b> {respuesta_letra} - Correcta", styles['Normal']))
+                    else:
+                        story.append(Paragraph(f"<b>Tu respuesta:</b> {respuesta_letra} - Incorrecta", styles['Normal']))
+                else:
+                    story.append(Paragraph("<b>Tu respuesta:</b> No respondida", styles['Normal']))
+            except RespuestaUsuario.DoesNotExist:
+                story.append(Paragraph("<b>Tu respuesta:</b> No respondida", styles['Normal']))
+            
+            story.append(Spacer(1, 12))
+        
+        # Generar PDF
+        doc.build(story)
+        buffer.seek(0)
+        
+        response = HttpResponse(buffer.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="Cuestionario_{cuestionario.titulo}.pdf"'
+        return response
+        
+    except ImportError:
+        messages.error(request, 'Funcionalidad de PDF no disponible. Instala reportlab.')
+        return redirect('cuestionarios:ver_cuestionario', cuestionario_id=cuestionario_id)
+    except Exception as e:
+        messages.error(request, f'Error al generar PDF: {str(e)}')
+        return redirect('cuestionarios:ver_cuestionario', cuestionario_id=cuestionario_id)
+
+def mis_cuestionarios(request):
+    """Ver todos los cuestionarios del usuario"""
+    cuestionarios = Cuestionario.objects.all().order_by('-fecha_creacion')
+    if request.user.is_authenticated:
+        cuestionarios = cuestionarios.filter(usuario=request.user)
+    
+    return render(request, 'cuestionarios/mis_cuestionarios.html', {
+        'cuestionarios': cuestionarios
+    })
 
 def calcular_resultados(cuestionario):
     """Calcular y guardar resultados del cuestionario"""

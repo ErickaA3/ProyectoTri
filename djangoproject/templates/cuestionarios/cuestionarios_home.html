@@ -5,940 +5,996 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cuestionarios - FocusPy</title>
-    <!-- Enlace al archivo CSS -->
     <style>
         /* Estilos generales */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-}
-
-/* Navbar */
-.navbar {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-}
-
-.navbar h1 {
-    color: #4a5568;
-    font-size: 1.8rem;
-    font-weight: 700;
-}
-
-/* Container principal */
-.container {
-    max-width: 1000px;
-    margin: 30px auto;
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-/* Header de sección */
-.section-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.section-header h2 {
-    color: #2d3748;
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-
-.section-header p {
-    color: #718096;
-    font-size: 1.2rem;
-}
-
-/* Grid de tarjetas */
-.cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 3rem;
-    margin: 3rem 0;
-    justify-items: center;
-}
-
-/* Tarjetas */
-.card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 2.5rem;
-    text-align: center;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: 2px solid transparent;
-    width: 100%;
-    max-width: 400px;
-}
-
-.card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-    border: 2px solid rgba(102, 126, 234, 0.3);
-}
-
-.card-icon {
-    width: 100px;
-    height: 100px;
-    margin: 0 auto 1.5rem;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.card:nth-child(1) .card-icon {
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-}
-
-.card:nth-child(2) .card-icon {
-    background: linear-gradient(135deg, #43e97b, #38f9d7);
-}
-
-.card h3 {
-    color: #2d3748;
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-.card p {
-    color: #718096;
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin-bottom: 2rem;
-}
-
-.card-btn {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    padding: 1rem 2.5rem;
-    border-radius: 25px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.card-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-}
-
-/* Botón volver */
-.boton-volver {
-    display: block;
-    width: 200px;
-    margin: 30px auto;
-    padding: 10px 20px;
-    background: #667eea;
-    color: white;
-    text-decoration: none;
-    text-align: center;
-    border-radius: 25px;
-    transition: background 0.3s;
-}
-
-.boton-volver:hover {
-    background: #5a6fd8;
-}
-
-/* Configuración del quiz */
-.config-container {
-    background: white;
-    padding: 2rem;
-    border-radius: 15px;
-}
-
-.config-container h2 {
-    color: #2d3748;
-    margin-bottom: 2rem;
-    text-align: center;
-    font-size: 2rem;
-}
-
-/* Área de subir archivos */
-.file-upload-section {
-    margin: 2rem 0;
-}
-
-.file-label {
-    cursor: pointer;
-    display: block;
-}
-
-.file-upload-area {
-    border: 3px dashed #667eea;
-    border-radius: 15px;
-    padding: 3rem;
-    text-align: center;
-    margin: 2rem 0;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    background: rgba(102, 126, 234, 0.05);
-    position: relative;
-}
-
-.file-upload-area:hover,
-.file-upload-area.dragover {
-    border-color: #5a6fd8;
-    background: rgba(102, 126, 234, 0.1);
-    transform: scale(1.02);
-}
-
-.file-upload-area .upload-icon {
-    font-size: 3rem;
-    color: #667eea;
-    margin-bottom: 1rem;
-}
-
-.file-upload-area p {
-    color: #718096;
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-}
-
-.file-input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    z-index: 10;
-}
-
-/* Estilos para mostrar archivo seleccionado */
-.file-input:valid + .file-upload-content .upload-icon {
-    color: #48bb78;
-}
-
-.file-input:valid + .file-upload-content .upload-text {
-    color: #2f855a;
-    font-weight: 600;
-}
-
-.file-input:valid + .file-upload-content .upload-text::after {
-    content: "\A✅ Archivo seleccionado correctamente";
-    white-space: pre;
-    display: block;
-    margin-top: 0.5rem;
-    font-size: 1rem;
-    color: #2f855a;
-}
-
-.file-input:valid + .file-upload-content .file-instructions {
-    display: none;
-}
-
-.file-input:valid + .file-upload-content .browse-btn {
-    background: linear-gradient(135deg, #48bb78, #38a169);
-}
-
-.file-input:valid + .file-upload-content .browse-btn::before {
-    content: "✅ ";
-    margin-right: 0.5rem;
-}
-
-.file-upload-content {
-    pointer-events: none;
-}
-
-.upload-text {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-}
-
-.file-instructions {
-    color: #718096;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-}
-
-.browse-btn {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    padding: 0.8rem 2rem;
-    border: none;
-    border-radius: 25px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-block;
-}
-
-.browse-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-}
-
-/* Indicador visual cuando archivo está seleccionado */
-.file-input:valid ~ .file-selected-indicator {
-    display: block;
-}
-
-.file-selected-indicator {
-    display: none;
-    background: rgba(72, 187, 120, 0.1);
-    border: 2px solid #48bb78;
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-top: 1rem;
-    color: #2f855a;
-    text-align: center;
-}
-
-.file-selected-indicator .success-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.file-selected-indicator .success-text {
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-}
-
-.file-selected-indicator .file-info {
-    font-size: 0.9rem;
-    color: #276749;
-    margin-top: 0.5rem;
-}
-
-/* Estilos adicionales para mejor UX */
-.file-input:valid + .file-upload-content {
-    border-color: #48bb78;
-}
-
-.file-upload-area:has(.file-input:valid) {
-    border-color: #48bb78;
-    background: rgba(72, 187, 120, 0.05);
-}
-
-/* Fallback para navegadores que no soportan :has() */
-.file-input:valid ~ * {
-    --file-selected: true;
-}
-
-/* Área de texto */
-.text-input-area {
-    margin: 2rem 0;
-}
-
-.text-input {
-    width: 100%;
-    min-height: 300px;
-    padding: 1.5rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 15px;
-    font-size: 1rem;
-    font-family: inherit;
-    resize: vertical;
-    transition: border-color 0.3s ease;
-}
-
-.text-input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Configuración del quiz */
-.quiz-config {
-    background: rgba(102, 126, 234, 0.05);
-    padding: 2rem;
-    border-radius: 15px;
-    margin: 2rem 0;
-}
-
-.quiz-config h3 {
-    color: #2d3748;
-    margin-bottom: 1.5rem;
-    font-size: 1.3rem;
-}
-
-.config-group {
-    margin-bottom: 1.5rem;
-}
-
-.config-group label {
-    display: block;
-    color: #4a5568;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.config-input {
-    width: 100%;
-    padding: 0.8rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-}
-
-.config-input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Radio buttons para dificultad */
-.difficulty-radio {
-    display: flex;
-    gap: 1rem;
-    margin-top: 0.5rem;
-}
-
-.radio-option {
-    flex: 1;
-    position: relative;
-    cursor: pointer;
-}
-
-.radio-option input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-}
-
-.radio-label {
-    display: block;
-    padding: 0.8rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    background: white;
-}
-
-.radio-option:hover .radio-label {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
-}
-
-.radio-option input[type="radio"]:checked + .radio-label {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border-color: #667eea;
-}
-
-/* Acciones del formulario */
-.form-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-
-.btn-secondary {
-    background: #e2e8f0;
-    color: #4a5568;
-    padding: 0.8rem 2rem;
-    border: none;
-    border-radius: 25px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-.btn-secondary:hover {
-    background: #cbd5e0;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    padding: 0.8rem 2rem;
-    border: none;
-    border-radius: 25px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-    transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-}
-
-/* Quiz activo */
-.quiz-container-active {
-    margin-top: 2rem;
-}
-
-.quiz-header {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    padding: 2rem;
-    border-radius: 15px 15px 0 0;
-    text-align: center;
-}
-
-.quiz-header h3 {
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-}
-
-.quiz-progress {
-    background: rgba(255, 255, 255, 0.2);
-    height: 8px;
-    border-radius: 4px;
-    margin-top: 1rem;
-    overflow: hidden;
-}
-
-.quiz-progress-bar {
-    background: white;
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.3s ease;
-}
-
-.progress-text {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.quiz-body {
-    background: white;
-    padding: 2rem;
-    border: 2px solid #e2e8f0;
-    border-top: none;
-    border-radius: 0 0 15px 15px;
-}
-
-.question {
-    font-size: 1.3rem;
-    color: #2d3748;
-    margin-bottom: 2rem;
-    font-weight: 600;
-    line-height: 1.5;
-}
-
-.answers {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.answer-option {
-    padding: 1.2rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.answer-option:hover {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
-}
-
-.answer-option input[type="radio"] {
-    margin-right: 1rem;
-}
-
-.answer-text {
-    font-size: 1rem;
-    line-height: 1.4;
-}
-
-.quiz-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 2px solid #e2e8f0;
-}
-
-.quiz-info {
-    color: #718096;
-    font-weight: 600;
-}
-
-.quiz-actions {
-    display: flex;
-    gap: 1rem;
-}
-
-/* Resultados del quiz */
-.quiz-results-active {
-    text-align: center;
-    padding: 3rem;
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    margin-top: 2rem;
-}
-
-.results-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-}
-
-.results-score {
-    font-size: 3rem;
-    color: #2d3748;
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
-
-.results-message {
-    font-size: 1.2rem;
-    color: #718096;
-    margin-bottom: 2rem;
-}
-
-.results-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin: 2rem 0;
-}
-
-.stat-card {
-    background: rgba(102, 126, 234, 0.05);
-    padding: 1.5rem;
-    border-radius: 10px;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #667eea;
-}
-
-.stat-label {
-    color: #718096;
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
-}
-
-.results-actions {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-
-/* Estilos para la revisión de respuestas */
-.review-section {
-    margin-top: 2rem;
-    padding: 2rem;
-    background: rgba(102, 126, 234, 0.05);
-    border-radius: 15px;
-}
-
-.review-section h3 {
-    color: #2d3748;
-    margin-bottom: 2rem;
-    text-align: center;
-    font-size: 1.5rem;
-}
-
-.review-item {
-    background: white;
-    margin-bottom: 2rem;
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-left: 5px solid #e2e8f0;
-}
-
-.review-item.correct {
-    border-left-color: #48bb78;
-    background: rgba(72, 187, 120, 0.02);
-}
-
-.review-item.incorrect {
-    border-left-color: #f56565;
-    background: rgba(245, 101, 101, 0.02);
-}
-
-.review-question {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #2d3748;
-    margin-bottom: 1.5rem;
-    line-height: 1.5;
-}
-
-.review-answers {
-    margin-top: 1rem;
-}
-
-.review-answer {
-    display: flex;
-    align-items: center;
-    padding: 0.8rem 1rem;
-    margin: 0.5rem 0;
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-.review-answer.user-correct {
-    background: rgba(72, 187, 120, 0.1);
-    color: #2f855a;
-    border: 2px solid #48bb78;
-}
-
-.review-answer.user-incorrect {
-    background: rgba(245, 101, 101, 0.1);
-    color: #c53030;
-    border: 2px solid #f56565;
-}
-
-.review-answer.correct-answer {
-    background: rgba(72, 187, 120, 0.15);
-    color: #2f855a;
-    border: 2px solid #48bb78;
-    font-weight: 600;
-}
-
-.review-answer.not-answered {
-    background: rgba(160, 174, 192, 0.1);
-    color: #4a5568;
-    border: 2px solid #a0aec0;
-}
-
-.answer-icon {
-    margin-right: 0.8rem;
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.answer-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.answer-label.correct {
-    color: #2f855a;
-}
-
-.answer-label.incorrect {
-    color: #c53030;
-}
-
-.answer-label.not-answered {
-    color: #4a5568;
-}
-
-.question-status {
-    display: inline-block;
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 1rem;
-}
-
-.question-status.correct {
-    background: rgba(72, 187, 120, 0.2);
-    color: #2f855a;
-}
-
-.question-status.incorrect {
-    background: rgba(245, 101, 101, 0.2);
-    color: #c53030;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .navbar {
-        padding: 1rem;
-    }
-
-    .navbar h1 {
-        font-size: 1.5rem;
-    }
-
-    .container {
-        padding: 2rem 1rem;
-        margin: 20px 10px;
-    }
-
-    .section-header h2 {
-        font-size: 2rem;
-    }
-
-    .section-header p {
-        font-size: 1rem;
-    }
-
-    .cards-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
-    .card {
-        padding: 2rem;
-    }
-
-    .file-upload-area {
-        padding: 2rem;
-    }
-
-    .results-stats {
-        grid-template-columns: 1fr;
-    }
-
-    .quiz-footer {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .quiz-actions {
-        justify-content: center;
-    }
-
-    .form-actions {
-        flex-direction: column;
-    }
-
-    .results-actions {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .difficulty-radio {
-        flex-direction: column;
-    }
-
-    .review-section {
-        padding: 1rem;
-    }
-    
-    .review-item {
-        padding: 1.5rem;
-    }
-    
-    .review-question {
-        font-size: 1.1rem;
-    }
-    
-    .review-answer {
-        padding: 0.6rem 0.8rem;
-        font-size: 0.9rem;
-    }
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            color: #4a5568;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .navbar .user-info {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Mensajes de Django */
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border-left: 4px solid #48bb78;
+        }
+
+        .alert-error, .alert-danger {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border-left: 4px solid #f56565;
+        }
+
+        .alert-info {
+            background: rgba(102, 126, 234, 0.1);
+            color: #4c51bf;
+            border-left: 4px solid #667eea;
+        }
+
+        .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        /* Tabs para mostrar diferentes vistas */
+        .view-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            background: #f7fafc;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #718096;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* Header de sección */
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: #718096;
+            font-size: 1.2rem;
+        }
+
+        /* Grid de tarjetas */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin: 3rem 0;
+            justify-items: center;
+        }
+
+        /* Tarjetas */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            width: 100%;
+            max-width: 400px;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .card-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:nth-child(1) .card-icon {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .card:nth-child(2) .card-icon {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .card h3 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: #718096;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .card-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .card-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Formularios */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .form-header h2 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Emojis mantienen sus colores originales */
+        .emoji-icon {
+            background: none !important;
+            -webkit-background-clip: initial !important;
+            -webkit-text-fill-color: initial !important;
+            background-clip: initial !important;
+            color: initial !important;
+            margin-right: 0.5rem;
+        }
+
+        .form-header p {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* Área de subir archivos con animación */
+        .file-upload-area {
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: rgba(102, 126, 234, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+
+        .file-icon {
+            font-size: 3.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-text {
+            color: #667eea;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-hint {
+            color: #667eea;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .file-upload-content {
+            pointer-events: none;
+            position: relative;
+        }
+
+        .browse-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .browse-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* === ESTILOS MÁGICOS CUANDO SE SELECCIONA ARCHIVO === */
+
+        /* Cuando hay archivo, el icono se vuelve verde y rebota */
+        .file-input:valid + .file-upload-content .file-icon {
+            color: #48bb78 !important;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+
+        /* El texto cambia */
+        .file-input:valid + .file-upload-content .file-upload-text {
+            color: #2f855a !important;
+            font-weight: 700 !important;
+        }
+
+        .file-input:valid + .file-upload-content .file-upload-hint {
+            color: #2f855a !important;
+            font-weight: 600 !important;
+        }
+
+        /* Agrega confirmación */
+        .file-input:valid + .file-upload-content .file-upload-text::after {
+            content: "\A✅ Archivo seleccionado correctamente";
+            white-space: pre;
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: #2f855a;
+            font-weight: 600;
+        }
+
+        /* Oculta las instrucciones */
+        .file-input:valid + .file-upload-content .file-upload-hint {
+            display: none;
+        }
+
+        /* El botón se vuelve verde */
+        .file-input:valid + .file-upload-content .browse-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169) !important;
+        }
+
+        .file-input:valid + .file-upload-content .browse-btn::before {
+            content: "✅ ";
+            margin-right: 0.5rem;
+        }
+
+        /* El área completa se vuelve verde */
+        .file-upload-area:has(.file-input:valid) {
+            border-color: #48bb78 !important;
+            background: rgba(72, 187, 120, 0.1) !important;
+        }
+
+        /* Indicador de éxito */
+        .file-selected-indicator {
+            display: none;
+            background: rgba(72, 187, 120, 0.15);
+            border: 2px solid #48bb78;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            color: #2f855a;
+            text-align: center;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        /* Mostrar cuando hay archivo válido */
+        .file-input:valid ~ .file-selected-indicator {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .success-text {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #22543d;
+        }
+
+        .file-info {
+            font-size: 1rem;
+            color: #276749;
+            font-weight: 500;
+        }
+
+        /* Área de texto */
+        .text-input-area {
+            margin: 2rem 0;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .form-control.textarea {
+            min-height: 300px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        /* ConfiguraciÃ³n del quiz */
+        .quiz-config {
+            background: rgba(102, 126, 234, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .quiz-config h3 {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .config-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .config-group label {
+            display: block;
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .config-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .config-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Radio buttons para dificultad */
+        .difficulty-radio {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .radio-option {
+            flex: 1;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-label {
+            display: block;
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .radio-option:hover .radio-label {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Botones */
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            color: #4a5568;
+            text-decoration: none;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Cuestionarios recientes */
+        .recent-quizzes {
+            margin-top: 3rem;
+        }
+
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .recent-header h3 {
+            color: #2d3748;
+            font-size: 1.8rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+
+        .quizzes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .quiz-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-title {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .quiz-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .quiz-meta {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-small {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success-small {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-danger-small {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-primary-small:hover, .btn-success-small:hover, .btn-danger-small:hover {
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-danger-small:hover {
+            background: #e53e3e;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .empty-state h5 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .empty-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* BotÃ³n volver */
+        .boton-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 25px;
+            transition: background 0.3s;
+        }
+         .form-text {
+            margin-top: 0.5rem;
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+ 
+        .boton-volver:hover {
+            background: #5a6fd8;
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .view-tabs {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .tab-btn {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+
+            .empty-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .recent-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .quizzes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .difficulty-radio {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <h1>FocusPy</h1>
+        <h1>FocusPy - Cuestionarios</h1>
     </nav>
 
     <div class="container">
-        <!-- Vista Principal: Selección de método -->
-        {% if not show_config and not show_quiz and not show_results %}
-        <div class="section-header">
-            <h2>📝 Cuestionarios</h2>
-            <p>Pon a prueba tus conocimientos con cuestionarios personalizados</p>
+        <!-- Mensajes de Django -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Tabs para navegar entre vistas -->
+        <div class="view-tabs">
+            <button class="tab-btn active" onclick="showView('home')">🏠 Inicio</button>
+            <button class="tab-btn" onclick="showView('crear-texto')">✏️ Crear desde Texto</button>
+            <button class="tab-btn" onclick="showView('crear-archivo')">📄 Crear desde Archivo</button>
         </div>
 
-        <div class="cards-grid">
-            <!-- Tarjeta Subir Archivos -->
-            <div class="card">
-                <form method="get" action="{% url 'cuestionarios:config' %}">
-                    <input type="hidden" name="method" value="file">
+        <!-- Vista Principal -->
+        <div id="home" class="view-section active">
+            {% if not show_config and not show_quiz and not show_results %}
+            <div class="section-header">
+                <h2>📝 Cuestionarios</h2>
+                <p>Pon a prueba tus conocimientos con cuestionarios personalizados</p>
+            </div>
+
+            <div class="cards-grid">
+                <!-- Tarjeta Crear desde Archivo -->
+                <div class="card" onclick="showView('crear-archivo')">
                     <div class="card-icon">📄</div>
                     <h3>Crear desde Archivo</h3>
                     <p>Genera un cuestionario automático a partir de tus documentos PDF, Word o TXT.</p>
-                    <button type="submit" class="card-btn">Subir Archivo</button>
-                </form>
-            </div>
+                    <button class="card-btn" onclick="event.stopPropagation(); showView('crear-archivo')">Subir Archivo</button>
+                </div>
 
-            <!-- Tarjeta Ingresar Texto -->
-            <div class="card">
-                <form method="get" action="{% url 'cuestionarios:config' %}">
-                    <input type="hidden" name="method" value="text">
+                <!-- Tarjeta Crear desde Texto -->
+                <div class="card" onclick="showView('crear-texto')">
                     <div class="card-icon">✏️</div>
                     <h3>Crear desde Texto</h3>
                     <p>Pega o escribe tu contenido para generar preguntas de forma instantánea.</p>
-                    <button type="submit" class="card-btn">Ingresar Texto</button>
-                </form>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Vista de Configuración -->
-        {% if show_config %}
-        <div class="config-container">
-            <h2>
-                {% if method == 'file' %}
-                    📄 Crear Cuestionario desde Archivo
-                {% else %}
-                    ✏️ Crear Cuestionario desde Texto
-                {% endif %}
-            </h2>
-
-            <form method="post" action="{% url 'cuestionarios:create' %}" {% if method == 'file' %}enctype="multipart/form-data"{% endif %}>
-                {% csrf_token %}
-                
-                <!-- Área de entrada según el método -->
-                {% if method == 'file' %}
-                <div class="file-upload-section">
-                    <div class="file-upload-area">
-                        <input type="file" id="file" name="file" class="file-input" accept=".pdf,.txt,.doc,.docx" required 
-                               title="Selecciona tu archivo PDF, TXT, DOC o DOCX">
-                        <div class="file-upload-content">
-                            <div class="upload-icon">📄</div>
-                            <div class="upload-text">
-                                <strong>Selecciona un archivo</strong>
-                            </div>
-                            <div class="file-instructions">
-                                <p>Formatos soportados: PDF, TXT, DOC, DOCX</p>
-                                <p>Haz clic aquí para seleccionar tu archivo</p>
-                            </div>
-                            <span class="browse-btn">Explorar Archivos</span>
-                        </div>
-                    </div>
-                    <div class="file-selected-indicator">
-                        <span class="success-icon">✅</span>
-                        <div class="success-text">¡Archivo cargado exitosamente!</div>
-                        <div class="file-info">
-                            Tu archivo está listo para procesar. Puedes continuar con la configuración del cuestionario.
-                            <br><small>Tip: El nombre del archivo aparecerá en el navegador al pasar el cursor sobre el campo.</small>
-                        </div>
-                    </div>
+                    <button class="card-btn" onclick="event.stopPropagation(); showView('crear-texto')">Ingresar Texto</button>
                 </div>
-                {% else %}
-                <div class="text-input-area">
-                    <textarea name="text_content" class="text-input" required
-                              placeholder="Pega aquí tu texto o escribe directamente...
+            </div>
+
+            <!-- Cuestionarios recientes -->
+            {% if cuestionarios_recientes %}
+            <div class="recent-quizzes">
+                <div class="recent-header">
+                    <h3>📚 Cuestionarios Recientes</h3>
+                    <a href="{% url 'cuestionarios:mis_cuestionarios' %}" class="btn-outline">Ver todos</a>
+                </div>
+                
+                <div class="quizzes-grid">
+                    {% for cuestionario in cuestionarios_recientes %}
+                    <div class="quiz-card">
+                        <div class="quiz-header">
+                            <h4 class="quiz-title">{{ cuestionario.titulo|truncatechars:35 }}</h4>
+                            <span class="quiz-badge">{{ cuestionario.get_dificultad_display }}</span>
+                        </div>
+                        <div class="quiz-meta">
+                            Creado: {{ cuestionario.fecha_creacion|date:"d/m/Y" }}
+                            <br>📊 {{ cuestionario.num_preguntas }} preguntas
+                            {% if cuestionario.completado %}
+                                <br>✅ Completado
+                                {% if cuestionario.resultado %}
+                                    - {{ cuestionario.resultado.puntuacion|floatformat:0 }}%
+                                {% endif %}
+                            {% else %}
+                                <br>⏳ Pendiente
+                            {% endif %}
+                        </div>
+                        <div class="quiz-actions">
+                            <a href="{% url 'cuestionarios:ver_cuestionario' cuestionario.id %}" class="btn-small btn-primary-small">Ver</a>
+                            <a href="{% url 'cuestionarios:exportar_pdf' cuestionario.id %}" class="btn-small btn-success-small">PDF</a>
+                            {% if not cuestionario.completado %}
+                                <a href="{% url 'cuestionarios:quiz' cuestionario.id %}" class="btn-small btn-primary-small">Continuar</a>
+                            {% endif %}
+                            <a href="{% url 'cuestionarios:eliminar_cuestionario' cuestionario.id %}" 
+                               class="btn-small btn-danger-small"
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar el cuestionario &quot;{{ cuestionario.titulo }}&quot;?')">Eliminar</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <!-- Estado vacío cuando no hay cuestionarios -->
+            <div class="empty-state">
+                <h5>¡Bienvenido a Cuestionarios!</h5>
+                <p>Aún no has creado ningún cuestionario. Comienza creando uno desde texto o archivo.</p>
+                <div class="empty-actions">
+                    <button class="card-btn" onclick="showView('crear-texto')">✏️ Crear desde Texto</button>
+                    <button class="card-btn" onclick="showView('crear-archivo')">📄 Crear desde Archivo</button>
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- Vista Crear desde Texto -->
+        <div id="crear-texto" class="view-section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2><span class="emoji-icon">✏️</span> Crear Cuestionario desde Texto</h2>
+                    <p>Pega o escribe tu contenido para generar preguntas de forma instantánea</p>
+                </div>
+
+                <form method="post" action="{% url 'cuestionarios:create' %}" id="cuestionarioTextoForm">
+                    {% csrf_token %}
+                    
+                    <div class="text-input-area">
+                        <label for="contenido_texto" class="form-label">Contenido</label>
+                        <textarea id="contenido_texto" 
+                                  name="text_content" 
+                                  class="form-control textarea"
+                                  placeholder="Pega aquí tu texto o escribe directamente...
 
 El sistema analizará tu contenido y generará preguntas relevantes automáticamente.
 
@@ -948,208 +1004,235 @@ Puedes incluir:
 • Capítulos de libros
 • Cualquier material de estudio
 
-Entre más detallado sea el texto, mejores serán las preguntas generadas."></textarea>
-                </div>
-                {% endif %}
-
-                <!-- Configuración del cuestionario -->
-                <div class="quiz-config">
-                    <h3>Configuración del Cuestionario</h3>
-                    
-                    <div class="config-group">
-                        <label for="num_questions">Número de preguntas:</label>
-                        <input type="number" class="config-input" id="num_questions" name="num_questions" 
-                               value="10" min="5" max="50" required>
+Entre más detallado sea el texto, mejores serán las preguntas generadas."
+                                  required></textarea>
+                        <div class="form-text">Introduce el texto del cual quieres generar el cuestionario</div>
                     </div>
 
-                    <div class="config-group">
-                        <label>Dificultad:</label>
-                        <div class="difficulty-radio">
-                            <label class="radio-option">
-                                <input type="radio" name="difficulty" value="facil">
-                                <span class="radio-label">Fácil</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="difficulty" value="medio" checked>
-                                <span class="radio-label">Medio</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="difficulty" value="dificil">
-                                <span class="radio-label">Difícil</span>
-                            </label>
+                    <!-- Configuración del cuestionario -->
+                    <div class="quiz-config">
+                        <h3>Configuración del Cuestionario</h3>
+                        
+                        <div class="config-group">
+                            <label for="num_questions_texto">Número de preguntas:</label>
+                            <input type="number" class="config-input" id="num_questions_texto" name="num_questions" 
+                                   value="10" min="5" max="50" required>
                         </div>
-                    </div>
-                </div>
-                
-                <div class="form-actions">
-                    <a href="{% url 'cuestionarios:home' %}" class="btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn-primary">Generar Cuestionario</button>
-                </div>
-            </form>
-        </div>
-        {% endif %}
 
-        <!-- Vista del Quiz -->
-        {% if show_quiz %}
-        <div class="quiz-container-active">
-            <div class="quiz-header">
-                <h3>Cuestionario en Progreso</h3>
-                <div class="quiz-progress">
-                    <div class="quiz-progress-bar" style="width: {{ progress_percentage }}%"></div>
-                </div>
-                <p class="progress-text">Pregunta {{ current_question }} de {{ total_questions }}</p>
-            </div>
-
-            <form method="post" action="{% url 'cuestionarios:answer' %}">
-                {% csrf_token %}
-                <input type="hidden" name="quiz_id" value="{{ quiz_id }}">
-                <input type="hidden" name="question_num" value="{{ current_question }}">
-                
-                <div class="quiz-body">
-                    <div class="question">
-                        {{ question_text }}
-                    </div>
-                    
-                    <div class="answers">
-                        {% for answer in answers %}
-                        <label class="answer-option">
-                            <input type="radio" name="answer" value="{{ forloop.counter0 }}" required>
-                            <span class="answer-text">{{ answer }}</span>
-                        </label>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="quiz-footer">
-                        <div class="quiz-info">
-                            <span>Pregunta {{ current_question }} de {{ total_questions }}</span>
-                        </div>
-                        <div class="quiz-actions">
-                            <button type="submit" name="action" value="skip" class="btn-secondary">Saltar</button>
-                            <button type="submit" name="action" value="next" class="btn-primary">Siguiente</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-        {% endif %}
-
-        <!-- Vista de Resultados -->
-        {% if show_results %}
-        <div class="quiz-results-active">
-            <div class="results-icon">🏆</div>
-            <div class="results-score">{{ score }}%</div>
-            <div class="results-message">
-                {% if score >= 90 %}
-                    ¡Excelente trabajo! 🎉
-                {% elif score >= 70 %}
-                    ¡Muy bien! 👏
-                {% elif score >= 50 %}
-                    Buen intento 👍
-                {% else %}
-                    Sigue practicando 💪
-                {% endif %}
-            </div>
-            
-            <div class="results-stats">
-                <div class="stat-card">
-                    <div class="stat-value">{{ correct_answers }}</div>
-                    <div class="stat-label">Respuestas Correctas</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">{{ incorrect_answers }}</div>
-                    <div class="stat-label">Respuestas Incorrectas</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">{{ total_questions }}</div>
-                    <div class="stat-label">Total de Preguntas</div>
-                </div>
-            </div>
-
-            <!-- Revisión de respuestas -->
-            {% if show_review %}
-            <div class="review-section">
-                <h3>📋 Revisión Detallada de Respuestas</h3>
-                
-                {% for item in review_data %}
-                <div class="review-item {% if item.correct %}correct{% else %}incorrect{% endif %}">
-                    <!-- Estado de la pregunta -->
-                    <div class="question-status {% if item.correct %}correct{% else %}incorrect{% endif %}">
-                        {% if item.correct %}
-                            ✅ Correcta
-                        {% elif not item.answered %}
-                            ⏭️ No respondida
-                        {% else %}
-                            ❌ Incorrecta
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Pregunta -->
-                    <div class="review-question">
-                        <strong>Pregunta {{ forloop.counter }}:</strong> {{ item.question }}
-                    </div>
-                    
-                    <div class="review-answers">
-                        {% if item.answered %}
-                            <!-- Mostrar respuesta del usuario -->
-                            {% if item.correct %}
-                                <!-- Respuesta correcta del usuario -->
-                                <div class="answer-label correct">Tu respuesta (Correcta):</div>
-                                <div class="review-answer user-correct">
-                                    <span class="answer-icon">✅</span>
-                                    {{ item.user_answer_text }}
-                                </div>
-                            {% else %}
-                                <!-- Respuesta incorrecta del usuario -->
-                                <div class="answer-label incorrect">Tu respuesta (Incorrecta):</div>
-                                <div class="review-answer user-incorrect">
-                                    <span class="answer-icon">❌</span>
-                                    {{ item.user_answer_text }}
-                                </div>
-                                
-                                <!-- Mostrar respuesta correcta -->
-                                <div class="answer-label correct" style="margin-top: 1rem;">Respuesta correcta:</div>
-                                <div class="review-answer correct-answer">
-                                    <span class="answer-icon">✅</span>
-                                    {{ item.correct_answer_text }}
-                                </div>
-                            {% endif %}
-                        {% else %}
-                            <!-- Pregunta no respondida -->
-                            <div class="answer-label not-answered">No respondiste esta pregunta</div>
-                            <div class="review-answer not-answered">
-                                <span class="answer-icon">⏭️</span>
-                                Pregunta saltada
+                        <div class="config-group">
+                            <label>Dificultad:</label>
+                            <div class="difficulty-radio">
+                                <label class="radio-option">
+                                    <input type="radio" name="difficulty" value="facil">
+                                    <span class="radio-label">Fácil</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="difficulty" value="medio" checked>
+                                    <span class="radio-label">Medio</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="difficulty" value="dificil">
+                                    <span class="radio-label">Difícil</span>
+                                </label>
                             </div>
-                            
-                            <!-- Mostrar respuesta correcta -->
-                            <div class="answer-label correct" style="margin-top: 1rem;">Respuesta correcta:</div>
-                            <div class="review-answer correct-answer">
-                                <span class="answer-icon">✅</span>
-                                {{ item.correct_answer_text }}
-                            </div>
-                        {% endif %}
+                        </div>
                     </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
 
-            <div class="results-actions">
-                <form method="get" action="{% url 'cuestionarios:home' %}" style="display: inline;">
-                    <button type="submit" class="btn-primary">Nuevo Cuestionario</button>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showView('home')">
+                            ← Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitTextoBtn">
+                            🚀 Generar Cuestionario
+                        </button>
+                    </div>
                 </form>
-                {% if not show_review %}
-                <form method="post" action="{% url 'cuestionarios:review' %}" style="display: inline;">
+
+                <div class="loading-spinner" id="loadingTextoSpinner">
+                    <div class="spinner"></div>
+                    <p>Generando tu cuestionario con inteligencia artificial...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Crear desde Archivo -->
+        <div id="crear-archivo" class="view-section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2><span class="emoji-icon">📄</span> Crear Cuestionario desde Archivo</h2>
+                    <p>Sube un documento y genera cuestionarios automáticamente</p>
+                </div>
+
+                <form method="post" action="{% url 'cuestionarios:create' %}" enctype="multipart/form-data" id="cuestionarioArchivoForm">
                     {% csrf_token %}
-                    <input type="hidden" name="quiz_id" value="{{ quiz_id }}">
-                    <button type="submit" class="btn-secondary">Revisar Respuestas</button>
+                    
+                    <div class="form-group">
+                        <label for="archivo" class="form-label">Archivo</label>
+                        
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" 
+                                   id="archivo" 
+                                   name="file" 
+                                   class="file-input"
+                                   accept=".pdf,.doc,.docx,.txt"
+                                   required
+                                   title="Archivo seleccionado">
+                            
+                            <div class="file-upload-content">
+                                <div class="file-icon">📄</div>
+                                <div class="file-upload-text">
+                                    <strong>Selecciona un archivo</strong>
+                                </div>
+                                <div class="file-upload-hint">
+                                    Formatos soportados: PDF, TXT, DOC, DOCX<br>
+                                    Haz clic aquí para seleccionar tu archivo
+                                </div>
+                                <span class="browse-btn">Explorar Archivos</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Indicador que aparece cuando se selecciona archivo -->
+                        <div class="file-selected-indicator">
+                            <span class="success-icon">✅</span>
+                            <div class="success-text">¡Archivo cargado exitosamente!</div>
+                            <div class="file-info">
+                                Tu archivo está listo para procesar. Puedes continuar con la configuración del cuestionario.
+                            </div>
+                        </div>
+                        
+                        <div class="form-text file-help-text">Sube un archivo PDF, DOC, DOCX o TXT (máximo 10MB)</div>
+                    </div>
+
+                    <!-- Configuración del cuestionario -->
+                    <div class="quiz-config">
+                        <h3>Configuración del Cuestionario</h3>
+                        
+                        <div class="config-group">
+                            <label for="num_questions_archivo">Número de preguntas:</label>
+                            <input type="number" class="config-input" id="num_questions_archivo" name="num_questions" 
+                                   value="10" min="5" max="50" required>
+                        </div>
+
+                        <div class="config-group">
+                            <label>Dificultad:</label>
+                            <div class="difficulty-radio">
+                                <label class="radio-option">
+                                    <input type="radio" name="difficulty" value="facil">
+                                    <span class="radio-label">Fácil</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="difficulty" value="medio" checked>
+                                    <span class="radio-label">Medio</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="difficulty" value="dificil">
+                                    <span class="radio-label">Difícil</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showView('home')">
+                            ← Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitArchivoBtn">
+                            🚀 Procesar Archivo
+                        </button>
+                    </div>
                 </form>
-                {% endif %}
+
+                <div class="loading-spinner" id="loadingArchivoSpinner">
+                    <div class="spinner"></div>
+                    <p>Extrayendo texto y generando cuestionario...</p>
+                </div>
             </div>
         </div>
-        {% endif %}
 
         <a href="{% url 'home' %}" class="boton-volver">← Volver al Inicio</a>
     </div>
+
+    <script>
+        function showView(viewId) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remover active de todos los tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar la vista seleccionada
+            document.getElementById(viewId).classList.add('active');
+            
+            // Activar el tab correspondiente
+            const activeBtn = document.querySelector(`[onclick="showView('${viewId}')"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
+
+        // Manejo del formulario de texto
+        document.getElementById('cuestionarioTextoForm').addEventListener('submit', function() {
+            document.getElementById('submitTextoBtn').disabled = true;
+            document.getElementById('loadingTextoSpinner').style.display = 'block';
+            document.getElementById('submitTextoBtn').innerHTML = '⏳ Generando...';
+        });
+
+        // JavaScript para mostrar el nombre del archivo seleccionado
+        document.getElementById('archivo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileUploadText = document.querySelector('#crear-archivo .file-upload-text strong');
+                if (fileUploadText) {
+                    fileUploadText.innerHTML = `Archivo seleccionado: <br><span style="font-size: 0.9rem; font-weight: normal;">${file.name}</span>`;
+                }
+            }
+        });
+
+        // Drag and drop funcionalidad
+        const fileUploadArea = document.getElementById('fileUploadArea');
+
+        fileUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('archivo').files = files;
+                // Trigger change event manually for drag and drop
+                document.getElementById('archivo').dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Manejo del formulario de archivo
+        document.getElementById('cuestionarioArchivoForm').addEventListener('submit', function() {
+            document.getElementById('submitArchivoBtn').disabled = true;
+            document.getElementById('loadingArchivoSpinner').style.display = 'block';
+            document.getElementById('submitArchivoBtn').innerHTML = '⏳ Procesando...';
+        });
+
+        // Cerrar alertas automáticamente
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
+    </script>
 </body>
 </html>
