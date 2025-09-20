@@ -1,4 +1,4 @@
-# cuestionarios/views.py - CÓDIGO COMPLETO ACTUALIZADO
+# cuestionarios/views.py - VERSIÓN CORREGIDA Y ACTUALIZADA
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse
@@ -10,6 +10,9 @@ import docx
 from io import BytesIO
 from .models import Cuestionario, Pregunta, RespuestaUsuario, ResultadoCuestionario
 from .utils import generar_preguntas_openai, extraer_texto_archivo
+
+# IMPORTAR HISTORIAL
+from historial.utils import registrar_actividad
 
 # Configurar OpenAI
 openai.api_key = settings.OPENAI_API_KEY
@@ -53,20 +56,28 @@ def crear_cuestionario(request):
         return redirect('cuestionarios:home')
     
     try:
+        print("DEBUG: Iniciando creación de cuestionario")
+        
         # Obtener datos del formulario
         num_preguntas = int(request.POST.get('num_questions', 10))
         dificultad = request.POST.get('difficulty', 'medio')
+        
+        print(f"DEBUG: Parámetros - Preguntas: {num_preguntas}, Dificultad: {dificultad}")
         
         # Extraer contenido según el método
         if 'file' in request.FILES:
             # Método archivo
             archivo = request.FILES['file']
+            print(f"DEBUG: Procesando archivo: {archivo.name}")
             contenido = extraer_texto_archivo(archivo)
             titulo = f"Cuestionario - {archivo.name}"
         else:
             # Método texto
             contenido = request.POST.get('text_content', '')
             titulo = f"Cuestionario - {contenido[:50]}..."
+            print("DEBUG: Procesando texto directo")
+        
+        print(f"DEBUG: Contenido extraído: {len(contenido)} caracteres")
         
         if not contenido.strip():
             messages.error(request, 'No se pudo extraer contenido válido.')
@@ -81,77 +92,162 @@ def crear_cuestionario(request):
             dificultad=dificultad
         )
         
+        print(f"DEBUG: Cuestionario creado con ID: {cuestionario.id}")
+        
         # Generar preguntas con OpenAI
-        preguntas_data = generar_preguntas_openai(contenido, num_preguntas, dificultad)
+        try:
+            print("DEBUG: Llamando a OpenAI para generar preguntas...")
+            preguntas_data = generar_preguntas_openai(contenido, num_preguntas, dificultad)
+            print(f"DEBUG: OpenAI devolvió {len(preguntas_data)} preguntas")
+            
+            if preguntas_data:
+                print(f"DEBUG: Primera pregunta: {preguntas_data[0].get('pregunta', 'SIN TEXTO')[:100]}")
+            
+        except Exception as e:
+            print(f"ERROR: Fallo OpenAI: {str(e)}")
+            messages.error(request, f'Error al generar preguntas con IA: {str(e)}')
+            # Crear pregunta de prueba como fallback
+            preguntas_data = [
+                {
+                    "pregunta": f"Pregunta de prueba sobre: {contenido[:100]}...",
+                    "opciones": ["Opción A", "Opción B", "Opción C", "Opción D"],
+                    "respuesta_correcta": 0
+                }
+            ]
+            print("DEBUG: Usando pregunta de fallback")
         
         # Guardar preguntas en la base de datos
+        preguntas_creadas = 0
         for i, pregunta_data in enumerate(preguntas_data, 1):
-            Pregunta.objects.create(
-                cuestionario=cuestionario,
-                numero=i,
-                texto=pregunta_data['pregunta'],
-                opciones=pregunta_data['opciones'],
-                respuesta_correcta=pregunta_data['respuesta_correcta']
-            )
+            try:
+                print(f"DEBUG: Creando pregunta {i}...")
+                
+                # Validar datos de la pregunta
+                if not pregunta_data.get('pregunta'):
+                    print(f"ERROR: Pregunta {i} sin texto")
+                    continue
+                    
+                if not pregunta_data.get('opciones') or len(pregunta_data['opciones']) != 4:
+                    print(f"ERROR: Pregunta {i} sin 4 opciones válidas")
+                    continue
+                
+                respuesta_correcta = pregunta_data.get('respuesta_correcta', 0)
+                if not isinstance(respuesta_correcta, int) or respuesta_correcta < 0 or respuesta_correcta > 3:
+                    print(f"ERROR: Pregunta {i} con respuesta_correcta inválida: {respuesta_correcta}")
+                    respuesta_correcta = 0
+                
+                pregunta = Pregunta.objects.create(
+                    cuestionario=cuestionario,
+                    numero=i,
+                    texto=pregunta_data['pregunta'],
+                    opciones=pregunta_data['opciones'],
+                    respuesta_correcta=respuesta_correcta
+                )
+                preguntas_creadas += 1
+                print(f"DEBUG: Pregunta {i} creada exitosamente - ID: {pregunta.id}")
+                
+            except Exception as e:
+                print(f"ERROR: No se pudo crear pregunta {i}: {str(e)}")
+                continue
+        
+        # Verificar que se crearon preguntas
+        total_en_bd = cuestionario.preguntas.count()
+        print(f"DEBUG: Preguntas creadas: {preguntas_creadas}, Total en BD: {total_en_bd}")
+        
+        if total_en_bd == 0:
+            print("ERROR: No se creó ninguna pregunta, eliminando cuestionario")
+            cuestionario.delete()
+            messages.error(request, 'No se pudieron generar preguntas válidas. Intenta con otro contenido.')
+            return redirect('cuestionarios:home')
+        
+        # *** REGISTRAR EN HISTORIAL ***
+        registrar_actividad(
+            tipo='cuestionario_creado',
+            titulo=titulo,
+            descripcion=f'{total_en_bd} preguntas • Dificultad {dificultad}',
+            app_origen='cuestionarios',
+            objeto_id=cuestionario.id,
+            metadata={
+                'num_preguntas': total_en_bd,
+                'dificultad': dificultad,
+                'metodo': 'archivo' if 'file' in request.FILES else 'texto'
+            }
+        )
+        
+        print(f"DEBUG: Redirigiendo a quiz con ID: {cuestionario.id}")
+        messages.success(request, f'Cuestionario creado exitosamente con {total_en_bd} preguntas.')
         
         # Redirigir al quiz
         return redirect('cuestionarios:quiz', quiz_id=cuestionario.id)
         
     except Exception as e:
+        print(f"ERROR GENERAL: {str(e)}")
         messages.error(request, f'Error al crear el cuestionario: {str(e)}')
         return redirect('cuestionarios:home')
 
 def mostrar_quiz(request, quiz_id):
     """Mostrar pregunta actual del quiz"""
+    print(f"DEBUG: Accediendo a quiz con ID: {quiz_id}")
+    
     cuestionario = get_object_or_404(Cuestionario, id=quiz_id)
+    print(f"DEBUG: Cuestionario encontrado: {cuestionario.titulo}")
     
     # Obtener pregunta actual (primera sin responder)
-    pregunta_actual = cuestionario.preguntas.filter(
-        respuestausuario__isnull=True
-    ).first()
+    respuestas_existentes = RespuestaUsuario.objects.filter(cuestionario=cuestionario)
+    pregunta_actual = cuestionario.preguntas.exclude(
+        id__in=respuestas_existentes.values_list('pregunta_id', flat=True)
+    ).order_by('numero').first()
+    
+    total_preguntas = cuestionario.preguntas.count()
+    print(f"DEBUG: Total preguntas en cuestionario: {total_preguntas}")
     
     if not pregunta_actual:
+        print("DEBUG: No hay más preguntas sin responder, redirigiendo a resultados")
         # No hay más preguntas, mostrar resultados
         return redirect('cuestionarios:results', quiz_id=quiz_id)
     
+    print(f"DEBUG: Mostrando pregunta número: {pregunta_actual.numero}")
+    
     # Calcular progreso
-    preguntas_respondidas = RespuestaUsuario.objects.filter(cuestionario=cuestionario).count()
-    total_preguntas = cuestionario.preguntas.count()
-    progress_percentage = (preguntas_respondidas / total_preguntas) * 100 if total_preguntas > 0 else 0
+    preguntas_respondidas = respuestas_existentes.count()
+    progreso = (preguntas_respondidas / total_preguntas) * 100 if total_preguntas > 0 else 0
+    
+    print(f"DEBUG: Progreso: {preguntas_respondidas}/{total_preguntas} ({progreso:.1f}%)")
     
     context = {
         'show_config': False,
         'show_quiz': True,
         'show_results': False,
-        'quiz_id': quiz_id,
-        'current_question': preguntas_respondidas + 1,
-        'total_questions': total_preguntas,
-        'progress_percentage': progress_percentage,
-        'question_text': pregunta_actual.texto,
-        'answers': pregunta_actual.opciones
+        'cuestionario': cuestionario,
+        'pregunta_actual': pregunta_actual,
+        'total_preguntas': total_preguntas,
+        'progreso': progreso,
     }
     
     return render(request, 'cuestionarios/cuestionarios_home.html', context)
 
-def responder_pregunta(request):
+def responder_pregunta(request, cuestionario_id):
     """Procesar respuesta de una pregunta"""
     if request.method != 'POST':
         return redirect('cuestionarios:home')
     
-    quiz_id = request.POST.get('quiz_id')
-    question_num = int(request.POST.get('question_num'))
-    action = request.POST.get('action')
-    respuesta = request.POST.get('answer')
+    print(f"DEBUG: Procesando respuesta para cuestionario ID: {cuestionario_id}")
     
-    cuestionario = get_object_or_404(Cuestionario, id=quiz_id)
-    pregunta = get_object_or_404(Pregunta, cuestionario=cuestionario, numero=question_num)
+    cuestionario = get_object_or_404(Cuestionario, id=cuestionario_id)
+    pregunta_id = request.POST.get('pregunta_id')
+    respuesta_seleccionada = request.POST.get('respuesta')
     
-    # Procesar respuesta
-    if action == 'next' and respuesta is not None:
-        respuesta_idx = int(respuesta)
+    print(f"DEBUG: Pregunta ID: {pregunta_id}, Respuesta: {respuesta_seleccionada}")
+    
+    pregunta = get_object_or_404(Pregunta, id=pregunta_id)
+    
+    # Guardar respuesta
+    if respuesta_seleccionada is not None:
+        respuesta_idx = int(respuesta_seleccionada)
         es_correcta = respuesta_idx == pregunta.respuesta_correcta
         
-        # Guardar respuesta
+        print(f"DEBUG: Respuesta {respuesta_idx}, Correcta: {pregunta.respuesta_correcta}, Es correcta: {es_correcta}")
+        
         RespuestaUsuario.objects.update_or_create(
             cuestionario=cuestionario,
             pregunta=pregunta,
@@ -160,33 +256,50 @@ def responder_pregunta(request):
                 'es_correcta': es_correcta
             }
         )
-    elif action == 'skip':
-        # Marcar como saltada (sin respuesta)
-        RespuestaUsuario.objects.update_or_create(
-            cuestionario=cuestionario,
-            pregunta=pregunta,
-            defaults={
-                'respuesta_seleccionada': None,
-                'es_correcta': False
-            }
-        )
     
-    # Verificar si quedan más preguntas
-    preguntas_restantes = cuestionario.preguntas.filter(
-        respuestausuario__isnull=True
-    ).exists()
+    # Verificar si hay más preguntas sin responder
+    respuestas_existentes = RespuestaUsuario.objects.filter(cuestionario=cuestionario)
+    siguiente_pregunta = cuestionario.preguntas.exclude(
+        id__in=respuestas_existentes.values_list('pregunta_id', flat=True)
+    ).order_by('numero').first()
     
-    if preguntas_restantes:
-        return redirect('cuestionarios:quiz', quiz_id=quiz_id)
+    print(f"DEBUG: ¿Hay siguiente pregunta? {siguiente_pregunta is not None}")
+    
+    if siguiente_pregunta:
+        return redirect('cuestionarios:quiz', quiz_id=cuestionario.id)
     else:
-        # Marcar cuestionario como completado y calcular resultados
+        # Completar cuestionario
         cuestionario.completado = True
         cuestionario.save()
         calcular_resultados(cuestionario)
-        return redirect('cuestionarios:results', quiz_id=quiz_id)
+        
+        print("DEBUG: Cuestionario completado, calculando resultados")
+        
+        # *** REGISTRAR CUESTIONARIO COMPLETADO EN HISTORIAL ***
+        try:
+            resultado = ResultadoCuestionario.objects.get(cuestionario=cuestionario)
+            registrar_actividad(
+                tipo='cuestionario_completado',
+                titulo=cuestionario.titulo,
+                descripcion=f'{resultado.respuestas_correctas}/{resultado.total_preguntas} correctas • {resultado.puntuacion:.0f}% de aciertos',
+                app_origen='cuestionarios',
+                objeto_id=cuestionario.id,
+                metadata={
+                    'puntuacion': resultado.puntuacion,
+                    'respuestas_correctas': resultado.respuestas_correctas,
+                    'total_preguntas': resultado.total_preguntas,
+                    'dificultad': cuestionario.dificultad
+                }
+            )
+        except ResultadoCuestionario.DoesNotExist:
+            pass
+        
+        return redirect('cuestionarios:results', quiz_id=cuestionario.id)
 
 def mostrar_resultados(request, quiz_id):
     """Mostrar resultados del cuestionario"""
+    print(f"DEBUG: Mostrando resultados para quiz ID: {quiz_id}")
+    
     cuestionario = get_object_or_404(Cuestionario, id=quiz_id)
     
     # Obtener o crear resultado
@@ -201,19 +314,18 @@ def mostrar_resultados(request, quiz_id):
     )
     
     if created:
+        print("DEBUG: Calculando resultados...")
         calcular_resultados(cuestionario)
         resultado.refresh_from_db()
+    
+    print(f"DEBUG: Puntuación: {resultado.puntuacion}%, Correctas: {resultado.respuestas_correctas}")
     
     context = {
         'show_config': False,
         'show_quiz': False,
         'show_results': True,
-        'quiz_id': quiz_id,
-        'score': int(resultado.puntuacion),
-        'correct_answers': resultado.respuestas_correctas,
-        'incorrect_answers': resultado.respuestas_incorrectas,
-        'total_questions': resultado.total_preguntas,
-        'show_review': False
+        'cuestionario': cuestionario,
+        'resultado': resultado,
     }
     
     return render(request, 'cuestionarios/cuestionarios_home.html', context)
@@ -278,11 +390,8 @@ def revisar_respuestas(request):
         'show_config': False,
         'show_quiz': False,
         'show_results': True,
-        'quiz_id': quiz_id,
-        'score': int(resultado.puntuacion),
-        'correct_answers': resultado.respuestas_correctas,
-        'incorrect_answers': resultado.respuestas_incorrectas,
-        'total_questions': resultado.total_preguntas,
+        'cuestionario': cuestionario,
+        'resultado': resultado,
         'show_review': True,
         'review_data': review_data
     }
@@ -453,6 +562,8 @@ def calcular_resultados(cuestionario):
     
     puntuacion = (respuestas_correctas / total_preguntas * 100) if total_preguntas > 0 else 0
     
+    print(f"DEBUG: Calculando resultados - Correctas: {respuestas_correctas}, Total: {total_preguntas}, Puntuación: {puntuacion}")
+    
     # Actualizar o crear resultado
     ResultadoCuestionario.objects.update_or_create(
         cuestionario=cuestionario,
@@ -463,3 +574,11 @@ def calcular_resultados(cuestionario):
             'total_preguntas': total_preguntas
         }
     )
+
+# Alias para mantener compatibilidad
+home = cuestionarios_home
+config = config_cuestionario
+create = crear_cuestionario
+answer = responder_pregunta
+results = mostrar_resultados
+review = revisar_respuestas

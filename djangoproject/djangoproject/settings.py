@@ -1,6 +1,10 @@
-# settings.py - Configuración corregida con apps de autenticación
+# settings.py - Configuración corregida con .env
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Cargar variables del archivo .env
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -102,8 +106,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# OpenAI API Key (si la usas)
-OPENAI_API_KEY = 'tu-openai-api-key-aqui'
+# OpenAI API Key - CARGADA DESDE .env
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # Configuración adicional para fechas y números en formato costarricense
 USE_L10N = True
