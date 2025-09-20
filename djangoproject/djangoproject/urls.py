@@ -1,19 +1,18 @@
-# En tu urls.py principal del proyecto (mi_proyecto/urls.py)
-
-from django.contrib import admin
+# urls.py - En tu proyecto principal
 from django.urls import path, include
-from django.shortcuts import render
-# Vista para la página de inicio (si no tienes una app principal)
-def home(request):
-    return render(request, 'home.html')
+from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', home, name='home'),
+    # Página principal
+    path('', views.home, name='home'),
+    
+    # APIs del historial
+    path('api/historial/', views.obtener_historial, name='obtener_historial'),
+    path('api/estadisticas/', views.estadisticas_historial, name='estadisticas_historial'),
+    
+    # URLs de las apps existentes
     path('resumenes/', include('resumenes.urls')),
     path('esquemas/', include('esquemas.urls')),
-    path('flashcards/', include('flashcards.urls')),
     path('cuestionarios/', include('cuestionarios.urls')),
+    path('flashcards/', include('flashcards.urls')),  # Si tienes esta app
 ]
-
-
