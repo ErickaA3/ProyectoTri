@@ -110,6 +110,8 @@
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-decoration: none;
         }
         .flashcards-grid {
             display: grid;
@@ -164,6 +166,8 @@
             background: white;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            color: #667eea;
+            text-decoration: none;
         }
         .empty-state {
             text-align: center;
@@ -217,6 +221,30 @@
             text-align: center;
             color: #718096;
         }
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: none;
+        }
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border-left: 4px solid #48bb78;
+        }
+        .alert-error, .alert-danger {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border-left: 4px solid #f56565;
+        }
+        .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+        }
         @media (max-width: 768px) {
             .collection-info {
                 flex-direction: column;
@@ -230,15 +258,29 @@
             .flashcards-grid {
                 grid-template-columns: 1fr;
             }
+            .container {
+                margin: 15px;
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <h1>FocusPy</h1>
+        <h1>FocusPy - Flashcards</h1>
     </nav>
 
     <div class="container">
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
         <div class="collection-header">
             <h1 class="collection-title">{{ collection.title }}</h1>
             
@@ -295,9 +337,9 @@
                 <a href="{% url 'flashcards:my_flashcards' %}" class="btn btn-secondary">
                     📋 Mis Colecciones
                 </a>
-                <button class="btn btn-danger" onclick="deleteCollection()">
+                <a href="{% url 'flashcards:confirmar_eliminar_collection' collection.id %}" class="btn btn-danger">
                     🗑️ Eliminar
-                </button>
+                </a>
             </div>
         </div>
 
@@ -319,50 +361,10 @@
         {% endif %}
 
         <div style="text-align: center;">
-            <a href="{% url 'flashcards:flashcards_home' %}" class="back-button">
+            <a href="{% url 'flashcards:home' %}" class="back-button">
                 ← Volver a Flashcards
             </a>
         </div>
     </div>
-
-    <script>
-        function deleteCollection() {
-            if (confirm('¿Estás seguro de que quieres eliminar esta colección? Esta acción no se puede deshacer.')) {
-                fetch(`/flashcards/collection/{{ collection.id }}/delete/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Colección eliminada correctamente');
-                        window.location.href = '{% url "flashcards:my_flashcards" %}';
-                    } else {
-                        alert('Error: ' + data.error);
-                    }
-                })
-                .catch(error => {
-                    alert('Error al eliminar la colección: ' + error.message);
-                });
-            }
-        }
-
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-    </script>
 </body>
 </html>

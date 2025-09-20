@@ -36,7 +36,24 @@
             max-width: 1000px;
             margin: 30px auto;
         }
-        
+        .boton-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 25px;
+            transition: background 0.3s;
+        }
+
+        .boton-volver:hover {
+            background: #5a6fd8;
+            color: white;
+            text-decoration: none;
+        }
         .summary-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -133,7 +150,7 @@
         
         .actions-bar {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
@@ -154,36 +171,40 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
         }
         
-        .btn-primary:hover {
+        .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #4a5568;
-        }
-        
-        .btn-secondary:hover {
-            background: #cbd5e0;
-            transform: translateY(-2px);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, #48bb78, #38a169);
+            text-decoration: none;
             color: white;
         }
         
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        /* Botón celeste - Descargar TXT */
+        .btn-txt {
+            background: linear-gradient(135deg, #56CCF2, #2F80ED);
+        }
+        
+        .btn-txt:hover {
+            box-shadow: 0 5px 15px rgba(86, 204, 242, 0.4);
+        }
+        
+        /* Botón rojo - Descargar PDF */
+        .btn-pdf {
+            background: linear-gradient(135deg, #FF6B6B, #EE5A52);
+        }
+        
+        .btn-pdf:hover {
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* Botón morado - Crear nuevo */
+        .btn-nuevo {
+            background: linear-gradient(135deg, #A855F7, #7C3AED);
+        }
+        
+        .btn-nuevo:hover {
+            box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4);
         }
         
         .stats {
@@ -280,7 +301,7 @@
                         <span>Procesado: {{ document.created_at|date:"d/m/Y H:i" }}</span>
                     </div>
                     <div class="meta-item">
-                        <span class="meta-icon">🔤</span>
+                        <span class="meta-icon">📤</span>
                         <span>{{ document.original_text|length }} caracteres</span>
                     </div>
                 </div>
@@ -291,45 +312,21 @@
             </div>
             
             <div class="actions-bar">
-                <div>
-                    <a href="{% url 'resumenes:home' %}" class="btn btn-secondary">
-                        ← Procesar otro documento
-                    </a>
-                </div>
-                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <button onclick="copyToClipboard()" class="btn btn-success">
-                        📋 Copiar resumen
-                    </button>
-                    <button onclick="downloadSummary()" class="btn btn-primary">
-                        💾 Descargar
-                    </button>
-                    <button onclick="printSummary()" class="btn btn-secondary">
-                        🖨️ Imprimir
-                    </button>
-                </div>
+                <a href="{% url 'resumenes:exportar_pdf' document.id %}" class="btn btn-pdf">
+                    📄 Descargar PDF
+                </a>
+                <button onclick="downloadSummary()" class="btn btn-txt">
+                    📝 Descargar TXT
+                </button>
+                <a href="{% url 'resumenes:home' %}" class="btn btn-nuevo">
+                    ➕ Crear Nuevo
+                </a>
             </div>
+            <a href="{% url 'resumenes:home' %}" class="boton-volver">← Volver a Resumenes</a>
         </div>
     </div>
     
     <script>
-        function copyToClipboard() {
-            const summaryText = document.querySelector('.summary-content').textContent;
-            navigator.clipboard.writeText(summaryText).then(() => {
-                // Cambiar temporalmente el texto del botón
-                const btn = event.target;
-                const originalText = btn.textContent;
-                btn.textContent = '✅ Copiado!';
-                btn.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
-                
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 2000);
-            }).catch(err => {
-                alert('Error al copiar al portapapeles');
-            });
-        }
-        
         function downloadSummary() {
             const title = '{{ document.title }}';
             const summary = document.querySelector('.summary-content').textContent;
@@ -342,25 +339,6 @@
             a.download = `resumen_${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
             a.click();
             window.URL.revokeObjectURL(url);
-        }
-        
-        function printSummary() {
-            const printContent = document.querySelector('.summary-card').innerHTML;
-            const originalContent = document.body.innerHTML;
-            
-            document.body.innerHTML = `
-                <div style="font-family: Arial, sans-serif; padding: 20px;">
-                    <h1>{{ document.title }}</h1>
-                    <p><strong>Fecha:</strong> {{ summary.created_at|date:"d/m/Y H:i" }}</p>
-                    <hr>
-                    <div style="margin-top: 20px;">
-                        {{ summary.summary_text|linebreaks }}
-                    </div>
-                </div>
-            `;
-            
-            window.print();
-            document.body.innerHTML = originalContent;
         }
     </script>
 </body>

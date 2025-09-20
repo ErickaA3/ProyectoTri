@@ -3,69 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resúmenes</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Resúmenes - FocusPy</title>
     <style>
-        /* ... todos tus estilos CSS existentes ... */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            color: #4a5568;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .navbar .user-info {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* Container principal */
         .container {
-            margin-top: 20px;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 30px auto;
             background: white;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .palabra {
-            font-size: 48px;
-            color: #667eea;
-            text-align: center;
-            margin: 50px 0;
-            font-weight: bold;
+
+        /* Mensajes de Django */
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: none;
         }
-        .descripcion {
-            text-align: justify;
-            color: #666;
-            font-size: 18px;
-            margin-bottom: 30px;
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border-left: 4px solid #48bb78;
         }
-        .boton-volver {
-            display: block;
-            width: 200px;
-            margin: 30px auto;
-            padding: 10px 20px;
-            background: #667eea;
+
+        .alert-error, .alert-danger {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border-left: 4px solid #f56565;
+        }
+
+        .alert-info {
+            background: rgba(102, 126, 234, 0.1);
+            color: #4c51bf;
+            border-left: 4px solid #667eea;
+        }
+
+        .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        /* Tabs para mostrar diferentes vistas */
+        .view-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            background: #f7fafc;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #718096;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .tab-btn:hover {
             color: white;
             text-decoration: none;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* Header de sección */
+        .section-header {
             text-align: center;
-            border-radius: 25px;
-            transition: background 0.3s;
+            margin-bottom: 2rem;
         }
-        .boton-volver:hover {
-            background: #5a6fd8;
+
+        .section-header h2 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
         }
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+
+        .section-header p {
+            color: #718096;
+            font-size: 1.2rem;
         }
-        .navbar h1 {
-            text-align: justify;
-            color: #4a5568;
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
+
+        /* Grid de tarjetas */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -73,6 +149,8 @@
             margin: 3rem 0;
             justify-items: center;
         }
+
+        /* Tarjetas */
         .card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -81,16 +159,18 @@
             text-align: center;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
-            cursor: pointer;
             border: 2px solid transparent;
             width: 100%;
             max-width: 400px;
+            cursor: pointer;
         }
+
         .card:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             border: 2px solid rgba(102, 126, 234, 0.3);
         }
+
         .card-icon {
             width: 100px;
             height: 100px;
@@ -103,24 +183,29 @@
             color: white;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
+
         .card:nth-child(1) .card-icon {
             background: linear-gradient(135deg, #667eea, #764ba2);
         }
+
         .card:nth-child(2) .card-icon {
             background: linear-gradient(135deg, #f093fb, #f5576c);
         }
+
         .card h3 {
             color: #2d3748;
             font-size: 1.8rem;
             margin-bottom: 1rem;
             font-weight: 600;
         }
+
         .card p {
             color: #718096;
             font-size: 1.1rem;
             line-height: 1.6;
             margin-bottom: 2rem;
         }
+
         .card-btn {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -131,93 +216,149 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-decoration: none;
             display: inline-block;
+            text-decoration: none;
         }
+
         .card-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
         }
-        /* Estilos para los modales */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
+
+        /* Formularios */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
         }
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 2rem;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 600px;
-            position: relative;
-            animation: modalSlideIn 0.3s ease;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 3rem;
         }
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-        .close:hover {
-            color: #667eea;
-        }
-        .modal h2 {
+
+        .form-header h2 {
             color: #2d3748;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            font-size: 1.8rem;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        /* Estilos para el área de subir archivos */
+
+        .emoji-icon {
+            background: none !important;
+            -webkit-background-clip: initial !important;
+            -webkit-text-fill-color: initial !important;
+            background-clip: initial !important;
+            color: initial !important;
+            margin-right: 0.5rem;
+        }
+
+        .form-header p {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .form-control.textarea {
+            min-height: 300px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-text {
+            margin-top: 0.5rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* File upload */
         .file-upload-area {
-            border: 3px dashed #667eea;
+            border: 3px dashed #cbd5e0;
             border-radius: 15px;
-            padding: 3rem;
+            padding: 3rem 2rem;
             text-align: center;
-            margin: 2rem 0;
+            background: rgba(102, 126, 234, 0.05);
             transition: all 0.3s ease;
             cursor: pointer;
-            background: rgba(102, 126, 234, 0.05);
+            position: relative;
         }
-        .file-upload-area:hover,
-        .file-upload-area.dragover {
-            border-color: #5a6fd8;
+
+        .file-upload-area:hover {
+            border-color: #667eea;
             background: rgba(102, 126, 234, 0.1);
             transform: scale(1.02);
         }
-        .file-upload-area .upload-icon {
-            font-size: 3rem;
+
+        .file-icon {
+            font-size: 3.5rem;
             color: #667eea;
             margin-bottom: 1rem;
+            transition: all 0.3s ease;
         }
-        .file-upload-area p {
+
+        .file-upload-text {
+            color: #2d3748;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-hint {
             color: #718096;
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
         }
+
         .file-input {
-            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
         }
+
+        .file-upload-content {
+            pointer-events: none;
+            position: relative;
+        }
+
         .browse-btn {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -225,406 +366,756 @@
             border: none;
             border-radius: 25px;
             font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: inline-block;
         }
+
         .browse-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
-        /* Estilos para el área de texto */
-        .text-input-area {
-            margin: 2rem 0;
+
+        /* Efectos cuando se selecciona archivo */
+        .file-input:valid + .file-upload-content .file-icon {
+            color: #48bb78 !important;
+            animation: bounce 0.6s ease-in-out;
         }
-        .text-input {
-            width: 100%;
-            min-height: 300px;
-            padding: 1.5rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
+
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+
+        .file-input:valid + .file-upload-content .file-upload-text {
+            color: #2f855a !important;
+            font-weight: 700 !important;
+        }
+
+        .file-input:valid + .file-upload-content .file-upload-text::after {
+            content: "\A✅ Archivo seleccionado correctamente";
+            white-space: pre;
+            display: block;
+            margin-top: 0.5rem;
             font-size: 1rem;
-            font-family: inherit;
-            resize: vertical;
-            transition: border-color 0.3s ease;
+            color: #2f855a;
+            font-weight: 600;
         }
-        .text-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+
+        .file-input:valid + .file-upload-content .file-upload-hint {
+            display: none;
         }
-        .modal-actions {
+
+        .file-input:valid + .file-upload-content .browse-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169) !important;
+        }
+
+        .file-input:valid + .file-upload-content .browse-btn::before {
+            content: "✅ ";
+            margin-right: 0.5rem;
+        }
+
+        .file-upload-area:has(.file-input:valid) {
+            border-color: #48bb78 !important;
+            background: rgba(72, 187, 120, 0.1) !important;
+        }
+
+        /* Botones */
+        .form-actions {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             gap: 1rem;
-            margin-top: 2rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
         }
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #4a5568;
-            padding: 0.8rem 2rem;
-            border: none;
+
+        .btn {
+            padding: 12px 30px;
             border-radius: 25px;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            display: inline-block;
         }
-        .btn-secondary:hover {
-            background: #cbd5e0;
-        }
+
         .btn-primary {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            padding: 0.8rem 2rem;
-            border: none;
-            border-radius: 25px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
+
         .btn-primary:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
         }
-        .selected-file {
-            background: rgba(102, 126, 234, 0.1);
-            padding: 1rem;
-            border-radius: 10px;
-            margin: 1rem 0;
-            text-align: left;
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
-        .selected-file .file-name {
-            font-weight: 600;
-            color: #2d3748;
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
         }
-        .selected-file .file-size {
-            color: #718096;
-            font-size: 0.9rem;
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            color: #4a5568;
+            text-decoration: none;
         }
-        /* Estilos para loading */
-        .loading {
+
+        /* Loading spinner */
+        .loading-spinner {
             display: none;
             text-align: center;
-            padding: 2rem;
+            margin: 2rem 0;
         }
-        .loading .spinner {
-            border: 4px solid #f3f3f3;
+
+        .spinner {
+            border: 4px solid #f3f4f6;
             border-top: 4px solid #667eea;
             border-radius: 50%;
             width: 40px;
             height: 40px;
-            animation: spin 2s linear infinite;
+            animation: spin 1s linear infinite;
             margin: 0 auto 1rem;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .title-input {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 1rem;
+
+        /* Botón volver */
+        .boton-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 25px;
+            transition: background 0.3s;
+        }
+
+        .boton-volver:hover {
+            background: #5a6fd8;
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .empty-state h5 {
+            color: #2d3748;
             margin-bottom: 1rem;
         }
-        .title-input:focus {
-            outline: none;
-            border-color: #667eea;
+
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .empty-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Resúmenes recientes */
+        .recent-summaries {
+            margin-top: 3rem;
+        }
+
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .recent-header h3 {
+            color: #2d3748;
+            font-size: 1.8rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+
+        .summaries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .summary-title {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .summary-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .summary-meta {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-small {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success-small {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-danger-small {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-primary-small:hover, .btn-success-small:hover, .btn-danger-small:hover {
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-danger-small:hover {
+            background: #e53e3e;
+        }
+
+        /* Info cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card h5 {
+            color: #2d3748;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card p {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .view-tabs {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .tab-btn {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+
+            .empty-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .recent-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .summaries-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <h1>FocusPy</h1>
+        <h1>FocusPy - Resúmenes</h1>
     </nav>
+
     <div class="container">
-        <h1>{{ titulo }}</h1>
-        <h1>{{ descripcion }}</h1>
-        <div class="cards-grid">
-            <!-- Tarjeta Subir Archivos -->
-            <div class="card" onclick="openFileModal()">
-                <div class="card-icon">📁</div>
-                <h3>Subir Archivos</h3>
-                <p>Sube archivos TXT, PDF, Word y otros formatos para procesar automáticamente.</p>
-                <div class="card-btn">Subir Archivo</div>
+        <!-- Mensajes de Django -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Tabs para navegar entre vistas -->
+        <div class="view-tabs">
+            <button class="tab-btn active" onclick="showView('home')">🏠 Inicio</button>
+            <button class="tab-btn" onclick="showView('crear-texto')">✍️ Crear desde Texto</button>
+            <button class="tab-btn" onclick="showView('crear-archivo')">📁 Crear desde Archivo</button>
+        </div>
+
+        <!-- Vista Principal -->
+        <div id="home" class="view-section active">
+            <div class="section-header">
+                <h2>📋 Resúmenes</h2>
+                <p>Convierte información compleja en resúmenes claros y concisos</p>
             </div>
 
-            <!-- Tarjeta Ingresar Texto -->
-            <div class="card" onclick="openTextModal()">
-                <div class="card-icon">✍️</div>
-                <h3>Ingresar Texto</h3>
-                <p>Escribe o pega texto directamente para crear resúmenes, esquemas y más.</p>
-                <div class="card-btn">Ingresar Texto</div>
+            <div class="cards-grid">
+                <div class="card" onclick="showView('crear-archivo')">
+                    <div class="card-icon">📁</div>
+                    <h3>Subir Archivos</h3>
+                    <p>Sube archivos TXT, PDF, Word y otros formatos para procesar automáticamente.</p>
+                    <button class="card-btn" onclick="event.stopPropagation(); showView('crear-archivo')">Subir Archivo</button>
+                </div>
+
+                <div class="card" onclick="showView('crear-texto')">
+                    <div class="card-icon">✍️</div>
+                    <h3>Ingresar Texto</h3>
+                    <p>Escribe o pega texto directamente para crear resúmenes, esquemas y más.</p>
+                    <button class="card-btn" onclick="event.stopPropagation(); showView('crear-texto')">Ingresar Texto</button>
+                </div>
+            </div>
+
+            <!-- Resúmenes recientes -->
+            {% if resumenes_recientes %}
+            <div class="recent-summaries">
+                <div class="recent-header">
+                    <h3>📚 Resúmenes Recientes</h3>
+                    <a href="{% url 'resumenes:mis_resumenes' %}" class="btn-outline">Ver todos</a>
+                </div>
+                
+                <div class="summaries-grid">
+                    {% for resumen in resumenes_recientes %}
+                    <div class="summary-card">
+                        <div class="summary-header">
+                            <h4 class="summary-title">{{ resumen.title|truncatechars:35 }}</h4>
+                            
+                        </div>
+                        <div class="summary-meta">
+                            Creado: {{ resumen.created_at|date:"d/m/Y" }}
+                            {% if resumen.original_file %}
+                                <br>📁 Desde archivo
+                            {% else %}
+                                <br>✍️ Desde texto
+                            {% endif %}
+                        </div>
+                        <div class="summary-actions">
+                            <a href="{% url 'resumenes:ver_resumen' resumen.id %}" class="btn-small btn-primary-small">Ver</a>
+                            <a href="{% url 'resumenes:exportar_pdf' resumen.id %}" class="btn-small btn-success-small">PDF</a>
+                            <a href="{% url 'resumenes:eliminar_resumen' resumen.id %}" 
+                               class="btn-small btn-danger-small">Eliminar</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h5>¡Bienvenido a Resúmenes!</h5>
+                <p>Aún no has creado ningún resumen. Comienza creando uno desde texto o archivo.</p>
+                <div class="empty-actions">
+                    <button class="card-btn" onclick="showView('crear-texto')">✍️ Crear desde Texto</button>
+                    <button class="card-btn" onclick="showView('crear-archivo')">📁 Crear desde Archivo</button>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Información adicional -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <h5>⚡ Rápido</h5>
+                    <p>Obtén resúmenes precisos en segundos</p>
+                </div>
+                <div class="info-card">
+                    <h5>🎯 Preciso</h5>
+                    <p>Mantiene los puntos clave del contenido</p>
+                </div>
+                <div class="info-card">
+                    <h5>📱 Versátil</h5>
+                    <p>Funciona con múltiples formatos de archivo</p>
+                </div>
             </div>
         </div>
-        
+
+        <!-- Vista Crear desde Texto -->
+        <div id="crear-texto" class="view-section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2><span class="emoji-icon">✍️</span> Crear Resumen desde Texto</h2>
+                    <p>Pega o escribe tu contenido para generar resúmenes automáticamente</p>
+                </div>
+
+                <form method="post" action="{% url 'resumenes:process_text' %}" id="resumenTextoForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="titulo_texto" class="form-label">Título del Resumen</label>
+                        <input type="text" 
+                               id="titulo_texto" 
+                               name="title" 
+                               class="form-control"
+                               placeholder="Título de tu resumen"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contenido_texto" class="form-label">Contenido</label>
+                        <textarea id="contenido_texto" 
+                                  name="text" 
+                                  class="form-control textarea"
+                                  placeholder="Pega o escribe aquí el contenido que quieres resumir...
+
+Puedes incluir:
+• Artículos completos
+• Notas de clase
+• Documentos largos
+• Cualquier texto que necesites resumir
+
+El sistema creará automáticamente un resumen estructurado y fácil de estudiar."
+                                  required></textarea>
+                        <div class="form-text">Introduce el texto del cual quieres generar el resumen</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showView('home')">
+                            ← Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitTextoBtn">
+                            🚀 Generar Resumen
+                        </button>
+                    </div>
+                </form>
+
+                <div class="loading-spinner" id="loadingTextoSpinner">
+                    <div class="spinner"></div>
+                    <p>Generando tu resumen con inteligencia artificial...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Crear desde Archivo -->
+        <div id="crear-archivo" class="view-section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2><span class="emoji-icon">📁</span> Crear Resumen desde Archivo</h2>
+                    <p>Sube un documento y genera resúmenes automáticamente</p>
+                </div>
+
+                <form method="post" action="{% url 'resumenes:process_file' %}" enctype="multipart/form-data" id="resumenArchivoForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="titulo_archivo" class="form-label">Título del Resumen</label>
+                        <input type="text" 
+                               id="titulo_archivo" 
+                               name="title" 
+                               class="form-control"
+                               placeholder="Título de tu resumen"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="archivo" class="form-label">Archivo</label>
+                        
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" 
+                                   id="archivo" 
+                                   name="file" 
+                                   class="file-input"
+                                   accept=".pdf,.doc,.docx,.txt"
+                                   required
+                                   title="Archivo seleccionado">
+                            
+                            <div class="file-upload-content">
+                                <div class="file-icon">📄</div>
+                                <div class="file-upload-text">
+                                    <strong>Haz clic aquí o arrastra un archivo</strong>
+                                </div>
+                                <div class="file-upload-hint">
+                                    Formatos soportados: PDF, TXT, DOC, DOCX<br>
+                                    Selecciona tu archivo para comenzar
+                                </div>
+                                <span class="browse-btn">Explorar Archivos</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-text">Sube un archivo PDF, DOC, DOCX o TXT (máximo 10MB)</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showView('home')">
+                            ← Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitArchivoBtn">
+                            🚀 Procesar Archivo
+                        </button>
+                    </div>
+                </form>
+
+                <div class="loading-spinner" id="loadingArchivoSpinner">
+                    <div class="spinner"></div>
+                    <p>Extrayendo texto y generando resumen...</p>
+                </div>
+            </div>
+        </div>
+
         <a href="{% url 'home' %}" class="boton-volver">← Volver al Inicio</a>
     </div>
 
-    <!-- Modal para Subir Archivos -->
-    <div id="fileModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('fileModal')">&times;</span>
-            <h2>Subir Archivo</h2>
-            
-            <input type="text" id="fileTitle" class="title-input" placeholder="Título del documento (opcional)">
-            
-            <div class="file-upload-area" onclick="document.getElementById('fileInput').click()" 
-                 ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                <div class="upload-icon">📁</div>
-                <p><strong>Haz clic aquí o arrastra un archivo</strong></p>
-                <p>Formatos soportados: PDF, TXT, DOC, DOCX</p>
-                <button class="browse-btn" type="button">Explorar Archivos</button>
-                <input type="file" id="fileInput" class="file-input" accept=".pdf,.txt,.doc,.docx" onchange="handleFileSelect(event)">
-            </div>
-            
-            <div id="selectedFile" class="selected-file" style="display: none;">
-                <div class="file-name"></div>
-                <div class="file-size"></div>
-            </div>
-            
-            <div id="fileLoading" class="loading">
-                <div class="spinner"></div>
-                <p>Procesando archivo con IA...</p>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="closeModal('fileModal')">Cancelar</button>
-                <button class="btn-primary" onclick="processFile()" id="processFileBtn">Procesar Archivo</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para Ingresar Texto -->
-    <div id="textModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('textModal')">&times;</span>
-            <h2>Ingresar Texto</h2>
-            
-            <input type="text" id="textTitle" class="title-input" placeholder="Título del contenido">
-            
-            <div class="text-input-area">
-                <textarea class="text-input" id="textInput" 
-                          placeholder="Pega aquí tu texto o escribe directamente...
-
-Puedes incluir:
-• Artículos
-• Notas de clase
-• Documentos
-• Cualquier texto que quieras procesar
-
-El sistema creará automáticamente resúmenes, esquemas y más contenido útil para tu estudio."></textarea>
-            </div>
-            
-            <div id="textLoading" class="loading">
-                <div class="spinner"></div>
-                <p>Generando resumen con IA...</p>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="closeModal('textModal')">Cancelar</button>
-                <button class="btn-primary" onclick="processText()" id="processTextBtn">Procesar Texto</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        let selectedFile = null;
-
-        // Obtener token CSRF
-        function getCSRFToken() {
-            return document.querySelector('[name=csrfmiddlewaretoken]').value;
-        }
-
-        // Funciones para abrir y cerrar modales
-        function openFileModal() {
-            document.getElementById('fileModal').style.display = 'block';
-        }
-
-        function openTextModal() {
-            document.getElementById('textModal').style.display = 'block';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            if (modalId === 'fileModal') {
-                selectedFile = null;
-                document.getElementById('selectedFile').style.display = 'none';
-                document.getElementById('fileTitle').value = '';
-                document.getElementById('fileLoading').style.display = 'none';
+        // JavaScript para manejar navegación con hash
+        document.addEventListener('DOMContentLoaded', function() {
+            // Si la URL contiene un hash, mostrar la vista correspondiente
+            const hash = window.location.hash;
+            if (hash === '#crear-texto') {
+                showView('crear-texto');
+            } else if (hash === '#crear-archivo') {
+                showView('crear-archivo');
             }
-            if (modalId === 'textModal') {
-                document.getElementById('textInput').value = '';
-                document.getElementById('textTitle').value = '';
-                document.getElementById('textLoading').style.display = 'none';
+        });
+
+        function showView(viewId) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remover active de todos los tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar la vista seleccionada
+            document.getElementById(viewId).classList.add('active');
+            
+            // Activar el tab correspondiente
+            const activeBtn = document.querySelector(`[onclick="showView('${viewId}')"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
             }
+            
+            // Actualizar URL con hash (sin recargar página)
+            history.replaceState(null, null, '#' + viewId);
         }
 
-        // Cerrar modal al hacer clic fuera de él
-        window.onclick = function(event) {
-            const fileModal = document.getElementById('fileModal');
-            const textModal = document.getElementById('textModal');
-            if (event.target === fileModal) {
-                closeModal('fileModal');
+        // Manejo del formulario de texto
+        document.getElementById('resumenTextoForm').addEventListener('submit', function(e) {
+            const text = document.getElementById('contenido_texto').value.trim();
+            const title = document.getElementById('titulo_texto').value.trim();
+            
+            if (!text || !title) {
+                e.preventDefault();
+                alert('Por favor completa todos los campos requeridos.');
+                return;
             }
-            if (event.target === textModal) {
-                closeModal('textModal');
+            
+            if (text.length < 50) {
+                e.preventDefault();
+                alert('El texto debe tener al menos 50 caracteres para generar un resumen útil.');
+                return;
             }
-        }
+            
+            // Mostrar loading
+            document.getElementById('submitTextoBtn').disabled = true;
+            document.getElementById('loadingTextoSpinner').style.display = 'block';
+            document.getElementById('submitTextoBtn').innerHTML = '⏳ Generando...';
+        });
 
-        // Funciones para manejo de archivos
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
+        // Manejo del formulario de archivo
+        document.getElementById('resumenArchivoForm').addEventListener('submit', function(e) {
+            const file = document.getElementById('archivo').files[0];
+            const title = document.getElementById('titulo_archivo').value.trim();
+            
+            if (!file || !title) {
+                e.preventDefault();
+                alert('Por favor selecciona un archivo y completa el título.');
+                return;
+            }
+            
+            // Validar tamaño del archivo (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                e.preventDefault();
+                alert('El archivo es demasiado grande. Máximo 10MB.');
+                return;
+            }
+            
+            // Validar tipo de archivo
+            const allowedTypes = ['pdf', 'txt', 'doc', 'docx'];
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (!allowedTypes.includes(fileExtension)) {
+                e.preventDefault();
+                alert('Tipo de archivo no soportado. Use: PDF, TXT, DOC, DOCX');
+                return;
+            }
+            
+            // Mostrar loading
+            document.getElementById('submitArchivoBtn').disabled = true;
+            document.getElementById('loadingArchivoSpinner').style.display = 'block';
+            document.getElementById('submitArchivoBtn').innerHTML = '⏳ Procesando...';
+        });
+
+        // JavaScript para mostrar el nombre del archivo seleccionado
+        document.getElementById('archivo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
             if (file) {
-                selectedFile = file;
-                showSelectedFile(file);
+                const fileUploadText = document.querySelector('.file-upload-text strong');
+                if (fileUploadText) {
+                    fileUploadText.innerHTML = `Archivo seleccionado: <br><span style="font-size: 0.9rem; font-weight: normal;">${file.name}</span>`;
+                }
+                
                 // Auto-completar título si está vacío
-                if (!document.getElementById('fileTitle').value) {
-                    document.getElementById('fileTitle').value = file.name.split('.')[0];
+                const titleInput = document.getElementById('titulo_archivo');
+                if (!titleInput.value.trim()) {
+                    titleInput.value = file.name.split('.')[0];
                 }
             }
-        }
+        });
 
-        function handleFileDrop(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            
-            const uploadArea = event.currentTarget;
-            uploadArea.classList.remove('dragover');
-            
-            const files = event.dataTransfer.files;
+        // Drag and drop funcionalidad
+        const fileUploadArea = document.getElementById('fileUploadArea');
+
+        fileUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
             if (files.length > 0) {
-                selectedFile = files[0];
-                showSelectedFile(files[0]);
-                if (!document.getElementById('fileTitle').value) {
-                    document.getElementById('fileTitle').value = files[0].name.split('.')[0];
-                }
+                const fileInput = document.getElementById('archivo');
+                fileInput.files = files;
+                // Trigger change event manually for drag and drop
+                fileInput.dispatchEvent(new Event('change'));
             }
-        }
+        });
 
-        function handleDragOver(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            event.currentTarget.classList.add('dragover');
-        }
-
-        function handleDragLeave(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            event.currentTarget.classList.remove('dragover');
-        }
-
-        function showSelectedFile(file) {
-            const selectedFileDiv = document.getElementById('selectedFile');
-            const fileName = selectedFileDiv.querySelector('.file-name');
-            const fileSize = selectedFileDiv.querySelector('.file-size');
-            
-            fileName.textContent = file.name;
-            fileSize.textContent = `Tamaño: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
-            
-            selectedFileDiv.style.display = 'block';
-        }
-
-        async function processFile() {
-            if (!selectedFile) {
-                alert('Por favor selecciona un archivo primero.');
-                return;
-            }
-
-            const title = document.getElementById('fileTitle').value || selectedFile.name.split('.')[0];
-            const loadingDiv = document.getElementById('fileLoading');
-            const processBtn = document.getElementById('processFileBtn');
-            
-            // Mostrar loading
-            loadingDiv.style.display = 'block';
-            processBtn.disabled = true;
-            processBtn.textContent = 'Procesando...';
-
-            const formData = new FormData();
-            formData.append('file', selectedFile);
-            formData.append('title', title);
-
-            try {
-                const response = await fetch('{% url "resumenes:process_file" %}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    // Redirigir a la página del resumen
-                    window.location.href = `/resumenes/summary/${data.document_id}/`;
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            } catch (error) {
-                alert('Error al procesar el archivo: ' + error.message);
-            } finally {
-                // Ocultar loading
-                loadingDiv.style.display = 'none';
-                processBtn.disabled = false;
-                processBtn.textContent = 'Procesar Archivo';
-            }
-        }
-
-        async function processText() {
-            const text = document.getElementById('textInput').value.trim();
-            const title = document.getElementById('textTitle').value.trim();
-            
-            if (!text) {
-                alert('Por favor ingresa algún texto primero.');
-                return;
-            }
-            
-            if (!title) {
-                alert('Por favor ingresa un título.');
-                return;
-            }
-
-            const loadingDiv = document.getElementById('textLoading');
-            const processBtn = document.getElementById('processTextBtn');
-            
-            // Mostrar loading
-            loadingDiv.style.display = 'block';
-            processBtn.disabled = true;
-            processBtn.textContent = 'Procesando...';
-
-            try {
-                const response = await fetch('{% url "resumenes:process_text" %}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: JSON.stringify({
-                        title: title,
-                        text: text
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    // Redirigir a la página del resumen
-                    window.location.href = `/resumenes/summary/${data.document_id}/`;
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            } catch (error) {
-                alert('Error al procesar el texto: ' + error.message);
-            } finally {
-                // Ocultar loading
-                loadingDiv.style.display = 'none';
-                processBtn.disabled = false;
-                processBtn.textContent = 'Procesar Texto';
-            }
-        }
-
-        // Función para obtener el token CSRF de las cookies
+        // Funciones para obtener el token CSRF
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -638,6 +1129,36 @@ El sistema creará automáticamente resúmenes, esquemas y más contenido útil 
                 }
             }
             return cookieValue;
+        }
+
+        // Cerrar alertas automáticamente
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
+
+        // Funciones adicionales para compatibilidad con el código original
+        function openFileModal() {
+            showView('crear-archivo');
+        }
+
+        function openTextModal() {
+            showView('crear-texto');
+        }
+
+        async function processFile() {
+            // Esta función se mantiene para compatibilidad, pero ahora usa el formulario
+            document.getElementById('resumenArchivoForm').dispatchEvent(new Event('submit'));
+        }
+
+        async function processText() {
+            // Esta función se mantiene para compatibilidad, pero ahora usa el formulario
+            document.getElementById('resumenTextoForm').dispatchEvent(new Event('submit'));
         }
     </script>
 </body>

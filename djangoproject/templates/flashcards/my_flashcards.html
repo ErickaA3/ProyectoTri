@@ -10,67 +10,84 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
+
         .navbar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             padding: 1rem 2rem;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
         }
+
         .navbar h1 {
             color: #4a5568;
             font-size: 1.8rem;
             font-weight: 700;
         }
+
         .container {
             max-width: 1200px;
             margin: 30px auto;
-            padding: 0 20px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 2rem;
-            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-            text-align: center;
         }
-        .header h1 {
-            font-size: 2.5rem;
+
+        .header h2 {
             color: #2d3748;
-            margin-bottom: 1rem;
-            font-weight: 700;
+            font-size: 2rem;
         }
-        .header p {
-            color: #718096;
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-        }
-        .create-button {
-            display: inline-block;
-            padding: 1rem 2rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            text-decoration: none;
+
+        .btn {
+            padding: 0.75rem 1.5rem;
             border-radius: 25px;
             font-weight: 600;
+            text-decoration: none;
             transition: all 0.3s ease;
         }
-        .create-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
         }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            color: #4a5568;
+        }
+
         .collections-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 2rem;
             margin-bottom: 3rem;
         }
+
         .collection-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -81,17 +98,20 @@
             border: 2px solid transparent;
             cursor: pointer;
         }
+
         .collection-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             border-color: rgba(102, 126, 234, 0.3);
         }
+
         .collection-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 1.5rem;
         }
+
         .collection-title {
             font-size: 1.5rem;
             font-weight: 600;
@@ -101,6 +121,7 @@
             flex-grow: 1;
             margin-right: 1rem;
         }
+
         .difficulty-badge {
             padding: 0.3rem 0.8rem;
             border-radius: 15px;
@@ -108,18 +129,22 @@
             font-size: 0.8rem;
             white-space: nowrap;
         }
+
         .difficulty-facil {
             background: linear-gradient(135deg, #48bb78, #38a169);
             color: white;
         }
+
         .difficulty-intermedio {
             background: linear-gradient(135deg, #ed8936, #dd6b20);
             color: white;
         }
+
         .difficulty-avanzado {
             background: linear-gradient(135deg, #e53e3e, #c53030);
             color: white;
         }
+
         .collection-info {
             display: flex;
             justify-content: space-between;
@@ -127,6 +152,7 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
+
         .info-item {
             display: flex;
             align-items: center;
@@ -134,17 +160,14 @@
             color: #718096;
             font-size: 0.9rem;
         }
-        .collection-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
+
         .progress-section {
             margin: 1rem 0;
             padding: 1rem;
             background: rgba(102, 126, 234, 0.05);
             border-radius: 10px;
         }
+
         .progress-label {
             display: flex;
             justify-content: space-between;
@@ -152,30 +175,42 @@
             margin-bottom: 0.5rem;
             font-size: 0.85rem;
         }
+
         .progress-label span:first-child {
             color: #4a5568;
             font-weight: 600;
         }
+
         .progress-status {
             color: #667eea;
             font-weight: 600;
         }
+
         .progress-bar-container {
             background: #e2e8f0;
             border-radius: 10px;
             height: 8px;
             overflow: hidden;
         }
+
         .progress-bar {
             height: 100%;
             border-radius: 10px;
             transition: width 0.3s ease;
             background: linear-gradient(135deg, #48bb78, #38a169);
         }
+
         .progress-bar-empty {
             background: #cbd5e0;
         }
-        .btn {
+
+        .collection-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
             padding: 0.8rem 1.5rem;
             border: none;
             border-radius: 20px;
@@ -187,18 +222,38 @@
             transition: all 0.3s ease;
             text-align: center;
         }
-        .btn-primary {
+
+        .btn-primary-small {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
         }
-        .btn-secondary {
+
+        .btn-secondary-small {
             background: #e2e8f0;
             color: #4a5568;
         }
-        .btn:hover {
+
+        .btn-danger-small {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-small:hover {
             transform: translateY(-1px);
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-decoration: none;
         }
+
+        .btn-secondary-small:hover {
+            background: #cbd5e0;
+            color: #4a5568;
+        }
+
+        .btn-danger-small:hover {
+            background: #e53e3e;
+        }
+
         .empty-state {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -207,81 +262,143 @@
             text-align: center;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
         }
+
         .empty-state h3 {
             font-size: 1.5rem;
             color: #2d3748;
             margin-bottom: 1rem;
         }
+
         .empty-state p {
             color: #718096;
             margin-bottom: 2rem;
             line-height: 1.6;
         }
-        .back-button {
+
+        .create-button {
             display: inline-block;
-            margin: 2rem auto;
             padding: 1rem 2rem;
-            background: rgba(255, 255, 255, 0.9);
-            color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
             text-decoration: none;
             border-radius: 25px;
             font-weight: 600;
             transition: all 0.3s ease;
-            text-align: center;
         }
-        .back-button:hover {
-            background: white;
+
+        .create-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        .stat-item {
-            text-align: center;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
             color: white;
+            text-decoration: none;
         }
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
+
+        .boton-volver {
             display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 25px;
+            transition: background 0.3s;
         }
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
+
+        .boton-volver:hover {
+            background: #5a6fd8;
+            color: white;
+            text-decoration: none;
         }
+
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border-left: 4px solid #48bb78;
+        }
+
+        .alert-error, .alert-danger {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border-left: 4px solid #f56565;
+        }
+
+        .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+        }
+
         @media (max-width: 768px) {
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+
             .collection-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .difficulty-badge {
                 margin-top: 0.5rem;
             }
+
             .collection-info {
                 flex-direction: column;
                 gap: 0.5rem;
             }
+
             .collection-actions {
                 justify-content: center;
             }
+
             .collections-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
             }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <h1>FocusPy</h1>
+        <h1>FocusPy - Flashcards</h1>
     </nav>
 
     <div class="container">
-    
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="header">
+            <h2>🎯 Mis Flashcards</h2>
+            <div>
+                <a href="{% url 'flashcards:home' %}#crear-texto" class="btn btn-primary">✏️ Nuevo Texto</a>
+                <a href="{% url 'flashcards:home' %}#crear-archivo" class="btn btn-secondary">📄 Nuevo Archivo</a>
+            </div>
+        </div>
 
         {% if collections %}
         <div class="collections-grid">
@@ -316,7 +433,7 @@
                                 {% elif item.progress_percentage >= 60 %}
                                     📚 En progreso
                                 {% elif item.progress_percentage >= 30 %}
-                                    🔄 Practicando
+                                    🔥 Practicando
                                 {% else %}
                                     🚀 Comenzando
                                 {% endif %}
@@ -338,12 +455,16 @@
 
                 <div class="collection-actions">
                     <a href="{% url 'flashcards:study_collection' item.collection.id %}" 
-                       class="btn btn-primary" onclick="event.stopPropagation()">
+                       class="btn-small btn-primary-small" onclick="event.stopPropagation()">
                         🎯 Estudiar
                     </a>
                     <a href="{% url 'flashcards:view_collection' item.collection.id %}" 
-                       class="btn btn-secondary" onclick="event.stopPropagation()">
+                       class="btn-small btn-secondary-small" onclick="event.stopPropagation()">
                         👁️ Ver
+                    </a>
+                    <a href="{% url 'flashcards:confirmar_eliminar_collection' item.collection.id %}" 
+                       class="btn-small btn-danger-small" onclick="event.stopPropagation()">
+                        🗑️ Eliminar
                     </a>
                 </div>
             </div>
@@ -354,37 +475,40 @@
             <h3>🎯 ¡Aún no tienes flashcards!</h3>
             <p>Comienza creando tu primera colección de flashcards.<br>
             Sube archivos o ingresa texto para generar tarjetas de estudio automáticamente con IA.</p>
-            <a href="{% url 'flashcards:flashcards_home' %}" class="create-button">
+            <a href="{% url 'flashcards:home' %}" class="create-button">
                 Crear Mi Primera Colección
             </a>
         </div>
         {% endif %}
 
-        <div style="text-align: center;">
-            <a href="{% url 'home' %}" class="back-button">
-                ← Volver al Inicio
-            </a>
-        </div>
+        <a href="{% url 'flashcards:home' %}" class="boton-volver">← Volver a Flashcards</a>
     </div>
 
     <script>
         function viewCollection(collectionId) {
             window.location.href = `/flashcards/collection/${collectionId}/`;
         }
-        
-        // Calcular total de tarjetas para las estadísticas
+
+        // JavaScript para manejar navegación con hash
         document.addEventListener('DOMContentLoaded', function() {
-            let totalCards = 0;
-            
-            {% for item in collections_with_stats %}
-            totalCards += {{ item.collection.total_cards }};
-            {% endfor %}
-            
-            const totalCardsElement = document.querySelector('.stat-item:last-child .stat-number');
-            if (totalCardsElement) {
-                totalCardsElement.textContent = totalCards;
+            // Si viene de un enlace con hash, activar la vista correspondiente
+            const hash = window.location.hash;
+            if (hash === '#crear-texto' || hash === '#crear-archivo') {
+                // Redirigir a la página principal con el hash
+                window.location.href = "{% url 'flashcards:home' %}" + hash;
             }
         });
+
+        // Cerrar alertas automáticamente
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
     </script>
 </body>
 </html>

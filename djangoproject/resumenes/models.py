@@ -6,6 +6,7 @@ class Document(models.Model):
         ('txt', 'Texto'),
         ('pdf', 'PDF'),
         ('doc', 'Word'),
+        ('docx', 'Word'),
         ('manual', 'Texto Manual'),
     ]
     
@@ -16,13 +17,26 @@ class Document(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     
+    class Meta:
+        ordering = ['-created_at']
+    
     def __str__(self):
         return self.title
+    
+    def get_document_type_display(self):
+        """Devuelve el tipo de documento en formato legible"""
+        type_dict = dict(self.DOCUMENT_TYPES)
+        return type_dict.get(self.document_type, self.document_type)
 
 class Summary(models.Model):
     document = models.OneToOneField(Document, on_delete=models.CASCADE)
     summary_text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Resumen'
+        verbose_name_plural = 'Resúmenes'
     
     def __str__(self):
         return f"Resumen de {self.document.title}"
