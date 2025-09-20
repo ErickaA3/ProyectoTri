@@ -1,10 +1,11 @@
-# views.py - En tu proyecto principal (donde tienes home.html)
+# views.py - En tu proyecto principal - HORA CORREGIDA
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.utils import timezone
 from datetime import datetime, timedelta
 from collections import defaultdict
 import json
+import pytz
 
 def home(request):
     """Vista principal del home"""
@@ -22,18 +23,23 @@ def obtener_historial(request):
             fecha_creacion__gte=fecha_limite
         ).order_by('-fecha_creacion')
         
+        # Zona horaria de Costa Rica
+        tz_costa_rica = pytz.timezone('America/Costa_Rica')
+        
         # Agrupar por día
         historial_por_dia = defaultdict(list)
         
         for actividad in actividades:
-            fecha_str = actividad.fecha_creacion.strftime('%Y-%m-%d')
+            # Convertir fecha a Costa Rica
+            fecha_cr = actividad.fecha_creacion.astimezone(tz_costa_rica)
+            fecha_str = fecha_cr.strftime('%Y-%m-%d')
             fecha_display = formatear_fecha(actividad.fecha_creacion)
             
             actividad_data = {
                 'tipo': actividad.tipo,
                 'titulo': actividad.titulo,
                 'descripcion': actividad.descripcion,
-                'hora': actividad.fecha_creacion.strftime('%H:%M'),
+                'hora': fecha_cr.strftime('%H:%M'),  # ← CORREGIDO: usar fecha_cr
                 'metadata': actividad.metadata,
                 'app_origen': actividad.app_origen,
                 'objeto_id': actividad.objeto_id,
@@ -68,13 +74,11 @@ def obtener_historial(request):
 
 def formatear_fecha(fecha):
     """Formatear fecha para mostrar de forma amigable en horario de Costa Rica"""
-    # Convertir a zona horaria de Costa Rica
-    import pytz
     tz_costa_rica = pytz.timezone('America/Costa_Rica')
-    fecha_local = fecha.astimezone(tz_costa_rica)
     
+    # Convertir fechas a Costa Rica
     hoy = timezone.now().astimezone(tz_costa_rica).date()
-    fecha_actividad = fecha_local.date()
+    fecha_actividad = fecha.astimezone(tz_costa_rica).date()
     
     if fecha_actividad == hoy:
         return "Hoy"
@@ -88,8 +92,9 @@ def formatear_fecha(fecha):
             'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
             'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
         ]
-        mes = meses[fecha_local.month - 1]
-        return f"{fecha_local.day} de {mes}"
+        fecha_cr = fecha.astimezone(tz_costa_rica)
+        mes = meses[fecha_cr.month - 1]
+        return f"{fecha_cr.day} de {mes}"
 
 def estadisticas_historial(request):
     """Vista para obtener estadísticas globales del historial"""

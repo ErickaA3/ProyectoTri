@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from collections import defaultdict
 import json
+import pytz
 
 def home(request):
     """Vista principal del home"""
@@ -33,7 +34,7 @@ def obtener_historial(request):
                 'tipo': actividad.tipo,
                 'titulo': actividad.titulo,
                 'descripcion': actividad.descripcion,
-                'hora': actividad.fecha_creacion.strftime('%H:%M'),
+                'hora': actividad.fecha_creacion.astimezone(pytz.timezone('America/Costa_Rica')).strftime('%H:%M'),
                 'metadata': actividad.metadata,
                 'app_origen': actividad.app_origen,
                 'objeto_id': actividad.objeto_id,

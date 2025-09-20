@@ -1,15 +1,15 @@
-# historial/models.py
+# historial/models.py - CORREGIDO
 from django.db import models
 from django.utils import timezone
 
 class ActividadHistorial(models.Model):
     TIPOS_ACTIVIDAD = [
         ('resumen_creado', 'Resumen Creado'),
-        ('esquema_creado', 'Esquema Creado'),
-        ('flashcard_creada', 'Flashcard Creada'),
+        ('esquema_generado', 'Esquema Generado'),  # ← CAMBIADO
+        ('flashcards_creadas', 'Flashcards Creadas'),  # ← CAMBIADO
+        ('flashcards_practicadas', 'Flashcards Practicadas'),  # ← CAMBIADO
         ('cuestionario_creado', 'Cuestionario Creado'),
         ('cuestionario_completado', 'Cuestionario Completado'),
-        ('flashcard_practicada', 'Flashcard Practicada'),
     ]
     
     # Sin usuario - historial global

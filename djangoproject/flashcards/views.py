@@ -1,3 +1,4 @@
+# flashcards/views.py - CÓDIGO COMPLETO ACTUALIZADO
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -12,6 +13,9 @@ from .utils import (
     validate_flashcard_params,
     clean_filename
 )
+
+# IMPORTAR HISTORIAL
+from historial.utils import registrar_actividad
 
 def flashcards_home(request):
     """Vista principal de flashcards"""
@@ -88,6 +92,21 @@ def process_file(request):
         collection.total_cards = len(flashcards_data)
         collection.save()
         
+        # *** REGISTRAR EN HISTORIAL ***
+        registrar_actividad(
+            tipo='flashcards_creadas',
+            titulo=title,
+            descripcion=f'{collection.total_cards} tarjetas • Dificultad {difficulty} • Desde archivo',
+            app_origen='flashcards',
+            objeto_id=collection.id,
+            metadata={
+                'total_cards': collection.total_cards,
+                'difficulty': difficulty,
+                'fuente': 'archivo',
+                'archivo_nombre': file.name
+            }
+        )
+        
         return JsonResponse({
             'success': True,
             'collection_id': str(collection.id),
@@ -155,6 +174,20 @@ def process_text(request):
         # Actualizar contador
         collection.total_cards = len(flashcards_data)
         collection.save()
+        
+        # *** REGISTRAR EN HISTORIAL ***
+        registrar_actividad(
+            tipo='flashcards_creadas',
+            titulo=title,
+            descripcion=f'{collection.total_cards} tarjetas • Dificultad {difficulty} • Desde texto',
+            app_origen='flashcards',
+            objeto_id=collection.id,
+            metadata={
+                'total_cards': collection.total_cards,
+                'difficulty': difficulty,
+                'fuente': 'texto'
+            }
+        )
         
         return JsonResponse({
             'success': True,
@@ -300,6 +333,21 @@ def complete_study_session(request, session_id):
         session.completed_at = timezone.now()
         session.correct_answers = correct_answers
         session.save()
+        
+        # *** REGISTRAR EN HISTORIAL ***
+        registrar_actividad(
+            tipo='flashcards_practicadas',
+            titulo=session.collection.title,
+            descripcion=f'{session.total_cards} tarjetas • {session.accuracy:.0f}% de aciertos',
+            app_origen='flashcards',
+            objeto_id=session.collection.id,
+            metadata={
+                'total_cards': session.total_cards,
+                'correct_answers': session.correct_answers,
+                'accuracy': session.accuracy,
+                'session_id': session.id
+            }
+        )
         
         return JsonResponse({
             'success': True,

@@ -1,4 +1,4 @@
-# esquemas/views.py
+# esquemas/views.py - CÓDIGO COMPLETO ACTUALIZADO
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
@@ -18,6 +18,9 @@ from .utils import (
     crear_eventos_desde_json,
     crear_conceptos_desde_json
 )
+
+# IMPORTAR HISTORIAL
+from historial.utils import registrar_actividad
 
 def get_or_create_default_user():
     """Crear o obtener un usuario por defecto para testing"""
@@ -78,6 +81,32 @@ def crear_desde_texto(request):
                     crear_eventos_desde_json(esquema, datos_esquema)
                 elif tipo == 'conceptual':
                     crear_conceptos_desde_json(esquema, datos_esquema)
+            
+            # *** REGISTRAR EN HISTORIAL ***
+            # Contar elementos según el tipo
+            elementos_count = 0
+            if tipo == 'jerarquico':
+                elementos_count = esquema.nodos.count()
+                descripcion = f'Desde texto • {elementos_count} nodos principales'
+            elif tipo == 'cronologico':
+                elementos_count = esquema.eventos.count()
+                descripcion = f'Desde texto • {elementos_count} eventos'
+            elif tipo == 'conceptual':
+                elementos_count = esquema.conceptos.count()
+                descripcion = f'Desde texto • {elementos_count} conceptos relacionados'
+            
+            registrar_actividad(
+                tipo='esquema_generado',
+                titulo=titulo,
+                descripcion=descripcion,
+                app_origen='esquemas',
+                objeto_id=esquema.id,
+                metadata={
+                    'tipo_esquema': tipo,
+                    'elementos_count': elementos_count,
+                    'fuente': 'texto'
+                }
+            )
             
             messages.success(request, f'Esquema "{titulo}" creado exitosamente con información expandible!')
             return redirect('esquemas:ver_esquema', esquema_id=esquema.id)
@@ -143,6 +172,33 @@ def crear_desde_archivo(request):
                     crear_eventos_desde_json(esquema, datos_esquema)
                 elif tipo == 'conceptual':
                     crear_conceptos_desde_json(esquema, datos_esquema)
+            
+            # *** REGISTRAR EN HISTORIAL ***
+            # Contar elementos según el tipo
+            elementos_count = 0
+            if tipo == 'jerarquico':
+                elementos_count = esquema.nodos.count()
+                descripcion = f'Desde archivo {archivo.name.split(".")[-1].upper()} • {elementos_count} nodos principales'
+            elif tipo == 'cronologico':
+                elementos_count = esquema.eventos.count()
+                descripcion = f'Desde archivo {archivo.name.split(".")[-1].upper()} • {elementos_count} eventos'
+            elif tipo == 'conceptual':
+                elementos_count = esquema.conceptos.count()
+                descripcion = f'Desde archivo {archivo.name.split(".")[-1].upper()} • {elementos_count} conceptos relacionados'
+            
+            registrar_actividad(
+                tipo='esquema_generado',
+                titulo=titulo,
+                descripcion=descripcion,
+                app_origen='esquemas',
+                objeto_id=esquema.id,
+                metadata={
+                    'tipo_esquema': tipo,
+                    'elementos_count': elementos_count,
+                    'fuente': 'archivo',
+                    'archivo_nombre': archivo.name
+                }
+            )
             
             messages.success(request, f'Esquema "{titulo}" creado exitosamente desde archivo con detalles expandibles!')
             return redirect('esquemas:ver_esquema', esquema_id=esquema.id)
@@ -262,7 +318,7 @@ def eliminar_esquema(request, esquema_id):
     return render(request, 'esquemas/confirmar_eliminar.html', {'esquema': esquema})
 
 def exportar_pdf(request, esquema_id):
-    """Exportar esquema a PDF - VERSIÓN MEJORADA"""
+    """Exportar esquema a PDF"""
     esquema = get_object_or_404(Esquema, id=esquema_id)
     
     try:
@@ -299,19 +355,6 @@ def exportar_pdf(request, esquema_id):
                 indent = "&nbsp;" * (nodo.nivel - 1) * 8
                 texto = f"{indent}{nodo.texto}"
                 story.append(Paragraph(texto, styles['Normal']))
-                
-                # Agregar detalles si existen
-                if nodo.tiene_detalles():
-                    indent_details = "&nbsp;" * (nodo.nivel - 1) * 8 + "&nbsp;" * 4
-                    detalles_text = f"{indent_details}<i>Detalles: {nodo.detalles}</i>"
-                    story.append(Paragraph(detalles_text, styles['Normal']))
-                
-                # Agregar palabras clave si existen
-                if nodo.palabras_clave:
-                    indent_keywords = "&nbsp;" * (nodo.nivel - 1) * 8 + "&nbsp;" * 4
-                    keywords_text = f"{indent_keywords}<b>Palabras clave:</b> {nodo.get_palabras_clave_str()}"
-                    story.append(Paragraph(keywords_text, styles['Normal']))
-                
                 story.append(Spacer(1, 6))
                 
         elif esquema.tipo == 'conceptual':
@@ -326,11 +369,6 @@ def exportar_pdf(request, esquema_id):
                 story.append(Paragraph(f"• {concepto.texto}", styles['Normal']))
                 if concepto.descripcion:
                     story.append(Paragraph(f"  {concepto.descripcion}", styles['Normal']))
-                
-                # Agregar ejemplos si existen
-                if concepto.ejemplos:
-                    story.append(Paragraph(f"  <b>Ejemplos:</b> {concepto.get_ejemplos_str()}", styles['Normal']))
-                
                 story.append(Spacer(1, 6))
                 
         elif esquema.tipo == 'cronologico':
@@ -338,15 +376,6 @@ def exportar_pdf(request, esquema_id):
             for evento in eventos:
                 story.append(Paragraph(f"<b>{evento.fecha}:</b> {evento.titulo}", styles['Heading3']))
                 story.append(Paragraph(evento.descripcion, styles['Normal']))
-                
-                # Agregar contexto si existe
-                if evento.contexto:
-                    story.append(Paragraph(f"<i>Contexto:</i> {evento.contexto}", styles['Normal']))
-                
-                # Agregar consecuencias si existen
-                if evento.consecuencias:
-                    story.append(Paragraph(f"<b>Consecuencias:</b> {evento.get_consecuencias_str()}", styles['Normal']))
-                
                 story.append(Spacer(1, 12))
         
         # Generar PDF
@@ -365,7 +394,7 @@ def exportar_pdf(request, esquema_id):
         return redirect('esquemas:ver_esquema', esquema_id=esquema.id)
 
 def exportar_txt(request, esquema_id):
-    """Exportar esquema a TXT - VERSIÓN MEJORADA"""
+    """Exportar esquema a TXT"""
     esquema = get_object_or_404(Esquema, id=esquema_id)
     
     contenido = f"{esquema.titulo}\n"
@@ -380,16 +409,6 @@ def exportar_txt(request, esquema_id):
             indent = "  " * (nodo.nivel - 1)
             contenido += f"{indent}- {nodo.texto}\n"
             
-            # Agregar detalles si existen
-            if nodo.tiene_detalles():
-                contenido += f"{indent}  Detalles: {nodo.detalles}\n"
-            
-            # Agregar palabras clave si existen
-            if nodo.palabras_clave:
-                contenido += f"{indent}  Palabras clave: {nodo.get_palabras_clave_str()}\n"
-            
-            contenido += "\n"
-            
     elif esquema.tipo == 'conceptual':
         conceptos = esquema.conceptos.all()
         concepto_central = conceptos.filter(es_central=True).first()
@@ -402,20 +421,12 @@ def exportar_txt(request, esquema_id):
             contenido += f"- {concepto.texto}\n"
             if concepto.descripcion:
                 contenido += f"  {concepto.descripcion}\n"
-            if concepto.ejemplos:
-                contenido += f"  Ejemplos: {concepto.get_ejemplos_str()}\n"
-            contenido += "\n"
             
     elif esquema.tipo == 'cronologico':
         eventos = esquema.eventos.all().order_by('orden')
         for evento in eventos:
             contenido += f"{evento.fecha}: {evento.titulo}\n"
-            contenido += f"{evento.descripcion}\n"
-            if evento.contexto:
-                contenido += f"Contexto: {evento.contexto}\n"
-            if evento.consecuencias:
-                contenido += f"Consecuencias: {evento.get_consecuencias_str()}\n"
-            contenido += "\n"
+            contenido += f"{evento.descripcion}\n\n"
     
     response = HttpResponse(contenido, content_type='text/plain; charset=utf-8')
     response['Content-Disposition'] = f'attachment; filename="{esquema.titulo}.txt"'
@@ -428,7 +439,6 @@ def exportar_esquema_pdf(request, esquema_id):
 def exportar_esquema_txt(request, esquema_id):
     return exportar_txt(request, esquema_id)
 
-# Funciones de debug
 def debug_esquema(request, esquema_id):
     """Vista de debug para esquemas"""
     esquema = get_object_or_404(Esquema, id=esquema_id)
@@ -456,18 +466,14 @@ def debug_esquema(request, esquema_id):
                 'nivel': nodo.nivel,
                 'orden': nodo.orden,
                 'padre_id': nodo.padre.id if nodo.padre else None,
-                'hijos_count': nodo.hijos.count(),
-                'tiene_detalles': nodo.tiene_detalles(),
-                'palabras_clave': nodo.get_palabras_clave_str(),
-                'importancia': nodo.importancia
+                'hijos_count': nodo.hijos.count()
             })
         
         debug_info['estadisticas'] = {
             'total_nodos_bd': nodos.count(),
             'total_nodos_json': len(debug_info['nodos_json']),
             'niveles_bd': list(nodos.values_list('nivel', flat=True).distinct()),
-            'nodos_sin_padre': nodos.filter(padre=None).count(),
-            'nodos_con_detalles': nodos.exclude(detalles='').count()
+            'nodos_sin_padre': nodos.filter(padre=None).count()
         }
     
     return JsonResponse(debug_info, json_dumps_params={'indent': 2, 'ensure_ascii': False})

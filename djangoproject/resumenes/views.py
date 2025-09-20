@@ -1,3 +1,4 @@
+# resumenes/views.py - CÓDIGO COMPLETO ACTUALIZADO
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import JsonResponse
@@ -7,6 +8,9 @@ import json
 from .models import Document, Summary
 from .forms import DocumentForm, TextForm
 from .utils import extract_text_from_file, generate_summary_with_openai, generate_outline_with_openai
+
+# IMPORTAR HISTORIAL
+from historial.utils import registrar_actividad
 
 def home(request):
     """Vista principal con las tarjetas"""
@@ -48,6 +52,22 @@ def process_file(request):
             summary_text=summary_text
         )
         
+        # *** REGISTRAR EN HISTORIAL ***
+        registrar_actividad(
+            tipo='resumen_creado',
+            titulo=title,
+            descripcion=f'Desde archivo {file.name.split(".")[-1].upper()} • {len(summary_text.split())} palabras',
+            app_origen='resumenes',
+            objeto_id=document.id,
+            metadata={
+                'document_type': document.document_type,
+                'archivo_nombre': file.name,
+                'palabras_resumen': len(summary_text.split()),
+                'palabras_original': len(text_content.split()),
+                'fuente': 'archivo'
+            }
+        )
+        
         return JsonResponse({
             'success': True,
             'document_id': document.id,
@@ -87,6 +107,24 @@ def process_text(request):
             summary_text=summary_text
         )
         
+        # *** REGISTRAR EN HISTORIAL ***
+        # Detectar el tema principal del texto (primeras palabras)
+        tema_principal = text_content.strip()[:50] + "..." if len(text_content) > 50 else text_content.strip()
+        
+        registrar_actividad(
+            tipo='resumen_creado',
+            titulo=title,
+            descripcion=f'Desde texto • {tema_principal}',
+            app_origen='resumenes',
+            objeto_id=document.id,
+            metadata={
+                'document_type': 'manual',
+                'palabras_resumen': len(summary_text.split()),
+                'palabras_original': len(text_content.split()),
+                'fuente': 'texto'
+            }
+        )
+        
         return JsonResponse({
             'success': True,
             'document_id': document.id,
@@ -114,4 +152,3 @@ def view_summary(request, document_id):
     except (Document.DoesNotExist, Summary.DoesNotExist):
         messages.error(request, 'Documento no encontrado')
         return redirect('resumenes:home')
-    

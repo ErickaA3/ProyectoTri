@@ -286,6 +286,28 @@
             color: #4a5568;
         }
 
+        .loading-historial {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .container {
             max-width: 1300px;
             margin: 0 auto;
@@ -480,102 +502,12 @@
                 <button class="close-btn" onclick="closeHistorial()">×</button>
             </div>
             
+            <!-- Contenedor dinámico del historial -->
             <div class="historial-timeline" id="historialTimeline">
-                <!-- Actividades de ejemplo - esto se llenará con datos reales -->
-                <div class="timeline-day">
-                    <div class="day-header">
-                        <span class="day-date">Hoy - 19 de Septiembre</span>
-                        <span class="day-count">3 actividades</span>
-                    </div>
-                    <div class="activities-list">
-                        <div class="activity-item cuestionarios">
-                            <div class="activity-header">
-                                <div class="activity-type">
-                                    <span>❓</span>
-                                    Cuestionario creado
-                                </div>
-                                <span class="activity-time">14:30</span>
-                            </div>
-                            <div class="activity-title">Cuestionario de Historia Universal</div>
-                            <div class="activity-description">10 preguntas • Dificultad media • 85% completado</div>
-                        </div>
-                        
-                        <div class="activity-item esquemas">
-                            <div class="activity-header">
-                                <div class="activity-type">
-                                    <span>🗂️</span>
-                                    Esquema generado
-                                </div>
-                                <span class="activity-time">12:15</span>
-                            </div>
-                            <div class="activity-title">Esquema jerárquico - Revolución Francesa</div>
-                            <div class="activity-description">Desde archivo PDF • 15 nodos principales</div>
-                        </div>
-                        
-                        <div class="activity-item resumenes">
-                            <div class="activity-header">
-                                <div class="activity-type">
-                                    <span>📄</span>
-                                    Resumen creado
-                                </div>
-                                <span class="activity-time">10:45</span>
-                            </div>
-                            <div class="activity-title">Resumen de Matemáticas</div>
-                            <div class="activity-description">Desde texto • Ecuaciones cuadráticas</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="timeline-day">
-                    <div class="day-header">
-                        <span class="day-date">Ayer - 18 de Septiembre</span>
-                        <span class="day-count">2 actividades</span>
-                    </div>
-                    <div class="activities-list">
-                        <div class="activity-item flashcards">
-                            <div class="activity-header">
-                                <div class="activity-type">
-                                    <span>🎴</span>
-                                    Flashcards practicadas
-                                </div>
-                                <span class="activity-time">16:20</span>
-                            </div>
-                            <div class="activity-title">Vocabulario en Inglés</div>
-                            <div class="activity-description">25 tarjetas • 80% de aciertos</div>
-                        </div>
-                        
-                        <div class="activity-item cuestionarios">
-                            <div class="activity-header">
-                                <div class="activity-type">
-                                    <span>❓</span>
-                                    Cuestionario completado
-                                </div>
-                                <span class="activity-time">14:10</span>
-                            </div>
-                            <div class="activity-title">Examen de Biología</div>
-                            <div class="activity-description">15 preguntas • Dificultad alta • 92% de aciertos</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="timeline-day">
-                    <div class="day-header">
-                        <span class="day-date">17 de Septiembre</span>
-                        <span class="day-count">1 actividad</span>
-                    </div>
-                    <div class="activities-list">
-                        <div class="activity-item esquemas">
-                            <div class="activity-header">
-                                <div class="activity-type">
-                                    <span>🗂️</span>
-                                    Mapa conceptual
-                                </div>
-                                <span class="activity-time">11:30</span>
-                            </div>
-                            <div class="activity-title">Sistema Solar</div>
-                            <div class="activity-description">Desde texto • 8 conceptos relacionados</div>
-                        </div>
-                    </div>
+                <!-- Loading inicial -->
+                <div class="loading-historial" id="loadingHistorial">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando tu historial...</p>
                 </div>
             </div>
         </div>
@@ -629,12 +561,135 @@
             const modal = document.getElementById('historialModal');
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            // Cargar historial cuando se abre el modal
+            cargarHistorial();
         }
 
         function closeHistorial() {
             const modal = document.getElementById('historialModal');
             modal.classList.remove('active');
             document.body.style.overflow = 'auto';
+        }
+
+        function cargarHistorial() {
+            const timelineContainer = document.getElementById('historialTimeline');
+            const loadingElement = document.getElementById('loadingHistorial');
+            
+            // Mostrar loading
+            loadingElement.style.display = 'block';
+            
+            // Llamada AJAX para obtener historial real
+            fetch('/obtener_historial/')
+                .then(response => response.json())
+                .then(data => {
+                    loadingElement.style.display = 'none';
+                    
+                    if (data.success) {
+                        if (data.historial && data.historial.length > 0) {
+                            mostrarHistorial(data.historial);
+                        } else {
+                            mostrarHistorialVacio();
+                        }
+                    } else {
+                        mostrarErrorHistorial(data.error || 'Error al cargar historial');
+                    }
+                })
+                .catch(error => {
+                    loadingElement.style.display = 'none';
+                    console.error('Error:', error);
+                    mostrarErrorHistorial('No se pudo conectar con el servidor');
+                });
+        }
+
+        function mostrarHistorial(historialData) {
+            const timelineContainer = document.getElementById('historialTimeline');
+            timelineContainer.innerHTML = '';
+            
+            historialData.forEach(dia => {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'timeline-day';
+                
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.innerHTML = `
+                    <span class="day-date">${dia.fecha_display}</span>
+                    <span class="day-count">${dia.count} actividad${dia.count !== 1 ? 'es' : ''}</span>
+                `;
+                
+                const activitiesList = document.createElement('div');
+                activitiesList.className = 'activities-list';
+                
+                dia.actividades.forEach(actividad => {
+                    const activityDiv = document.createElement('div');
+                    activityDiv.className = `activity-item ${actividad.app_origen}`;
+                    
+                    const icon = getActivityIcon(actividad.tipo);
+                    const typeDisplay = getActivityTypeDisplay(actividad.tipo);
+                    
+                    activityDiv.innerHTML = `
+                        <div class="activity-header">
+                            <div class="activity-type">
+                                <span>${icon}</span>
+                                ${typeDisplay}
+                            </div>
+                            <span class="activity-time">${actividad.hora}</span>
+                        </div>
+                        <div class="activity-title">${actividad.titulo}</div>
+                        <div class="activity-description">${actividad.descripcion}</div>
+                    `;
+                    
+                    activitiesList.appendChild(activityDiv);
+                });
+                
+                dayDiv.appendChild(dayHeader);
+                dayDiv.appendChild(activitiesList);
+                timelineContainer.appendChild(dayDiv);
+            });
+        }
+
+        function mostrarHistorialVacio() {
+            const timelineContainer = document.getElementById('historialTimeline');
+            timelineContainer.innerHTML = `
+                <div class="empty-historial">
+                    <h3>📚 Aún no tienes actividades</h3>
+                    <p>Cuando uses las herramientas de estudio, aquí aparecerá tu historial.</p>
+                </div>
+            `;
+        }
+
+        function mostrarErrorHistorial(mensaje) {
+            const timelineContainer = document.getElementById('historialTimeline');
+            timelineContainer.innerHTML = `
+                <div class="empty-historial">
+                    <h3>⚠️ Error al cargar historial</h3>
+                    <p>${mensaje}</p>
+                </div>
+            `;
+        }
+
+        function getActivityIcon(tipo) {
+            const iconos = {
+                'cuestionario_creado': '❓',
+                'cuestionario_completado': '✅',
+                'esquema_generado': '🗂️',
+                'flashcards_creadas': '🎴',
+                'flashcards_practicadas': '🎯',
+                'resumen_creado': '📄'
+            };
+            return iconos[tipo] || '📚';
+        }
+
+        function getActivityTypeDisplay(tipo) {
+            const tipos = {
+                'cuestionario_creado': 'Cuestionario creado',
+                'cuestionario_completado': 'Cuestionario completado',
+                'esquema_generado': 'Esquema generado',
+                'flashcards_creadas': 'Flashcards creadas',
+                'flashcards_practicadas': 'Flashcards practicadas',
+                'resumen_creado': 'Resumen creado'
+            };
+            return tipos[tipo] || 'Actividad';
         }
 
         // Cerrar modal al hacer click fuera de él
@@ -649,15 +704,6 @@
             if (e.key === 'Escape') {
                 closeHistorial();
             }
-        });
-
-        // Simular click en actividades para mostrar más detalles (opcional)
-        document.querySelectorAll('.activity-item').forEach(item => {
-            item.addEventListener('click', function() {
-                // Aquí podrías agregar funcionalidad para mostrar más detalles
-                // o navegar a la actividad específica
-                console.log('Clicked on activity:', this.querySelector('.activity-title').textContent);
-            });
         });
     </script>
 </body>

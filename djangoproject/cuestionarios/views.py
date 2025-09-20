@@ -11,6 +11,9 @@ from io import BytesIO
 from .models import Cuestionario, Pregunta, RespuestaUsuario, ResultadoCuestionario
 from .utils import generar_preguntas_openai, extraer_texto_archivo
 
+# IMPORTAR HISTORIAL
+from historial.utils import registrar_actividad
+
 # Configurar OpenAI
 openai.api_key = settings.OPENAI_API_KEY
 
@@ -93,6 +96,20 @@ def crear_cuestionario(request):
                 opciones=pregunta_data['opciones'],
                 respuesta_correcta=pregunta_data['respuesta_correcta']
             )
+        
+        # *** REGISTRAR EN HISTORIAL ***
+        registrar_actividad(
+            tipo='cuestionario_creado',
+            titulo=titulo,
+            descripcion=f'{num_preguntas} preguntas • Dificultad {dificultad}',
+            app_origen='cuestionarios',
+            objeto_id=cuestionario.id,
+            metadata={
+                'num_preguntas': num_preguntas,
+                'dificultad': dificultad,
+                'metodo': 'archivo' if 'file' in request.FILES else 'texto'
+            }
+        )
         
         # Redirigir al quiz
         return redirect('cuestionarios:quiz', quiz_id=cuestionario.id)
@@ -183,6 +200,23 @@ def responder_pregunta(request):
         cuestionario.completado = True
         cuestionario.save()
         calcular_resultados(cuestionario)
+        
+        # *** REGISTRAR CUESTIONARIO COMPLETADO EN HISTORIAL ***
+        resultado = ResultadoCuestionario.objects.get(cuestionario=cuestionario)
+        registrar_actividad(
+            tipo='cuestionario_completado',
+            titulo=cuestionario.titulo,
+            descripcion=f'{resultado.respuestas_correctas}/{resultado.total_preguntas} correctas • {resultado.puntuacion:.0f}% de aciertos',
+            app_origen='cuestionarios',
+            objeto_id=cuestionario.id,
+            metadata={
+                'puntuacion': resultado.puntuacion,
+                'respuestas_correctas': resultado.respuestas_correctas,
+                'total_preguntas': resultado.total_preguntas,
+                'dificultad': cuestionario.dificultad
+            }
+        )
+        
         return redirect('cuestionarios:results', quiz_id=quiz_id)
 
 def mostrar_resultados(request, quiz_id):

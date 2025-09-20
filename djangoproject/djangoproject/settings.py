@@ -103,7 +103,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # OpenAI API Key (si la usas)
-OPENAI_API_KEY = 'tu-openai-api-key-aqui'
+OPENAI_API_KEY = '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'
 
 # Configuración adicional para fechas y números en formato costarricense
 USE_L10N = True
