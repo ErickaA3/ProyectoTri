@@ -19,7 +19,7 @@ class ActividadHistorial(models.Model):
     fecha_creacion = models.DateTimeField(default=timezone.now)
     
     # Campos para almacenar IDs de los objetos relacionados
-    objeto_id = models.IntegerField(null=True, blank=True)  # ID del resumen, esquema, etc.
+    objeto_id = models.CharField(max_length=50, null=True, blank=True)  # ID del resumen, esquema, etc.
     app_origen = models.CharField(max_length=20)  # 'resumenes', 'esquemas', etc.
     
     # Metadata adicional como JSON

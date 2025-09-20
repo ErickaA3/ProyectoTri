@@ -52,6 +52,12 @@
             border-left: 4px solid #48bb78;
         }
 
+        .alert-info {
+            background: rgba(102, 126, 234, 0.1);
+            color: #4c51bf;
+            border-left: 4px solid #667eea;
+        }
+
         .cuestionario-header {
             text-align: center;
             margin-bottom: 2rem;
@@ -345,7 +351,7 @@
 
         <div class="cuestionario-actions">
             {% if not resultado %}
-                <a href="{% url 'cuestionarios:quiz' cuestionario.id %}" class="btn btn-primary">
+                <a href="{% url 'cuestionarios:quiz' quiz_id=cuestionario.id %}" class="btn btn-primary">
                     Continuar Cuestionario
                 </a>
             {% else %}

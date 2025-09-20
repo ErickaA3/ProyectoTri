@@ -1,4 +1,4 @@
-# cuestionarios/urls.py - URLs ACTUALIZADAS
+# cuestionarios/urls.py
 from django.urls import path
 from . import views
 
@@ -10,7 +10,7 @@ urlpatterns = [
     path('config/', views.config_cuestionario, name='config'),
     path('crear/', views.crear_cuestionario, name='create'),
     path('quiz/<int:quiz_id>/', views.mostrar_quiz, name='quiz'),
-    path('responder/', views.responder_pregunta, name='answer'),
+    path('responder/<int:cuestionario_id>/', views.responder_pregunta, name='responder'),  # <- CORREGIDO
     path('resultados/<int:quiz_id>/', views.mostrar_resultados, name='results'),
     path('revisar/', views.revisar_respuestas, name='review'),
     

@@ -484,7 +484,7 @@
             font-family: inherit;
         }
 
-        /* ConfiguraciÃ³n del quiz */
+        /* Configuración del quiz */
         .quiz-config {
             background: rgba(102, 126, 234, 0.05);
             padding: 2rem;
@@ -786,7 +786,149 @@
             flex-wrap: wrap;
         }
 
-        /* BotÃ³n volver */
+        /* Estilos del Quiz */
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quiz-header-section {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .quiz-header-section h2 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .quiz-progress {
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .question-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+        }
+
+        .question-card h3 {
+            color: #2d3748;
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .options-list {
+            margin-bottom: 2rem;
+        }
+
+        .option-item {
+            display: block;
+            background: #f7fafc;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .option-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .option-item input[type="radio"] {
+            margin-right: 1rem;
+        }
+
+        .option-item input[type="radio"]:checked + .option-text {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .option-text {
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .quiz-actions {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        /* Resultados del Quiz */
+        .resultado-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .score-message {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Botón volver */
         .boton-volver {
             display: block;
             width: 200px;
@@ -871,6 +1013,15 @@
             .difficulty-radio {
                 flex-direction: column;
             }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quiz-actions {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
@@ -890,15 +1041,116 @@
             {% endfor %}
         {% endif %}
 
-        <!-- Tabs para navegar entre vistas -->
+        <!-- Vista del Quiz -->
+        {% if show_quiz %}
+        <div id="quiz" class="view-section active">
+            <div class="quiz-container">
+                <div class="quiz-header-section">
+                    <h2>{{ cuestionario.titulo }}</h2>
+                    <div class="quiz-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ progreso }}%"></div>
+                        </div>
+                        <span class="progress-text">Pregunta {{ pregunta_actual.numero }} de {{ total_preguntas }} ({{ progreso|floatformat:0 }}%)</span>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'cuestionarios:responder' cuestionario.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="pregunta_id" value="{{ pregunta_actual.id }}">
+                    
+                    <div class="question-card">
+                        <h3>{{ pregunta_actual.texto }}</h3>
+                        
+                        <div class="options-list">
+                            {% for opcion in pregunta_actual.opciones %}
+                            <label class="option-item">
+                                <input type="radio" name="respuesta" value="{{ forloop.counter0 }}" required>
+                                <span class="option-text">{{ forloop.counter|upper }}. {{ opcion }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="quiz-actions">
+                            <button type="submit" class="btn btn-primary">
+                                {% if pregunta_actual.numero == total_preguntas %}
+                                    🏁 Finalizar Cuestionario
+                                {% else %}
+                                    ➡️ Siguiente Pregunta
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Vista de Resultados -->
+        {% if show_results %}
+        <div id="resultados" class="view-section active">
+            <div class="quiz-container">
+                <div class="quiz-header-section">
+                    <h2>🎯 Resultados del Cuestionario</h2>
+                    <p>{{ cuestionario.titulo }}</p>
+                </div>
+
+                <div class="resultado-card">
+                    <div class="score-display">{{ resultado.puntuacion|floatformat:0 }}%</div>
+                    <div class="score-message">
+                        {% if resultado.puntuacion >= 90 %}
+                            ¡Excelente trabajo! 🎉
+                        {% elif resultado.puntuacion >= 70 %}
+                            ¡Muy bien! 👏
+                        {% elif resultado.puntuacion >= 50 %}
+                            Buen intento 👍
+                        {% else %}
+                            Sigue practicando 💪
+                        {% endif %}
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ resultado.respuestas_correctas }}</div>
+                            <div class="stat-label">Correctas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">{{ resultado.respuestas_incorrectas }}</div>
+                            <div class="stat-label">Incorrectas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">{{ resultado.total_preguntas }}</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'cuestionarios:ver_cuestionario' cuestionario.id %}" class="btn btn-primary">
+                        📋 Ver Detalle Completo
+                    </a>
+                    <a href="{% url 'cuestionarios:exportar_pdf' cuestionario.id %}" class="btn btn-success">
+                        📄 Exportar PDF
+                    </a>
+                    <a href="{% url 'cuestionarios:home' %}" class="btn btn-secondary">
+                        🏠 Crear Nuevo
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Tabs para navegar entre vistas (solo cuando no está en quiz o resultados) -->
+        {% if not show_quiz and not show_results %}
         <div class="view-tabs">
             <button class="tab-btn active" onclick="showView('home')">🏠 Inicio</button>
             <button class="tab-btn" onclick="showView('crear-texto')">✏️ Crear desde Texto</button>
             <button class="tab-btn" onclick="showView('crear-archivo')">📄 Crear desde Archivo</button>
         </div>
+        {% endif %}
 
         <!-- Vista Principal -->
-        <div id="home" class="view-section active">
+        <div id="home" class="view-section {% if not show_quiz and not show_results and not show_config %}active{% endif %}">
             {% if not show_config and not show_quiz and not show_results %}
             <div class="section-header">
                 <h2>📝 Cuestionarios</h2>
@@ -1149,7 +1401,10 @@ Entre más detallado sea el texto, mejores serán las preguntas generadas."
             </div>
         </div>
 
+        <!-- Botón volver (solo cuando no está en quiz o resultados) -->
+        {% if not show_quiz and not show_results %}
         <a href="{% url 'home' %}" class="boton-volver">← Volver al Inicio</a>
+        {% endif %}
     </div>
 
     <script>
