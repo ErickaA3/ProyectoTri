@@ -242,7 +242,7 @@ def generar_esquema_openai_fallback(texto, tipo_esquema, client):
         prompt = prompts_cortos.get(tipo_esquema, prompts_cortos['jerarquico'])
         
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",  # Usar modelo más eficiente como respaldo
+            model="gpt-4",  
             messages=[
                 {
                     "role": "user", 

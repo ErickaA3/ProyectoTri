@@ -1,4 +1,3 @@
-# resumenes/views.py - CÓDIGO COMPLETO FINAL
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
@@ -14,10 +13,25 @@ from historial.utils import registrar_actividad
 
 def home(request):
     """Vista principal con las tarjetas"""
-    context = {
-        'titulo': 'Procesamiento de Documentos',
-        'descripcion': 'Sube archivos o ingresa texto para generar resúmenes automáticos'
-    }
+    try:
+        # Obtener los últimos 6 resúmenes recientes
+        resumenes_recientes = Document.objects.filter(
+            summary__isnull=False  # Solo documentos que tengan resumen
+        ).select_related('summary').order_by('-created_at')[:6]
+        
+        context = {
+            'titulo': 'Procesamiento de Documentos',
+            'descripcion': 'Sube archivos o ingresa texto para generar resúmenes automáticos',
+            'resumenes_recientes': resumenes_recientes,
+        }
+    except Exception as e:
+        # Si hay algún error, mostrar la página sin resúmenes recientes
+        context = {
+            'titulo': 'Procesamiento de Documentos',
+            'descripcion': 'Sube archivos o ingresa texto para generar resúmenes automáticos',
+            'resumenes_recientes': [],
+        }
+    
     return render(request, 'resumenes/resumenes_home.html', context)
 
 @csrf_exempt
@@ -81,9 +95,15 @@ def process_file(request):
 def process_text(request):
     """Procesa texto ingresado manualmente"""
     try:
-        data = json.loads(request.body)
-        title = data.get('title', 'Texto sin título')
-        text_content = data.get('text', '')
+        # Check if it's JSON data (AJAX request) or form data
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+            title = data.get('title', 'Texto sin título')
+            text_content = data.get('text', '')
+        else:
+            # Form data
+            title = request.POST.get('title', 'Texto sin título')
+            text_content = request.POST.get('text', '')
         
         if not text_content.strip():
             messages.error(request, 'El texto no puede estar vacío')
@@ -291,4 +311,4 @@ def eliminar_resumen(request, id):
         return redirect('resumenes:mis_resumenes')
     
     # Si no es POST, redirigir a la página de confirmación
-    return redirect('resumenes:eliminar_resumen', id=id)
+    return redirect('resumenes:eliminar_resumen', id=id)    

@@ -41,7 +41,7 @@ def generate_summary_with_openai(text):
         client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
         
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=[
                 {
                     "role": "system", 
@@ -76,7 +76,7 @@ def generate_outline_with_openai(text):
         client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
         
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=[
                 {
                     "role": "system", 
