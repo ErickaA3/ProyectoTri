@@ -1,4 +1,3 @@
-# esquemas/views.py - CÓDIGO COMPLETO ACTUALIZADO
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
@@ -9,6 +8,8 @@ import json
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from io import BytesIO
+
+# Importa modelos y utilidades del mismo módulo
 
 from .models import Esquema, NodoEsquema, EventoTimeline, ConceptoMapa
 from .utils import (
@@ -46,7 +47,7 @@ def esquemas_home(request):
     return render(request, 'esquemas/esquemas_home.html', context)
 
 def crear_desde_texto(request):
-    """Vista para crear esquema desde texto - VERSIÓN MEJORADA"""
+    """Vista para crear esquema desde texto """
     if request.method == 'POST':
         titulo = request.POST.get('titulo')
         tipo = request.POST.get('tipo')
@@ -147,7 +148,7 @@ def crear_desde_archivo(request):
                 messages.error(request, 'No se pudo extraer texto del archivo')
                 return render(request, 'esquemas/esquemas_home.html')
             
-            # Generar esquema con OpenAI (función actualizada)
+            # Generar esquema con OpenAI 
             datos_esquema = generar_esquema_openai(contenido_texto, tipo)
             
             # Obtener usuario por defecto
@@ -210,7 +211,7 @@ def crear_desde_archivo(request):
     return render(request, 'esquemas/esquemas_home.html')
 
 def ver_esquema(request, esquema_id):
-    """Vista para mostrar un esquema específico - VERSIÓN MEJORADA"""
+    """Vista para mostrar un esquema específico"""
     esquema = get_object_or_404(Esquema, id=esquema_id)
     
     context = {'esquema': esquema}

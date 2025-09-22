@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Cuestionarios - FocusPy</title>
+    <title>FocusPy</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo_v2.png' %}">
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Paytone+One&display=swap');
         * {
             margin: 0;
             padding: 0;
@@ -17,17 +21,65 @@
             min-height: 100vh;
         }
 
+        .paytone-one-regular {
+            font-family: "Paytone One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        /* NAVBAR REUTILIZABLE */
         .navbar {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 254, 254, 1);
             backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
+            padding: 0rem 1rem;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 0px;
+            object-fit: cover;
         }
 
         .navbar h1 {
-            color: #4a5568;
-            font-size: 1.8rem;
-            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.4rem;
+            font-weight: 400;
+            font-family: "Fugaz One", sans-serif;
+        }
+
+        .navbar-title-link {
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-title-link:hover {
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        .navbar-title-link:hover h1 {
+            text-decoration: none;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .container {
@@ -251,8 +303,14 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <h1>FocusPy - Cuestionarios</h1>
+     <nav class="navbar">
+    <div class="navbar-left">
+        <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
+        <a href="{% url 'home' %}" class="navbar-title-link">
+            <h1 class="paytone-one-regular">FocusPy</h1>
+        </a>
+    </div>
+
     </nav>
 
     <div class="container">

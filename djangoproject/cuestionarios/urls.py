@@ -10,7 +10,7 @@ urlpatterns = [
     path('config/', views.config_cuestionario, name='config'),
     path('crear/', views.crear_cuestionario, name='create'),
     path('quiz/<int:quiz_id>/', views.mostrar_quiz, name='quiz'),
-    path('responder/<int:cuestionario_id>/', views.responder_pregunta, name='responder'),  # <- CORREGIDO
+    path('responder/<int:cuestionario_id>/', views.responder_pregunta, name='responder'),  
     path('resultados/<int:quiz_id>/', views.mostrar_resultados, name='results'),
     path('revisar/', views.revisar_respuestas, name='review'),
     

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 import json
 
 class Esquema(models.Model):
+    
     TIPO_CHOICES = [
         ('jerarquico', 'Esquema Jerárquico'),
         ('conceptual', 'Mapa Conceptual'),

@@ -1,17 +1,14 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}MyOwnStudy{% endblock %}</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fugaz+One&family=Paytone+One&display=swap" rel="stylesheet">
+    <title>FocusPy</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo_v2.png' %}">
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Paytone+One&display=swap');
         .paytone-one-regular {
             font-family: "Paytone One", sans-serif;
             font-weight: 400;

@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     'resumenes',
     'esquemas',
     'cuestionarios',
-    'flashcards',  # Si la tienes
+    'flashcards',  
     'historial',
 ]
 

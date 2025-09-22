@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcards - FocusPy</title>
+    <title>FocusPy</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo_v2.png' %}">
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Paytone+One&display=swap');
         * {
             margin: 0;
             padding: 0;
@@ -17,26 +21,66 @@
             min-height: 100vh;
         }
 
-        /* Navbar */
+        /* Clase para la tipografía especial */
+        .paytone-one-regular {
+            font-family: "Paytone One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        /* NAVBAR REUTILIZABLE */
         .navbar {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 254, 254, 1);
             backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
+            padding: 0rem 1rem;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 0px;
+            object-fit: cover;
         }
 
         .navbar h1 {
-            color: #4a5568;
-            font-size: 1.8rem;
-            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.4rem;
+            font-weight: 400;
+            font-family: "Fugaz One", sans-serif;
         }
 
-        .navbar .user-info {
-            color: #718096;
-            font-size: 0.9rem;
+        .navbar-title-link {
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-title-link:hover {
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        .navbar-title-link:hover h1 {
+            text-decoration: none;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         /* Container principal */
@@ -304,7 +348,7 @@
 
         .form-text {
             margin-top: 0.5rem;
-            color: #718096;
+            color: #667eea;
             font-size: 0.9rem;
         }
 
@@ -334,14 +378,14 @@
         }
 
         .file-upload-text {
-            color: #2d3748;
+            color: #667eea;
             font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
 
         .file-upload-hint {
-            color: #718096;
+            color: #667eea;
             font-size: 1rem;
             margin-bottom: 1.5rem;
             line-height: 1.5;
@@ -379,6 +423,111 @@
         .browse-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* === ESTILOS MÁGICOS CUANDO SE SELECCIONA ARCHIVO === */
+
+        /* Cuando hay archivo, el icono se vuelve verde y rebota */
+        .file-input:valid + .file-upload-content .file-icon {
+            color: #48bb78 !important;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+
+        /* El texto cambia */
+        .file-input:valid + .file-upload-content .file-upload-text {
+            color: #2f855a !important;
+            font-weight: 700 !important;
+        }
+
+        .file-input:valid + .file-upload-content .file-upload-hint {
+            color: #2f855a !important;
+            font-weight: 600 !important;
+        }
+
+        /* Agrega confirmación */
+        .file-input:valid + .file-upload-content .file-upload-text::after {
+            content: "\A✅ Archivo seleccionado correctamente";
+            white-space: pre;
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: #2f855a;
+            font-weight: 600;
+        }
+
+        /* Oculta las instrucciones */
+        .file-input:valid + .file-upload-content .file-upload-hint {
+            display: none;
+        }
+
+        /* El botón se vuelve verde */
+        .file-input:valid + .file-upload-content .browse-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169) !important;
+        }
+
+        .file-input:valid + .file-upload-content .browse-btn::before {
+            content: "✅ ";
+            margin-right: 0.5rem;
+        }
+
+        /* El área completa se vuelve verde */
+        .file-upload-area:has(.file-input:valid) {
+            border-color: #48bb78 !important;
+            background: rgba(72, 187, 120, 0.1) !important;
+        }
+
+        /* Indicador de éxito */
+        .file-selected-indicator {
+            display: none;
+            background: rgba(72, 187, 120, 0.15);
+            border: 2px solid #48bb78;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            color: #2f855a;
+            text-align: center;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        /* Mostrar cuando hay archivo válido */
+        .file-input:valid ~ .file-selected-indicator {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .success-text {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #22543d;
+        }
+
+        .file-info {
+            font-size: 1rem;
+            color: #276749;
+            font-weight: 500;
         }
 
         /* Selector de dificultad */
@@ -771,8 +920,14 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <h1>FocusPy - Flashcards</h1>
+      <nav class="navbar">
+    <div class="navbar-left">
+        <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
+        <a href="{% url 'home' %}" class="navbar-title-link">
+            <h1 class="paytone-one-regular">FocusPy</h1>
+        </a>
+    </div>
+
     </nav>
 
     <div class="container">
@@ -974,6 +1129,15 @@ La IA analizará el texto y creará flashcards automáticamente con preguntas y 
                                 Selecciona tu archivo para comenzar
                             </div>
                             <span class="browse-btn">Explorar Archivos</span>
+                        </div>
+                    </div>
+
+                    <!-- Indicador que aparece cuando se selecciona archivo -->
+                    <div class="file-selected-indicator">
+                        <span class="success-icon">✅</span>
+                        <div class="success-text">¡Archivo cargado exitosamente!</div>
+                        <div class="file-info">
+                            Tu archivo está listo para procesar. Puedes continuar con la configuración.
                         </div>
                     </div>
                     
