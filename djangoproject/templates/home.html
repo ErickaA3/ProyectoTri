@@ -118,7 +118,7 @@
             background: white;
             border-radius: 20px;
             padding: 2rem;
-            max-width: 800px;
+            max-width: 900px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
@@ -130,7 +130,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             padding-bottom: 1rem;
             border-bottom: 2px solid #e2e8f0;
         }
@@ -162,6 +162,83 @@
         .close-btn:hover {
             background: #f7fafc;
             color: #2d3748;
+        }
+
+        /* Controles de ordenamiento */
+        .sorting-controls {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .sorting-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+
+        .sorting-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .control-select, .control-button {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .control-select:focus, .control-button:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .control-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .control-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .sorting-stats {
+            font-size: 0.8rem;
+            color: #718096;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: #e2e8f0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-weight: 500;
         }
 
         .historial-timeline {
@@ -279,28 +356,6 @@
         .empty-historial h3 {
             margin-bottom: 1rem;
             color: #4a5568;
-        }
-
-        .loading-historial {
-            text-align: center;
-            padding: 3rem;
-            color: #718096;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         .container {
@@ -440,6 +495,22 @@
                 max-height: 85vh;
             }
 
+            .sorting-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+
+            .control-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .control-select, .control-button {
+                flex: 1;
+                min-width: 120px;
+            }
+
             .container {
                 padding: 2rem 1rem;
             }
@@ -482,7 +553,7 @@
         </div>
         
         <div class="navbar-right">
-            <button class="historial-btn" onclick="openHistorial()">
+            <button class="historial-btn" id="historialBtn">
                 <span class="historial-icon">📚</span>
                 Historial
             </button>
@@ -494,16 +565,49 @@
         <div class="historial-content">
             <div class="historial-header">
                 <h2>📚 Tu Historial de Estudio</h2>
-                <button class="close-btn" onclick="closeHistorial()">×</button>
+                <button class="close-btn" id="closeBtn">×</button>
+            </div>
+            
+            <!-- Controles de ordenamiento -->
+            <div class="sorting-controls">
+                <div class="sorting-row">
+                    <div class="control-group">
+                        <label>Algoritmo:</label>
+                        <select class="control-select" id="algoritmoSelect">
+                            <option value="quick">Quick Sort</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Orden:</label>
+                        <select class="control-select" id="ordenSelect">
+                            <option value="desc">Más Reciente Primero</option>
+                            <option value="asc">Más Antiguo Primero</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Período:</label>
+                        <select class="control-select" id="diasSelect">
+                            <option value="3">Últimos 3 días</option>
+                            <option value="4" selected>Últimos 4 días</option>
+                            <option value="7">Última semana</option>
+                        </select>
+                    </div>
+                    
+                    <button class="control-button" id="aplicarBtn">
+                        Aplicar Ordenamiento
+                    </button>
+                </div>
+                
+                <div class="sorting-stats" id="sortingStats">
+                    <span class="stat-badge">Sin datos aún</span>
+                </div>
             </div>
             
             <!-- Contenedor dinámico del historial -->
             <div class="historial-timeline" id="historialTimeline">
-                <!-- Loading inicial -->
-                <div class="loading-historial" id="loadingHistorial">
-                    <div class="loading-spinner"></div>
-                    <p>Cargando tu historial...</p>
-                </div>
+                <!-- El contenido se carga dinámicamente -->
             </div>
         </div>
     </div>
@@ -552,37 +656,66 @@
     </div>
 
     <script>
+        // Variables globales
+        let historialData = [];
+
+        // Funciones principales
         function openHistorial() {
+            console.log("Abriendo historial");
             const modal = document.getElementById('historialModal');
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            
-            // Cargar historial cuando se abre el modal
-            cargarHistorial();
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                cargarHistorial();
+            }
         }
 
         function closeHistorial() {
+            console.log("Cerrando historial");
             const modal = document.getElementById('historialModal');
-            modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
         }
 
         function cargarHistorial() {
+            console.log("Función cargarHistorial llamada");
             const timelineContainer = document.getElementById('historialTimeline');
-            const loadingElement = document.getElementById('loadingHistorial');
             
-            // Mostrar loading
-            loadingElement.style.display = 'block';
+            if (!timelineContainer) {
+                console.error("No se encontró historialTimeline");
+                return;
+            }
             
-            // Llamada AJAX para obtener historial real
-            fetch('/obtener_historial/')
-                .then(response => response.json())
+            // Mostrar mensaje de carga
+            timelineContainer.innerHTML = '<div style="text-align:center; padding:2rem; color:#666;">Cargando historial...</div>';
+            
+            // Obtener valores de los controles
+            const algoritmo = document.getElementById('algoritmoSelect')?.value || 'quick';
+            const orden = document.getElementById('ordenSelect')?.value || 'desc';
+            const dias = document.getElementById('diasSelect')?.value || '4';
+            
+            const url = `/obtener_historial/?algoritmo=${algoritmo}&orden=${orden}&dias=${dias}`;
+            console.log("URL de llamada:", url);
+            
+            // Llamada AJAX
+            fetch(url)
+                .then(response => {
+                    console.log("Respuesta recibida:", response);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    loadingElement.style.display = 'none';
+                    console.log("Datos recibidos:", data);
                     
                     if (data.success) {
-                        if (data.historial && data.historial.length > 0) {
-                            mostrarHistorial(data.historial);
+                        historialData = data.historial || [];
+                        if (historialData.length > 0) {
+                            mostrarHistorial(historialData);
+                            mostrarEstadisticasBasicas(data);
                         } else {
                             mostrarHistorialVacio();
                         }
@@ -591,17 +724,38 @@
                     }
                 })
                 .catch(error => {
-                    loadingElement.style.display = 'none';
-                    console.error('Error:', error);
-                    mostrarErrorHistorial('No se pudo conectar con el servidor');
+                    console.error('Error en fetch:', error);
+                    mostrarErrorHistorial('No se pudo conectar con el servidor: ' + error.message);
                 });
         }
 
+        function aplicarOrdenamiento() {
+            console.log("Aplicando ordenamiento...");
+            cargarHistorial();
+        }
+
+        function mostrarEstadisticasBasicas(data) {
+            const statsContainer = document.getElementById('sortingStats');
+            if (!statsContainer) return;
+            
+            let html = `<span class="stat-badge">Total: ${data.total_actividades} actividades</span>`;
+            html += `<span class="stat-badge">Días: ${data.total_dias}</span>`;
+            html += `<span class="stat-badge">Algoritmo: Quick Sort</span>`;
+            html += `<span class="stat-badge">Orden: ${data.orden}</span>`;
+            
+            statsContainer.innerHTML = html;
+        }
+
         function mostrarHistorial(historialData) {
+            console.log("Mostrando historial con", historialData.length, "días");
             const timelineContainer = document.getElementById('historialTimeline');
+            if (!timelineContainer) return;
+            
             timelineContainer.innerHTML = '';
             
-            historialData.forEach(dia => {
+            historialData.forEach((dia, index) => {
+                console.log(`Día ${index + 1}:`, dia.fecha_display, "con", dia.count, "actividades");
+                
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'timeline-day';
                 
@@ -615,7 +769,9 @@
                 const activitiesList = document.createElement('div');
                 activitiesList.className = 'activities-list';
                 
-                dia.actividades.forEach(actividad => {
+                dia.actividades.forEach((actividad, actIndex) => {
+                    console.log(`  Actividad ${actIndex + 1}:`, actividad.titulo);
+                    
                     const activityDiv = document.createElement('div');
                     activityDiv.className = `activity-item ${actividad.app_origen}`;
                     
@@ -645,6 +801,8 @@
 
         function mostrarHistorialVacio() {
             const timelineContainer = document.getElementById('historialTimeline');
+            if (!timelineContainer) return;
+            
             timelineContainer.innerHTML = `
                 <div class="empty-historial">
                     <h3>📚 Aún no tienes actividades</h3>
@@ -655,6 +813,8 @@
 
         function mostrarErrorHistorial(mensaje) {
             const timelineContainer = document.getElementById('historialTimeline');
+            if (!timelineContainer) return;
+            
             timelineContainer.innerHTML = `
                 <div class="empty-historial">
                     <h3>⚠️ Error al cargar historial</h3>
@@ -687,18 +847,45 @@
             return tipos[tipo] || 'Actividad';
         }
 
-        // Cerrar modal al hacer click fuera de él
-        document.getElementById('historialModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeHistorial();
+        // Event listeners cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM cargado, configurando event listeners");
+            
+            // Botón abrir historial
+            const historialBtn = document.getElementById('historialBtn');
+            if (historialBtn) {
+                historialBtn.addEventListener('click', openHistorial);
             }
-        });
-
-        // Cerrar modal con tecla Escape
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeHistorial();
+            
+            // Botón cerrar historial
+            const closeBtn = document.getElementById('closeBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeHistorial);
             }
+            
+            // Botón aplicar ordenamiento
+            const aplicarBtn = document.getElementById('aplicarBtn');
+            if (aplicarBtn) {
+                aplicarBtn.addEventListener('click', aplicarOrdenamiento);
+                console.log("Event listener agregado al botón aplicar");
+            }
+            
+            // Cerrar modal al hacer click fuera
+            const modal = document.getElementById('historialModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeHistorial();
+                    }
+                });
+            }
+            
+            // Cerrar modal con tecla Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeHistorial();
+                }
+            });
         });
     </script>
 </body>
