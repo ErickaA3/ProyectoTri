@@ -21,7 +21,7 @@
             min-height: 100vh;
         }
 
-                .paytone-one-regular {
+        .paytone-one-regular {
             font-family: "Paytone One", sans-serif;
             font-weight: 400;
             font-style: normal;
@@ -289,14 +289,13 @@
     </style>
 </head>
 <body>
-     <nav class="navbar">
-    <div class="navbar-left">
-        <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
-        <a href="{% url 'home' %}" class="navbar-title-link">
-            <h1 class="paytone-one-regular">FocusPy</h1>
-        </a>
-    </div>
-
+    <nav class="navbar">
+        <div class="navbar-left">
+            <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
+            <a href="{% url 'home' %}" class="navbar-title-link">
+                <h1 class="paytone-one-regular">FocusPy</h1>
+            </a>
+        </div>
     </nav>
 
     <div class="container">
@@ -318,27 +317,28 @@
             </div>
         </div>
 
-        {% if resumenes %}
+        {% if resumenes_data %}
             <div class="resumenes-grid">
-                {% for resumen in resumenes %}
+                {% for item in resumenes_data %}
                     <div class="resumen-card">
                         <div class="resumen-header">
-                            <h4 class="resumen-title">{{ resumen.title|truncatechars:40 }}</h4>
-                            <span class="resumen-badge">{{ resumen.get_document_type_display }}</span>
+                            <h4 class="resumen-title">{{ item.document.title|truncatechars:40 }}</h4>
+                            <span class="resumen-badge">{{ item.document.get_document_type_display }}</span>
                         </div>
                         <div class="resumen-meta">
-                            Creado: {{ resumen.created_at|date:"d/m/Y H:i" }}<br>
+                            Creado: {{ item.document.created_at|date:"d/m/Y H:i" }}<br>
+                            Palabras: {{ item.palabras_resumen }}<br>
                             Fuente: 
-                            {% if resumen.original_file %}
+                            {% if item.document.original_file %}
                                 📁 Archivo
                             {% else %}
                                 ✍️ Texto
                             {% endif %}
                         </div>
                         <div class="resumen-actions">
-                            <a href="{% url 'resumenes:ver_resumen' resumen.id %}" class="btn-small btn-primary-small">Ver</a>
-                            <a href="{% url 'resumenes:exportar_pdf' resumen.id %}" class="btn-small btn-success-small">PDF</a>
-                            <a href="{% url 'resumenes:eliminar_resumen' resumen.id %}" 
+                            <a href="{% url 'resumenes:ver_resumen' item.document.id %}" class="btn-small btn-primary-small">Ver</a>
+                            <a href="{% url 'resumenes:exportar_pdf' item.document.id %}" class="btn-small btn-success-small">PDF</a>
+                            <a href="{% url 'resumenes:eliminar_resumen' item.document.id %}" 
                                class="btn-small btn-danger-small">Eliminar</a>
                         </div>
                     </div>

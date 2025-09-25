@@ -21,7 +21,7 @@
             min-height: 100vh;
         }
         
-                 .paytone-one-regular {
+        .paytone-one-regular {
             font-family: "Paytone One", sans-serif;
             font-weight: 400;
             font-style: normal;
@@ -87,6 +87,7 @@
             max-width: 1000px;
             margin: 30px auto;
         }
+        
         .boton-volver {
             display: block;
             width: 200px;
@@ -105,6 +106,7 @@
             color: white;
             text-decoration: none;
         }
+        
         .summary-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -170,33 +172,105 @@
             color: #2d3748;
         }
         
-        /* Estilos para el contenido markdown procesado */
+        /* Enhanced styles for markdown content */
+        .summary-content h2 {
+            color: #2d3748;
+            font-size: 1.6rem;
+            margin: 2rem 0 1rem 0;
+            font-weight: 700;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
         .summary-content h3 {
             color: #2d3748;
             font-size: 1.4rem;
             margin: 1.5rem 0 1rem 0;
             font-weight: 600;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.3rem;
         }
-        
+
         .summary-content h4 {
             color: #4a5568;
             font-size: 1.2rem;
-            margin: 1rem 0 0.5rem 0;
+            margin: 1.2rem 0 0.8rem 0;
             font-weight: 500;
         }
-        
+
+        .summary-content h5 {
+            color: #4a5568;
+            font-size: 1.1rem;
+            margin: 1rem 0 0.6rem 0;
+            font-weight: 500;
+        }
+
         .summary-content p {
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
+            line-height: 1.7;
+            color: #2d3748;
         }
-        
+
         .summary-content strong {
-            color: #667eea;
-            font-weight: 600;
+            color: #9333ea;
+            font-weight: 700;
         }
-        
+
         .summary-content em {
             color: #718096;
             font-style: italic;
+        }
+
+        .summary-content ul, .summary-content ol {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        .summary-content li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+            color: #4a5568;
+        }
+
+        .summary-content ul li {
+            list-style-type: none;
+            position: relative;
+        }
+
+        .summary-content ul li::before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: -1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .summary-content ol li {
+            list-style-type: decimal;
+            color: #4a5568;
+            position: relative;
+        }
+
+        .summary-content ol li::marker {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .summary-content ul ul, .summary-content ol ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        /* Add spacing between sections */
+        .summary-content > * + h2,
+        .summary-content > * + h3,
+        .summary-content > * + h4 {
+            margin-top: 2.5rem;
         }
         
         .actions-bar {
@@ -314,6 +388,22 @@
             .btn {
                 justify-content: center;
             }
+            
+            .summary-content h2 {
+                font-size: 1.4rem;
+            }
+            
+            .summary-content h3 {
+                font-size: 1.2rem;
+            }
+            
+            .summary-content ul, .summary-content ol {
+                padding-left: 1.5rem;
+            }
+            
+            .summary-content ul li::before {
+                left: -1.2rem;
+            }
         }
         
         /* Animación de entrada */
@@ -334,14 +424,13 @@
     </style>
 </head>
 <body>
-     <nav class="navbar">
-    <div class="navbar-left">
-        <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
-        <a href="{% url 'home' %}" class="navbar-title-link">
-            <h1 class="paytone-one-regular">FocusPy</h1>
-        </a>
-    </div>
-
+    <nav class="navbar">
+        <div class="navbar-left">
+            <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
+            <a href="{% url 'home' %}" class="navbar-title-link">
+                <h1 class="paytone-one-regular">FocusPy</h1>
+            </a>
+        </div>
     </nav>
     
     <div class="container">

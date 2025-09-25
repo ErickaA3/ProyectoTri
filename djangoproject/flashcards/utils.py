@@ -125,7 +125,7 @@ def generate_flashcards_with_ai(text, difficulty, quantity):
     
     try:
         response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {
                     "role": "system", 

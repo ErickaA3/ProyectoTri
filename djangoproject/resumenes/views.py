@@ -9,7 +9,12 @@ from .forms import DocumentForm, TextForm
 from .utils import extract_text_from_file, generate_summary_with_openai, generate_outline_with_openai
 
 # IMPORTAR HISTORIAL
-from historial.utils import registrar_actividad
+try:
+    from historial.utils import registrar_actividad
+except ImportError:
+    # Si no existe el módulo historial, crear una función dummy
+    def registrar_actividad(*args, **kwargs):
+        pass
 
 def home(request):
     """Vista principal con las tarjetas"""
@@ -220,7 +225,7 @@ def ver_resumen(request, id):
             'summary': summary,
         }
         
-        return render(request, 'resumenes/ver_resumen.html', context)
+        return render(request, 'resumenes/summary.html', context)
         
     except Exception as e:
         messages.error(request, f'Error al cargar el resumen: {str(e)}')
@@ -297,18 +302,17 @@ def confirmar_eliminar_resumen(request, id):
     """Vista de confirmación antes de eliminar un resumen"""
     document = get_object_or_404(Document, id=id)
     
-    # Solo mostrar la página de confirmación (GET)
-    return render(request, 'resumenes/confirmar_eliminar.html', {'document': document})
-
-def eliminar_resumen(request, id):
-    """Vista para eliminar definitivamente un resumen"""
-    document = get_object_or_404(Document, id=id)
-    
+    # Si es POST, eliminar directamente
     if request.method == 'POST':
         titulo = document.title
         document.delete()  # Esto también eliminará el summary por CASCADE
         messages.success(request, f'Resumen "{titulo}" eliminado correctamente.')
         return redirect('resumenes:mis_resumenes')
     
-    # Si no es POST, redirigir a la página de confirmación
-    return redirect('resumenes:eliminar_resumen', id=id)    
+    # Si es GET, mostrar página de confirmación
+    context = {'document': document}
+    return render(request, 'resumenes/confirmar_eliminar.html', context)
+
+def eliminar_resumen(request, id):
+    """Vista para eliminar definitivamente un resumen - redirige a confirmar"""
+    return redirect('resumenes:confirmar_eliminar_resumen', id=id)

@@ -179,7 +179,7 @@ Texto a analizar:
         prompt = prompts.get(tipo_esquema, prompts['jerarquico'])
         
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {
                     "role": "system", 
@@ -242,7 +242,7 @@ def generar_esquema_openai_fallback(texto, tipo_esquema, client):
         prompt = prompts_cortos.get(tipo_esquema, prompts_cortos['jerarquico'])
         
         response = client.chat.completions.create(
-            model="gpt-4",  
+            model="gpt-3.5-turbo",  
             messages=[
                 {
                     "role": "user", 

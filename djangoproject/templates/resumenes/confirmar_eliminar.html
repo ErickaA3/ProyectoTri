@@ -144,11 +144,11 @@
         </div>
         
         <div class="resumen-info">
-            <h3>{{ resumen.title }}</h3>
+            <h3>{{ document.title }}</h3>
             <p>
-                Tipo: {{ resumen.get_document_type_display }}<br>
-                Creado: {{ resumen.created_at|date:"d/m/Y H:i" }}<br>
-                {% if resumen.original_file %}
+                Tipo: {{ document.get_document_type_display }}<br>
+                Creado: {{ document.created_at|date:"d/m/Y H:i" }}<br>
+                {% if document.original_file %}
                     Fuente: 📁 Archivo
                 {% else %}
                     Fuente: ✍️ Texto manual
@@ -169,7 +169,7 @@
                 </button>
             </form>
             
-            <a href="{% url 'resumenes:ver_resumen' resumen.id %}" class="btn btn-secondary">
+            <a href="{% url 'resumenes:mis_resumenes' %}" class="btn btn-secondary">
                 ← Cancelar
             </a>
         </div>
