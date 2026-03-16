@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusPy</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo_v2.png' %}">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Paytone+One&display=swap');
+        .paytone-one-regular {
+            font-family: "Paytone One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 254, 254, 1);
+            backdrop-filter: blur(10px);
+            padding: 0rem 1rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 0px;
+            object-fit: cover;
+        }
+
+        .navbar h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.4rem;
+            font-weight: 400;
+            font-family: "Fugaz One", sans-serif;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .historial-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .historial-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .historial-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Modal del historial */
+        .historial-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .historial-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .historial-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .historial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .historial-header h2 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: #f7fafc;
+            color: #2d3748;
+        }
+
+        .historial-timeline {
+            position: relative;
+        }
+
+        .timeline-day {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .day-date {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .day-count {
+            background: #667eea;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .activities-list {
+            margin-left: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .activity-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .activity-item.resumenes {
+            border-left-color: #667eea;
+        }
+
+        .activity-item.esquemas {
+            border-left-color: #f093fb;
+        }
+
+        .activity-item.flashcards {
+            border-left-color: #4facfe;
+        }
+
+        .activity-item.cuestionarios {
+            border-left-color: #43e97b;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .activity-type {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .activity-title {
+            color: #4a5568;
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .activity-description {
+            color: #718096;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .empty-historial {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .empty-historial h3 {
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+
+        .loading-historial {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .welcome-section h2 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .welcome-section p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:nth-child(1) .card-icon {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .card:nth-child(2) .card-icon {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .card:nth-child(3) .card-icon {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .card:nth-child(4) .card-icon {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .card h3 {
+            color: #2d3748;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: #718096;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .card-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                gap: 0.5rem;
+            }
+
+            .navbar .logo-img {
+                width: 35px;
+                height: 35px;
+            }
+
+            .navbar h1 {
+                font-size: 1.5rem;
+            }
+
+            .historial-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .historial-content {
+                width: 95%;
+                padding: 1.5rem;
+                max-height: 85vh;
+            }
+
+            .container {
+                padding: 2rem 1rem;
+            }
+
+            .welcome-section h2 {
+                font-size: 2rem;
+            }
+
+            .welcome-section p {
+                font-size: 1rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .activities-list {
+                margin-left: 0;
+            }
+
+            .activity-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
+            <h1 class="paytone-one-regular">FocusPy</h1>
+        </div>
+        
+        <div class="navbar-right">
+            <button class="historial-btn" onclick="openHistorial()">
+                <span class="historial-icon">📚</span>
+                Historial
+            </button>
+        </div>
+    </nav>
+
+    <!-- Modal del historial -->
+    <div class="historial-modal" id="historialModal">
+        <div class="historial-content">
+            <div class="historial-header">
+                <h2>📚 Tu Historial de Estudio</h2>
+                <button class="close-btn" onclick="closeHistorial()">×</button>
+            </div>
+            
+            <!-- Contenedor dinámico del historial -->
+            <div class="historial-timeline" id="historialTimeline">
+                <!-- Loading inicial -->
+                <div class="loading-historial" id="loadingHistorial">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando tu historial...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="container">
+        <div class="welcome-section">
+            <h2>¡Bienvenido a tu espacio de estudio!</h2>
+            <p>Organiza y optimiza tu aprendizaje con nuestras herramientas</p>
+        </div>
+
+        <!-- Grid de tarjetas -->
+        <div class="cards-grid">
+            <!-- Tarjeta Resúmenes -->
+            <div class="card">
+                <div class="card-icon">📄</div>
+                <h3>Resúmenes</h3>
+                <p>Crea y organiza resúmenes de tus temas de estudio para un repaso rápido y efectivo.</p>
+                <a href="{% url 'resumenes:home' %}" class="card-btn">Ir a Resúmenes</a>
+            </div>
+
+            <!-- Tarjeta Esquemas -->
+            <div class="card">
+                <div class="card-icon">🗂️</div>
+                <h3>Esquemas</h3>
+                <p>Estructura tu conocimiento con esquemas visuales que te ayuden a comprender mejor.</p>
+                <a href="{% url 'esquemas:home' %}" class="card-btn">Ir a Esquemas</a>
+            </div>
+
+            <!-- Tarjeta Flashcards -->
+            <div class="card">
+                <div class="card-icon">🎴</div>
+                <h3>Flashcards</h3>
+                <p>Practica con tarjetas de memoria para memorizar conceptos y definiciones importantes.</p>
+                <a href="{% url 'flashcards:home' %}" class="card-btn">Ir a Flashcards</a>
+            </div>
+
+            <!-- Tarjeta Cuestionarios -->
+            <div class="card">
+                <div class="card-icon">❓</div>
+                <h3>Cuestionarios</h3>
+                <p>Pon a prueba tus conocimientos con cuestionarios personalizados y mide tu progreso.</p>
+                <a href="{% url 'cuestionarios:home' %}" class="card-btn">Ir a Cuestionarios</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openHistorial() {
+            const modal = document.getElementById('historialModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Cargar historial cuando se abre el modal
+            cargarHistorial();
+        }
+
+        function closeHistorial() {
+            const modal = document.getElementById('historialModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function cargarHistorial() {
+            const timelineContainer = document.getElementById('historialTimeline');
+            const loadingElement = document.getElementById('loadingHistorial');
+            
+            // Mostrar loading
+            loadingElement.style.display = 'block';
+            
+            // Llamada AJAX para obtener historial real
+            fetch('/obtener_historial/')
+                .then(response => response.json())
+                .then(data => {
+                    loadingElement.style.display = 'none';
+                    
+                    if (data.success) {
+                        if (data.historial && data.historial.length > 0) {
+                            mostrarHistorial(data.historial);
+                        } else {
+                            mostrarHistorialVacio();
+                        }
+                    } else {
+                        mostrarErrorHistorial(data.error || 'Error al cargar historial');
+                    }
+                })
+                .catch(error => {
+                    loadingElement.style.display = 'none';
+                    console.error('Error:', error);
+                    mostrarErrorHistorial('No se pudo conectar con el servidor');
+                });
+        }
+
+        function mostrarHistorial(historialData) {
+            const timelineContainer = document.getElementById('historialTimeline');
+            timelineContainer.innerHTML = '';
+            
+            historialData.forEach(dia => {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'timeline-day';
+                
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.innerHTML = `
+                    <span class="day-date">${dia.fecha_display}</span>
+                    <span class="day-count">${dia.count} actividad${dia.count !== 1 ? 'es' : ''}</span>
+                `;
+                
+                const activitiesList = document.createElement('div');
+                activitiesList.className = 'activities-list';
+                
+                dia.actividades.forEach(actividad => {
+                    const activityDiv = document.createElement('div');
+                    activityDiv.className = `activity-item ${actividad.app_origen}`;
+                    
+                    const icon = getActivityIcon(actividad.tipo);
+                    const typeDisplay = getActivityTypeDisplay(actividad.tipo);
+                    
+                    activityDiv.innerHTML = `
+                        <div class="activity-header">
+                            <div class="activity-type">
+                                <span>${icon}</span>
+                                ${typeDisplay}
+                            </div>
+                            <span class="activity-time">${actividad.hora}</span>
+                        </div>
+                        <div class="activity-title">${actividad.titulo}</div>
+                        <div class="activity-description">${actividad.descripcion}</div>
+                    `;
+                    
+                    activitiesList.appendChild(activityDiv);
+                });
+                
+                dayDiv.appendChild(dayHeader);
+                dayDiv.appendChild(activitiesList);
+                timelineContainer.appendChild(dayDiv);
+            });
+        }
+
+        function mostrarHistorialVacio() {
+            const timelineContainer = document.getElementById('historialTimeline');
+            timelineContainer.innerHTML = `
+                <div class="empty-historial">
+                    <h3>📚 Aún no tienes actividades</h3>
+                    <p>Cuando uses las herramientas de estudio, aquí aparecerá tu historial.</p>
+                </div>
+            `;
+        }
+
+        function mostrarErrorHistorial(mensaje) {
+            const timelineContainer = document.getElementById('historialTimeline');
+            timelineContainer.innerHTML = `
+                <div class="empty-historial">
+                    <h3>⚠️ Error al cargar historial</h3>
+                    <p>${mensaje}</p>
+                </div>
+            `;
+        }
+
+        function getActivityIcon(tipo) {
+            const iconos = {
+                'cuestionario_creado': '❓',
+                'cuestionario_completado': '✅',
+                'esquema_generado': '🗂️',
+                'flashcards_creadas': '🎴',
+                'flashcards_practicadas': '🎯',
+                'resumen_creado': '📄'
+            };
+            return iconos[tipo] || '📚';
+        }
+
+        function getActivityTypeDisplay(tipo) {
+            const tipos = {
+                'cuestionario_creado': 'Cuestionario creado',
+                'cuestionario_completado': 'Cuestionario completado',
+                'esquema_generado': 'Esquema generado',
+                'flashcards_creadas': 'Flashcards creadas',
+                'flashcards_practicadas': 'Flashcards practicadas',
+                'resumen_creado': 'Resumen creado'
+            };
+            return tipos[tipo] || 'Actividad';
+        }
+
+        // Cerrar modal al hacer click fuera de él
+        document.getElementById('historialModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeHistorial();
+            }
+        });
+
+        // Cerrar modal con tecla Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeHistorial();
+            }
+        });
+    </script>
+</body>
+</html>

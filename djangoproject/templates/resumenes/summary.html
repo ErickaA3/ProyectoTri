@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+{% load static %}
+{% load markdown_extras %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusPy</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo_v2.png' %}">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Paytone+One&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+                 .paytone-one-regular {
+            font-family: "Paytone One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        /* NAVBAR REUTILIZABLE */
+        .navbar {
+            background: rgba(255, 254, 254, 1);
+            backdrop-filter: blur(10px);
+            padding: 0rem 1rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 0px;
+            object-fit: cover;
+        }
+
+        .navbar h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.4rem;
+            font-weight: 400;
+            font-family: "Fugaz One", sans-serif;
+        }
+
+        .navbar-title-link {
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-title-link:hover {
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        .navbar-title-link:hover h1 {
+            text-decoration: none;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .container {
+            margin-top: 20px;
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+        .boton-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 25px;
+            transition: background 0.3s;
+        }
+
+        .boton-volver:hover {
+            background: #5a6fd8;
+            color: white;
+            text-decoration: none;
+        }
+        .summary-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .document-info {
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .document-title {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .document-meta {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: #718096;
+            font-size: 1rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .meta-icon {
+            font-size: 1.2rem;
+        }
+        
+        .summary-section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .summary-content {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: #2d3748;
+        }
+        
+        /* Estilos para el contenido markdown procesado */
+        .summary-content h3 {
+            color: #2d3748;
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem 0;
+            font-weight: 600;
+        }
+        
+        .summary-content h4 {
+            color: #4a5568;
+            font-size: 1.2rem;
+            margin: 1rem 0 0.5rem 0;
+            font-weight: 500;
+        }
+        
+        .summary-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .summary-content strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .summary-content em {
+            color: #718096;
+            font-style: italic;
+        }
+        
+        .actions-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+        }
+        
+        /* Botón celeste - Descargar TXT */
+        .btn-txt {
+            background: linear-gradient(135deg, #56CCF2, #2F80ED);
+        }
+        
+        .btn-txt:hover {
+            box-shadow: 0 5px 15px rgba(86, 204, 242, 0.4);
+        }
+        
+        /* Botón rojo - Descargar PDF */
+        .btn-pdf {
+            background: linear-gradient(135deg, #FF6B6B, #EE5A52);
+        }
+        
+        .btn-pdf:hover {
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* Botón morado - Crear nuevo */
+        .btn-nuevo {
+            background: linear-gradient(135deg, #A855F7, #7C3AED);
+        }
+        
+        .btn-nuevo:hover {
+            box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+        
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .document-title {
+                font-size: 2rem;
+            }
+            
+            .document-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .actions-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                justify-content: center;
+            }
+        }
+        
+        /* Animación de entrada */
+        .summary-card {
+            animation: slideInUp 0.6s ease-out;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+     <nav class="navbar">
+    <div class="navbar-left">
+        <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
+        <a href="{% url 'home' %}" class="navbar-title-link">
+            <h1 class="paytone-one-regular">FocusPy</h1>
+        </a>
+    </div>
+
+    </nav>
+    
+    <div class="container">
+        <div class="summary-card">
+            <div class="document-info">
+                <h1 class="document-title">{{ document.title }}</h1>
+                <div class="document-meta">
+                    <div class="meta-item">
+                        <span class="meta-icon">📄</span>
+                        <span>Tipo: {{ document.get_document_type_display }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">📅</span>
+                        <span>Procesado: {{ document.created_at|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">📤</span>
+                        <span>{{ document.original_text|length }} caracteres</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="summary-section">
+                <div class="summary-content">{{ summary.summary_text|markdown_to_html }}</div>
+            </div>
+            
+            <div class="actions-bar">
+                <a href="{% url 'resumenes:exportar_pdf' document.id %}" class="btn btn-pdf">
+                    📄 Descargar PDF
+                </a>
+                <button onclick="downloadSummary()" class="btn btn-txt">
+                    📝 Descargar TXT
+                </button>
+                <a href="{% url 'resumenes:home' %}" class="btn btn-nuevo">
+                    ➕ Crear Nuevo
+                </a>
+            </div>
+            <a href="{% url 'resumenes:home' %}" class="boton-volver">← Volver a Resumenes</a>
+        </div>
+    </div>
+    
+    <script>
+        function downloadSummary() {
+            const title = '{{ document.title }}';
+            const summary = document.querySelector('.summary-content').textContent;
+            const content = `RESUMEN: ${title}\n\nGenerado el: {{ summary.created_at|date:"d/m/Y H:i" }}\n\n${summary}`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `resumen_${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

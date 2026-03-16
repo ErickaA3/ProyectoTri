@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusPy</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo_v2.png' %}">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Paytone+One&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+                .paytone-one-regular {
+            font-family: "Paytone One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        /* NAVBAR REUTILIZABLE */
+        .navbar {
+            background: rgba(255, 254, 254, 1);
+            backdrop-filter: blur(10px);
+            padding: 0rem 1rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 0px;
+            object-fit: cover;
+        }
+
+        .navbar h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.4rem;
+            font-weight: 400;
+            font-family: "Fugaz One", sans-serif;
+        }
+
+        .navbar-title-link {
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-title-link:hover {
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        .navbar-title-link:hover h1 {
+            text-decoration: none;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border-left: 4px solid #48bb78;
+        }
+
+        .alert-error, .alert-danger {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border-left: 4px solid #f56565;
+        }
+
+        .alert-info {
+            background: rgba(102, 126, 234, 0.1);
+            color: #4c51bf;
+            border-left: 4px solid #667eea;
+        }
+
+        .alert-warning {
+            background: rgba(237, 137, 54, 0.1);
+            color: #c05621;
+            border-left: 4px solid #ed8936;
+        }
+
+        .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        .esquema-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .esquema-header h2 {
+            color: #2d3748;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .esquema-meta {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .esquema-content {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        /* Controles del esquema */
+        .esquema-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: #5a6fd8;
+            transform: scale(1.05);
+        }
+
+        /* Esquemas Jerárquicos mejorados */
+        .hierarchy-node {
+            margin: 0.5rem 0;
+            position: relative;
+        }
+
+        .level-1 {
+            padding-left: 0;
+        }
+
+        .level-2 {
+            padding-left: 2rem;
+        }
+
+        .level-3 {
+            padding-left: 4rem;
+        }
+
+        .level-4 {
+            padding-left: 6rem;
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: white;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .level-1 .node-header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-left: 4px solid #667eea;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .level-2 .node-header {
+            border-left: 3px solid #a78bfa;
+            background: rgba(167, 139, 250, 0.05);
+        }
+
+        .level-3 .node-header {
+            border-left: 2px solid #c4b5fd;
+            font-size: 0.95rem;
+            background: rgba(196, 181, 253, 0.05);
+        }
+
+        .level-4 .node-header {
+            border-left: 1px solid #ddd6fe;
+            font-size: 0.9rem;
+            background: rgba(221, 214, 254, 0.05);
+        }
+
+        .node-header:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .node-header.expanded {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.05);
+        }
+
+        .expand-icon {
+            margin-right: 0.75rem;
+            color: #667eea;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(90deg);
+            color: #48bb78;
+        }
+
+        .expand-icon.no-children {
+            color: #cbd5e0;
+            cursor: default;
+        }
+
+        .node-title {
+            flex: 1;
+            color: #2d3748;
+            line-height: 1.5;
+        }
+
+        .node-meta {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-left: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .children-count {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .node-children {
+            overflow: hidden;
+            transition: all 0.4s ease;
+            max-height: 0;
+            opacity: 0;
+            margin-left: 1rem;
+            border-left: 2px solid rgba(102, 126, 234, 0.2);
+            padding-left: 0.5rem;
+        }
+
+        .node-children.expanded {
+            max-height: 2000px;
+            opacity: 1;
+            margin-top: 0.5rem;
+        }
+
+        /* Detalles expandibles */
+        .node-details {
+            background: rgba(102, 126, 234, 0.02);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .node-details.expanded {
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        .node-detail-content {
+            color: #4a5568;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .detail-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .detail-tag {
+            background: #667eea;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* Mapas Conceptuales */
+        .concept-map {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .central-concept {
+            margin-bottom: 3rem;
+        }
+
+        .concept-node {
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            background: white;
+            border: 3px solid #667eea;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .concept-node.main {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 1.3rem;
+            padding: 2rem 3rem;
+        }
+
+        .sub-concepts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .concept-branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .connector {
+            width: 2px;
+            height: 40px;
+            background: #667eea;
+            margin-bottom: -20px;
+            margin-top: -60px;
+        }
+
+        .concept-node.sub {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid #a78bfa;
+            color: #2d3748;
+        }
+
+        /* Líneas de Tiempo */
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #667eea;
+        }
+
+        .timeline-item {
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border: 4px solid white;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-content {
+            width: 45%;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-item.left .timeline-content {
+            margin-right: auto;
+        }
+
+        .timeline-item.right .timeline-content {
+            margin-left: auto;
+        }
+
+        .timeline-date {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-description {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* Botones */
+        .esquema-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-export {
+            background: #48bb78;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn-export:hover {
+            background: #38a169;
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            color: #4a5568;
+            text-decoration: none;
+        }
+
+        .boton-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 25px;
+            transition: background 0.3s;
+        }
+
+        .boton-volver:hover {
+            background: #5a6fd8;
+            color: white;
+            text-decoration: none;
+        }
+
+        .empty-content {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .node-details.expanded {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+
+            .esquema-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .esquema-content {
+                padding: 1rem;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-content {
+                width: calc(100% - 60px);
+                margin-left: 50px !important;
+            }
+
+            .timeline-marker {
+                left: 20px;
+            }
+
+            .sub-concepts {
+                grid-template-columns: 1fr;
+            }
+
+            .esquema-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .level-2 {
+                padding-left: 1rem;
+            }
+
+            .level-3 {
+                padding-left: 2rem;
+            }
+
+            .level-4 {
+                padding-left: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+     <nav class="navbar">
+    <div class="navbar-left">
+        <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
+        <a href="{% url 'home' %}" class="navbar-title-link">
+            <h1 class="paytone-one-regular">FocusPy</h1>
+        </a>
+    </div>
+
+    </nav>
+
+    <div class="container">
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="esquema-header">
+            <h2>{{ esquema.titulo }}</h2>
+            <p class="esquema-meta">
+                Tipo: {{ esquema.get_tipo_display }} | 
+                Creado: {{ esquema.fecha_creacion|date:"d/m/Y H:i" }}
+                {% if esquema.fuente == 'archivo' and esquema.archivo_original %}
+                    | Fuente: {{ esquema.archivo_original.name }}
+                {% else %}
+                    | Fuente: Texto directo
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Contenido según el tipo de esquema -->
+        {% if esquema.tipo == 'jerarquico' %}
+            <!-- Controles para esquema jerárquico -->
+            <div class="esquema-controls">
+                <button class="control-btn" onclick="expandAll()">Expandir Todo</button>
+                <button class="control-btn" onclick="collapseAll()">Colapsar Todo</button>
+                <button class="control-btn" onclick="toggleAllDetails()" id="toggleAllBtn">Mostrar Todos los Detalles</button>
+            </div>
+            
+            <div class="esquema-content">
+                <div id="esquema-jerarquico">
+                    <!-- Los nodos se renderizarán aquí con JavaScript -->
+                </div>
+                {% if not nodos %}
+                    <div class="empty-content">
+                        <p>No hay contenido disponible para este esquema.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+        {% elif esquema.tipo == 'conceptual' %}
+            <div class="esquema-content">
+                <div class="concept-map">
+                    {% if concepto_central %}
+                    <div class="central-concept">
+                        <div class="concept-node main">
+                            {{ concepto_central.texto|upper }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if conceptos_relacionados %}
+                    <div class="sub-concepts">
+                        {% for concepto in conceptos_relacionados %}
+                        <div class="concept-branch">
+                            <div class="connector"></div>
+                            <div class="concept-node sub">
+                                <strong>{{ concepto.texto }}</strong>
+                                {% if concepto.descripcion %}
+                                <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+                                    {{ concepto.descripcion|linebreaksbr }}
+                                </p>
+                                {% endif %}
+                                {% if concepto.ejemplos %}
+                                <p style="font-size: 0.8rem; margin-top: 0.5rem; color: #667eea;">
+                                    <strong>Ejemplos:</strong> {{ concepto.get_ejemplos_str }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-content">
+                        <p>No hay conceptos relacionados disponibles.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        {% elif esquema.tipo == 'cronologico' %}
+            <div class="esquema-content">
+                <div class="timeline">
+                    {% for evento in eventos %}
+                    <div class="timeline-item {% cycle 'left' 'right' %}">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4 class="timeline-date">{{ evento.fecha }}</h4>
+                            <h3 class="timeline-title">{{ evento.titulo }}</h3>
+                            <p class="timeline-description">{{ evento.descripcion }}</p>
+                            {% if evento.contexto %}
+                            <p style="margin-top: 0.5rem; font-style: italic; color: #667eea;">
+                                <strong>Contexto:</strong> {{ evento.contexto }}
+                            </p>
+                            {% endif %}
+                            {% if evento.consecuencias %}
+                            <p style="margin-top: 0.5rem; color: #e53e3e;">
+                                <strong>Consecuencias:</strong> {{ evento.get_consecuencias_str }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-content">
+                        <p>No hay eventos disponibles para esta línea de tiempo.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Acciones del esquema -->
+        <div class="esquema-actions">
+            <a href="{% url 'esquemas:exportar_pdf' esquema.id %}" class="btn-export">
+                Exportar PDF
+            </a>
+            <a href="{% url 'esquemas:exportar_txt' esquema.id %}" class="btn-export">
+                Exportar TXT
+            </a>
+            <a href="{% url 'esquemas:home' %}" class="btn-secondary">
+                Volver a Esquemas
+            </a>
+            <a href="{% url 'esquemas:home' %}" class="btn-primary">
+                Crear Nuevo
+            </a>
+        </div>
+
+        <a href="{% url 'esquemas:home' %}" class="boton-volver">← Volver a Esquemas</a>
+    </div>
+
+    <script>
+        // Variables globales
+        let nodesData = [];
+        let hierarchyTree = [];
+        let showDetails = false;
+
+        // Función para toggle individual de detalles (para el ℹ️)
+        function toggleNodeDetails(nodeId) {
+            console.log('Toggle individual para nodo:', nodeId);
+            const details = document.getElementById(`details-${nodeId}`);
+            if (details) {
+                details.classList.toggle('expanded');
+                console.log('Detalles del nodo', nodeId, 'toggled');
+            } else {
+                console.error('No se encontró details-' + nodeId);
+            }
+        }
+
+        // Función para toggle global de todos los detalles (para el botón)
+        function toggleAllDetails() {
+            const allDetails = document.querySelectorAll('.node-details');
+            const button = document.getElementById('toggleAllBtn');
+            
+            if (allDetails.length === 0) {
+                console.log('No hay detalles para mostrar');
+                return;
+            }
+
+            // Verificar si alguno está expandido
+            const anyExpanded = Array.from(allDetails).some(detail => detail.classList.contains('expanded'));
+            
+            if (anyExpanded) {
+                // Ocultar todos
+                allDetails.forEach(details => {
+                    details.classList.remove('expanded');
+                });
+                if (button) button.textContent = 'Mostrar Todos los Detalles';
+                showDetails = false;
+            } else {
+                // Mostrar todos
+                allDetails.forEach(details => {
+                    details.classList.add('expanded');
+                });
+                if (button) button.textContent = 'Ocultar Todos los Detalles';
+                showDetails = true;
+            }
+        }
+
+        // Cerrar alertas automáticamente
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
+
+        // Datos para esquemas jerárquicos mejorados
+        {% if esquema.tipo == 'jerarquico' and nodos %}
+        document.addEventListener('DOMContentLoaded', function() {
+            nodesData = [
+                {% for nodo in nodos %}
+                {
+                    id: {{ nodo.id }},
+                    texto: "{{ nodo.texto|escapejs }}",
+                    nivel: {{ nodo.nivel }},
+                    orden: {{ nodo.orden }},
+                    padre_id: {% if nodo.padre %}{{ nodo.padre.id }}{% else %}null{% endif %},
+                    detalles: "{{ nodo.detalles|escapejs }}",
+                    palabras_clave: {{ nodo.palabras_clave|safe }},
+                    importancia: "{{ nodo.importancia }}",
+                    tiene_detalles: {{ nodo.tiene_detalles|yesno:"true,false" }}
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            console.log('Nodos cargados:', nodesData);
+            buildHierarchyTree();
+            renderHierarchy();
+        });
+
+        function buildHierarchyTree() {
+            const nodesMap = {};
+            nodesData.forEach(node => {
+                nodesMap[node.id] = { ...node, children: [] };
+            });
+
+            const roots = [];
+            nodesData.forEach(node => {
+                if (node.padre_id === null) {
+                    roots.push(nodesMap[node.id]);
+                } else {
+                    if (nodesMap[node.padre_id]) {
+                        nodesMap[node.padre_id].children.push(nodesMap[node.id]);
+                    }
+                }
+            });
+
+            hierarchyTree = roots;
+        }
+
+        function renderNode(node, parentExpanded = true) {
+            const hasChildren = node.children && node.children.length > 0;
+            const expandIcon = hasChildren ? '▶' : '•';
+            const nodeId = `node-${node.id}`;
+            const detailsId = `details-${node.id}`;
+            const childrenId = `children-${node.id}`;
+
+            let html = `
+                <div class="hierarchy-node level-${node.nivel}" data-node-id="${node.id}">
+                    <div class="node-header" onclick="toggleNode(${node.id}, ${hasChildren})">
+                        <span class="expand-icon ${hasChildren ? 'expandable' : 'no-children'}" id="icon-${node.id}">
+                            ${expandIcon}
+                        </span>
+                        <span class="node-title">${node.texto}</span>
+                        <div class="node-meta">
+                            ${hasChildren ? `<span class="children-count">${node.children.length}</span>` : ''}
+                            ${node.tiene_detalles ? '<span onclick="toggleNodeDetails(' + node.id + '); event.stopPropagation();" style="cursor: pointer; color: #667eea; font-size: 1.1rem;" title="Ver detalles">ℹ️</span>' : ''}
+                        </div>
+                    </div>`;
+
+            // Detalles expandibles
+            if (node.tiene_detalles && node.detalles) {
+                html += `
+                    <div class="node-details" id="${detailsId}">
+                        <div class="node-detail-content">
+                            ${node.detalles}
+                            ${node.palabras_clave && node.palabras_clave.length > 0 ? `
+                                <div class="detail-tags">
+                                    ${node.palabras_clave.map(tag => `<span class="detail-tag">${tag}</span>`).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>`;
+            }
+
+            // Contenedor de hijos
+            if (hasChildren) {
+                html += `<div class="node-children" id="${childrenId}">`;
+                node.children.forEach(child => {
+                    html += renderNode(child, false);
+                });
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        function renderHierarchy() {
+            const container = document.getElementById('esquema-jerarquico');
+            if (!container) return;
+
+            let html = '';
+            hierarchyTree.forEach(root => {
+                html += renderNode(root, true);
+            });
+
+            container.innerHTML = html;
+        }
+
+        function toggleNode(nodeId, hasChildren) {
+            if (!hasChildren) return;
+
+            const icon = document.getElementById(`icon-${nodeId}`);
+            const children = document.getElementById(`children-${nodeId}`);
+            const header = document.querySelector(`[data-node-id="${nodeId}"] .node-header`);
+
+            if (children.classList.contains('expanded')) {
+                children.classList.remove('expanded');
+                icon.classList.remove('expanded');
+                header.classList.remove('expanded');
+            } else {
+                children.classList.add('expanded');
+                icon.classList.add('expanded');
+                header.classList.add('expanded');
+            }
+        }
+
+        function expandAll() {
+            document.querySelectorAll('.node-children').forEach(children => {
+                children.classList.add('expanded');
+            });
+            document.querySelectorAll('.expand-icon.expandable').forEach(icon => {
+                icon.classList.add('expanded');
+            });
+            document.querySelectorAll('.node-header').forEach(header => {
+                if (header.onclick && header.onclick.toString().includes('true')) {
+                    header.classList.add('expanded');
+                }
+            });
+        }
+
+        function collapseAll() {
+            document.querySelectorAll('.node-children').forEach(children => {
+                children.classList.remove('expanded');
+            });
+            document.querySelectorAll('.expand-icon').forEach(icon => {
+                icon.classList.remove('expanded');
+            });
+            document.querySelectorAll('.node-header').forEach(header => {
+                header.classList.remove('expanded');
+            });
+        }
+        {% endif %}
+    </script>
+</body>
+</html>

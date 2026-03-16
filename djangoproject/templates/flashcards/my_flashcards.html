@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusPy</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo_v2.png' %}">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Paytone+One&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+                .paytone-one-regular {
+            font-family: "Paytone One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        /* NAVBAR REUTILIZABLE */
+        .navbar {
+            background: rgba(255, 254, 254, 1);
+            backdrop-filter: blur(10px);
+            padding: 0rem 1rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 0px;
+            object-fit: cover;
+        }
+
+        .navbar h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.4rem;
+            font-weight: 400;
+            font-family: "Fugaz One", sans-serif;
+        }
+
+        .navbar-title-link {
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-title-link:hover {
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        .navbar-title-link:hover h1 {
+            text-decoration: none;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h2 {
+            color: #2d3748;
+            font-size: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            color: #4a5568;
+        }
+
+        .collections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .collection-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .collection-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .collection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .collection-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+            flex-grow: 1;
+            margin-right: 1rem;
+        }
+
+        .difficulty-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .difficulty-facil {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .difficulty-intermedio {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+        }
+
+        .difficulty-avanzado {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+            color: white;
+        }
+
+        .collection-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .progress-section {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .progress-label span:first-child {
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .progress-status {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .progress-bar-container {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .progress-bar-empty {
+            background: #cbd5e0;
+        }
+
+        .collection-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-primary-small {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary-small {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-danger-small {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-small:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-secondary-small:hover {
+            background: #cbd5e0;
+            color: #4a5568;
+        }
+
+        .btn-danger-small:hover {
+            background: #e53e3e;
+        }
+
+        .empty-state {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 4rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .create-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .create-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .boton-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 25px;
+            transition: background 0.3s;
+        }
+
+        .boton-volver:hover {
+            background: #5a6fd8;
+            color: white;
+            text-decoration: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border-left: 4px solid #48bb78;
+        }
+
+        .alert-error, .alert-danger {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border-left: 4px solid #f56565;
+        }
+
+        .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+
+            .collection-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .difficulty-badge {
+                margin-top: 0.5rem;
+            }
+
+            .collection-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .collection-actions {
+                justify-content: center;
+            }
+
+            .collections-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+     <nav class="navbar">
+    <div class="navbar-left">
+        <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
+        <a href="{% url 'home' %}" class="navbar-title-link">
+            <h1 class="paytone-one-regular">FocusPy</h1>
+        </a>
+    </div>
+
+    </nav>
+
+    <div class="container">
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="header">
+            <h2>🎯 Mis Flashcards</h2>
+            <div>
+                <a href="{% url 'flashcards:home' %}#crear-texto" class="btn btn-primary">✏️ Nuevo Texto</a>
+                <a href="{% url 'flashcards:home' %}#crear-archivo" class="btn btn-secondary">📄 Nuevo Archivo</a>
+            </div>
+        </div>
+
+        {% if collections %}
+        <div class="collections-grid">
+            {% for item in collections_with_stats %}
+            <div class="collection-card" onclick="viewCollection('{{ item.collection.id }}')">
+                <div class="collection-header">
+                    <div class="collection-title">{{ item.collection.title }}</div>
+                    <div class="difficulty-badge difficulty-{{ item.collection.difficulty }}">
+                        {{ item.collection.get_difficulty_display }}
+                    </div>
+                </div>
+                
+                <div class="collection-info">
+                    <div class="info-item">
+                        <span>📚</span>
+                        <span>{{ item.collection.total_cards }} tarjetas</span>
+                    </div>
+                    <div class="info-item">
+                        <span>📅</span>
+                        <span>{{ item.collection.created_at|date:"d M Y" }}</span>
+                    </div>
+                </div>
+
+                <!-- Barra de progreso de aprendizaje -->
+                <div class="progress-section">
+                    {% if item.has_been_studied %}
+                        <div class="progress-label">
+                            <span>Dominio: {{ item.last_accuracy }}%</span>
+                            <span class="progress-status">
+                                {% if item.progress_percentage >= 80 %}
+                                    🎯 Dominado
+                                {% elif item.progress_percentage >= 60 %}
+                                    📚 En progreso
+                                {% elif item.progress_percentage >= 30 %}
+                                    🔥 Practicando
+                                {% else %}
+                                    🚀 Comenzando
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: {{ item.progress_percentage }}%"></div>
+                        </div>
+                    {% else %}
+                        <div class="progress-label">
+                            <span>Sin estudiar</span>
+                            <span class="progress-status">🎯 ¡Empezar!</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar progress-bar-empty" style="width: 0%"></div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="collection-actions">
+                    <a href="{% url 'flashcards:study_collection' item.collection.id %}" 
+                       class="btn-small btn-primary-small" onclick="event.stopPropagation()">
+                        🎯 Estudiar
+                    </a>
+                    <a href="{% url 'flashcards:view_collection' item.collection.id %}" 
+                       class="btn-small btn-secondary-small" onclick="event.stopPropagation()">
+                        👁️ Ver
+                    </a>
+                    <a href="{% url 'flashcards:confirmar_eliminar_collection' item.collection.id %}" 
+                       class="btn-small btn-danger-small" onclick="event.stopPropagation()">
+                        🗑️ Eliminar
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>🎯 ¡Aún no tienes flashcards!</h3>
+            <p>Comienza creando tu primera colección de flashcards.<br>
+            Sube archivos o ingresa texto para generar tarjetas de estudio automáticamente con IA.</p>
+            <a href="{% url 'flashcards:home' %}" class="create-button">
+                Crear Mi Primera Colección
+            </a>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'flashcards:home' %}" class="boton-volver">← Volver a Flashcards</a>
+    </div>
+
+    <script>
+        function viewCollection(collectionId) {
+            window.location.href = `/flashcards/collection/${collectionId}/`;
+        }
+
+        // JavaScript para manejar navegación con hash
+        document.addEventListener('DOMContentLoaded', function() {
+            // Si viene de un enlace con hash, activar la vista correspondiente
+            const hash = window.location.hash;
+            if (hash === '#crear-texto' || hash === '#crear-archivo') {
+                // Redirigir a la página principal con el hash
+                window.location.href = "{% url 'flashcards:home' %}" + hash;
+            }
+        });
+
+        // Cerrar alertas automáticamente
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

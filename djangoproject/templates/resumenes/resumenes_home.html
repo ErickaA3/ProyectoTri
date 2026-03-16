@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusPy</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo_v2.png' %}">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Paytone+One&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+                .paytone-one-regular {
+            font-family: "Paytone One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        /* NAVBAR REUTILIZABLE */
+        .navbar {
+            background: rgba(255, 254, 254, 1);
+            backdrop-filter: blur(10px);
+            padding: 0rem 1rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 0px;
+            object-fit: cover;
+        }
+
+        .navbar h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.4rem;
+            font-weight: 400;
+            font-family: "Fugaz One", sans-serif;
+        }
+
+        .navbar-title-link {
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-title-link:hover {
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        .navbar-title-link:hover h1 {
+            text-decoration: none;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Mensajes de Django */
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border-left: 4px solid #48bb78;
+        }
+
+        .alert-error, .alert-danger {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border-left: 4px solid #f56565;
+        }
+
+        .alert-info {
+            background: rgba(102, 126, 234, 0.1);
+            color: #4c51bf;
+            border-left: 4px solid #667eea;
+        }
+
+        .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        /* Tabs para mostrar diferentes vistas */
+        .view-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            background: #f7fafc;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #718096;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .tab-btn:hover {
+            color: white;
+            text-decoration: none;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* Header de sección */
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: #718096;
+            font-size: 1.2rem;
+        }
+
+        /* Grid de tarjetas */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin: 3rem 0;
+            justify-items: center;
+        }
+
+        /* Tarjetas */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            width: 100%;
+            max-width: 400px;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .card-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:nth-child(1) .card-icon {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .card:nth-child(2) .card-icon {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .card h3 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: #718096;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .card-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .card-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Formularios */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .form-header h2 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .emoji-icon {
+            background: none !important;
+            -webkit-background-clip: initial !important;
+            -webkit-text-fill-color: initial !important;
+            background-clip: initial !important;
+            color: initial !important;
+            margin-right: 0.5rem;
+        }
+
+        .form-header p {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .form-control.textarea {
+            min-height: 300px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-text {
+            margin-top: 0.5rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* File upload */
+        .file-upload-area {
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: rgba(102, 126, 234, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+
+        .file-icon {
+            font-size: 3.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-text {
+            color: #2d3748;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-hint {
+            color: #718096;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .file-upload-content {
+            pointer-events: none;
+            position: relative;
+        }
+
+        .browse-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .browse-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Efectos cuando se selecciona archivo */
+        .file-input:valid + .file-upload-content .file-icon {
+            color: #48bb78 !important;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+
+        .file-input:valid + .file-upload-content .file-upload-text {
+            color: #2f855a !important;
+            font-weight: 700 !important;
+        }
+
+        .file-input:valid + .file-upload-content .file-upload-text::after {
+            content: "\A✅ Archivo seleccionado correctamente";
+            white-space: pre;
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: #2f855a;
+            font-weight: 600;
+        }
+
+        .file-input:valid + .file-upload-content .file-upload-hint {
+            display: none;
+        }
+
+        .file-input:valid + .file-upload-content .browse-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169) !important;
+        }
+
+        .file-input:valid + .file-upload-content .browse-btn::before {
+            content: "✅ ";
+            margin-right: 0.5rem;
+        }
+
+        .file-upload-area:has(.file-input:valid) {
+            border-color: #48bb78 !important;
+            background: rgba(72, 187, 120, 0.1) !important;
+        }
+
+        /* Botones */
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            color: #4a5568;
+            text-decoration: none;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Botón volver */
+        .boton-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 25px;
+            transition: background 0.3s;
+        }
+
+        .boton-volver:hover {
+            background: #5a6fd8;
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .empty-state h5 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .empty-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Resúmenes recientes */
+        .recent-summaries {
+            margin-top: 3rem;
+        }
+
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .recent-header h3 {
+            color: #2d3748;
+            font-size: 1.8rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+
+        .summaries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .summary-title {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .summary-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .summary-meta {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-small {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success-small {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-danger-small {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-primary-small:hover, .btn-success-small:hover, .btn-danger-small:hover {
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-danger-small:hover {
+            background: #e53e3e;
+        }
+
+        /* Info cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card h5 {
+            color: #2d3748;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card p {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .view-tabs {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .tab-btn {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+
+            .empty-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .recent-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .summaries-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+     <nav class="navbar">
+    <div class="navbar-left">
+        <img src="{% static 'images/logo_v2.png' %}" alt="FocusPy Logo" class="logo-img">
+        <a href="{% url 'home' %}" class="navbar-title-link">
+            <h1 class="paytone-one-regular">FocusPy</h1>
+        </a>
+    </div>
+
+    </nav>
+
+    <div class="container">
+        <!-- Mensajes de Django -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Tabs para navegar entre vistas -->
+        <div class="view-tabs">
+            <button class="tab-btn active" onclick="showView('home')">🏠 Inicio</button>
+            <button class="tab-btn" onclick="showView('crear-texto')">✍️ Crear desde Texto</button>
+            <button class="tab-btn" onclick="showView('crear-archivo')">📁 Crear desde Archivo</button>
+        </div>
+
+        <!-- Vista Principal -->
+        <div id="home" class="view-section active">
+            <div class="section-header">
+                <h2>📋 Resúmenes</h2>
+                <p>Convierte información compleja en resúmenes claros y concisos</p>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card" onclick="showView('crear-archivo')">
+                    <div class="card-icon">📁</div>
+                    <h3>Subir Archivos</h3>
+                    <p>Sube archivos TXT, PDF, Word y otros formatos para procesar automáticamente.</p>
+                    <button class="card-btn" onclick="event.stopPropagation(); showView('crear-archivo')">Subir Archivo</button>
+                </div>
+
+                <div class="card" onclick="showView('crear-texto')">
+                    <div class="card-icon">✍️</div>
+                    <h3>Ingresar Texto</h3>
+                    <p>Escribe o pega texto directamente para crear resúmenes, esquemas y más.</p>
+                    <button class="card-btn" onclick="event.stopPropagation(); showView('crear-texto')">Ingresar Texto</button>
+                </div>
+            </div>
+
+            <!-- Resúmenes recientes -->
+            {% if resumenes_recientes %}
+            <div class="recent-summaries">
+                <div class="recent-header">
+                    <h3>📚 Resúmenes Recientes</h3>
+                    <a href="{% url 'resumenes:mis_resumenes' %}" class="btn-outline">Ver todos</a>
+                </div>
+                
+                <div class="summaries-grid">
+                    {% for resumen in resumenes_recientes %}
+                    <div class="summary-card">
+                        <div class="summary-header">
+                            <h4 class="summary-title">{{ resumen.title|truncatechars:35 }}</h4>
+                            
+                        </div>
+                        <div class="summary-meta">
+                            Creado: {{ resumen.created_at|date:"d/m/Y" }}
+                            {% if resumen.original_file %}
+                                <br>📁 Desde archivo
+                            {% else %}
+                                <br>✍️ Desde texto
+                            {% endif %}
+                        </div>
+                        <div class="summary-actions">
+                            <a href="{% url 'resumenes:ver_resumen' resumen.id %}" class="btn-small btn-primary-small">Ver</a>
+                            <a href="{% url 'resumenes:exportar_pdf' resumen.id %}" class="btn-small btn-success-small">PDF</a>
+                            <a href="{% url 'resumenes:eliminar_resumen' resumen.id %}" 
+                               class="btn-small btn-danger-small">Eliminar</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h5>¡Bienvenido a Resúmenes!</h5>
+                <p>Aún no has creado ningún resumen. Comienza creando uno desde texto o archivo.</p>
+                <div class="empty-actions">
+                    <button class="card-btn" onclick="showView('crear-texto')">✍️ Crear desde Texto</button>
+                    <button class="card-btn" onclick="showView('crear-archivo')">📁 Crear desde Archivo</button>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Información adicional -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <h5>⚡ Rápido</h5>
+                    <p>Obtén resúmenes precisos en segundos</p>
+                </div>
+                <div class="info-card">
+                    <h5>🎯 Preciso</h5>
+                    <p>Mantiene los puntos clave del contenido</p>
+                </div>
+                <div class="info-card">
+                    <h5>📱 Versátil</h5>
+                    <p>Funciona con múltiples formatos de archivo</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Crear desde Texto -->
+        <div id="crear-texto" class="view-section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2><span class="emoji-icon">✍️</span> Crear Resumen desde Texto</h2>
+                    <p>Pega o escribe tu contenido para generar resúmenes automáticamente</p>
+                </div>
+
+                <form method="post" action="{% url 'resumenes:process_text' %}" id="resumenTextoForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="titulo_texto" class="form-label">Título del Resumen</label>
+                        <input type="text" 
+                               id="titulo_texto" 
+                               name="title" 
+                               class="form-control"
+                               placeholder="Título de tu resumen"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contenido_texto" class="form-label">Contenido</label>
+                        <textarea id="contenido_texto" 
+                                  name="text" 
+                                  class="form-control textarea"
+                                  placeholder="Pega o escribe aquí el contenido que quieres resumir...
+
+Puedes incluir:
+• Artículos completos
+• Notas de clase
+• Documentos largos
+• Cualquier texto que necesites resumir
+
+El sistema creará automáticamente un resumen estructurado y fácil de estudiar."
+                                  required></textarea>
+                        <div class="form-text">Introduce el texto del cual quieres generar el resumen</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showView('home')">
+                            ← Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitTextoBtn">
+                            🚀 Generar Resumen
+                        </button>
+                    </div>
+                </form>
+
+                <div class="loading-spinner" id="loadingTextoSpinner">
+                    <div class="spinner"></div>
+                    <p>Generando tu resumen con inteligencia artificial...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Crear desde Archivo -->
+        <div id="crear-archivo" class="view-section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2><span class="emoji-icon">📁</span> Crear Resumen desde Archivo</h2>
+                    <p>Sube un documento y genera resúmenes automáticamente</p>
+                </div>
+
+                <form method="post" action="{% url 'resumenes:process_file' %}" enctype="multipart/form-data" id="resumenArchivoForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="titulo_archivo" class="form-label">Título del Resumen</label>
+                        <input type="text" 
+                               id="titulo_archivo" 
+                               name="title" 
+                               class="form-control"
+                               placeholder="Título de tu resumen"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="archivo" class="form-label">Archivo</label>
+                        
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" 
+                                   id="archivo" 
+                                   name="file" 
+                                   class="file-input"
+                                   accept=".pdf,.doc,.docx,.txt"
+                                   required
+                                   title="Archivo seleccionado">
+                            
+                            <div class="file-upload-content">
+                                <div class="file-icon">📄</div>
+                                <div class="file-upload-text">
+                                    <strong>Haz clic aquí o arrastra un archivo</strong>
+                                </div>
+                                <div class="file-upload-hint">
+                                    Formatos soportados: PDF, TXT, DOC, DOCX<br>
+                                    Selecciona tu archivo para comenzar
+                                </div>
+                                <span class="browse-btn">Explorar Archivos</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-text">Sube un archivo PDF, DOC, DOCX o TXT (máximo 10MB)</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showView('home')">
+                            ← Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitArchivoBtn">
+                            🚀 Procesar Archivo
+                        </button>
+                    </div>
+                </form>
+
+                <div class="loading-spinner" id="loadingArchivoSpinner">
+                    <div class="spinner"></div>
+                    <p>Extrayendo texto y generando resumen...</p>
+                </div>
+            </div>
+        </div>
+
+        <a href="{% url 'home' %}" class="boton-volver">← Volver al Inicio</a>
+    </div>
+
+    <script>
+        // JavaScript para manejar navegación con hash
+        document.addEventListener('DOMContentLoaded', function() {
+            // Si la URL contiene un hash, mostrar la vista correspondiente
+            const hash = window.location.hash;
+            if (hash === '#crear-texto') {
+                showView('crear-texto');
+            } else if (hash === '#crear-archivo') {
+                showView('crear-archivo');
+            }
+        });
+
+        function showView(viewId) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remover active de todos los tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar la vista seleccionada
+            document.getElementById(viewId).classList.add('active');
+            
+            // Activar el tab correspondiente
+            const activeBtn = document.querySelector(`[onclick="showView('${viewId}')"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            // Actualizar URL con hash (sin recargar página)
+            history.replaceState(null, null, '#' + viewId);
+        }
+
+        // Manejo del formulario de texto
+        document.getElementById('resumenTextoForm').addEventListener('submit', function(e) {
+            const text = document.getElementById('contenido_texto').value.trim();
+            const title = document.getElementById('titulo_texto').value.trim();
+            
+            if (!text || !title) {
+                e.preventDefault();
+                alert('Por favor completa todos los campos requeridos.');
+                return;
+            }
+            
+            if (text.length < 50) {
+                e.preventDefault();
+                alert('El texto debe tener al menos 50 caracteres para generar un resumen útil.');
+                return;
+            }
+            
+            // Mostrar loading
+            document.getElementById('submitTextoBtn').disabled = true;
+            document.getElementById('loadingTextoSpinner').style.display = 'block';
+            document.getElementById('submitTextoBtn').innerHTML = '⏳ Generando...';
+        });
+
+        // Manejo del formulario de archivo
+        document.getElementById('resumenArchivoForm').addEventListener('submit', function(e) {
+            const file = document.getElementById('archivo').files[0];
+            const title = document.getElementById('titulo_archivo').value.trim();
+            
+            if (!file || !title) {
+                e.preventDefault();
+                alert('Por favor selecciona un archivo y completa el título.');
+                return;
+            }
+            
+            // Validar tamaño del archivo (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                e.preventDefault();
+                alert('El archivo es demasiado grande. Máximo 10MB.');
+                return;
+            }
+            
+            // Validar tipo de archivo
+            const allowedTypes = ['pdf', 'txt', 'doc', 'docx'];
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (!allowedTypes.includes(fileExtension)) {
+                e.preventDefault();
+                alert('Tipo de archivo no soportado. Use: PDF, TXT, DOC, DOCX');
+                return;
+            }
+            
+            // Mostrar loading
+            document.getElementById('submitArchivoBtn').disabled = true;
+            document.getElementById('loadingArchivoSpinner').style.display = 'block';
+            document.getElementById('submitArchivoBtn').innerHTML = '⏳ Procesando...';
+        });
+
+        // JavaScript para mostrar el nombre del archivo seleccionado
+        document.getElementById('archivo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileUploadText = document.querySelector('.file-upload-text strong');
+                if (fileUploadText) {
+                    fileUploadText.innerHTML = `Archivo seleccionado: <br><span style="font-size: 0.9rem; font-weight: normal;">${file.name}</span>`;
+                }
+                
+                // Auto-completar título si está vacío
+                const titleInput = document.getElementById('titulo_archivo');
+                if (!titleInput.value.trim()) {
+                    titleInput.value = file.name.split('.')[0];
+                }
+            }
+        });
+
+        // Drag and drop funcionalidad
+        const fileUploadArea = document.getElementById('fileUploadArea');
+
+        fileUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const fileInput = document.getElementById('archivo');
+                fileInput.files = files;
+                // Trigger change event manually for drag and drop
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Funciones para obtener el token CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Cerrar alertas automáticamente
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
+
+        // Funciones adicionales para compatibilidad con el código original
+        function openFileModal() {
+            showView('crear-archivo');
+        }
+
+        function openTextModal() {
+            showView('crear-texto');
+        }
+
+        async function processFile() {
+            // Esta función se mantiene para compatibilidad, pero ahora usa el formulario
+            document.getElementById('resumenArchivoForm').dispatchEvent(new Event('submit'));
+        }
+
+        async function processText() {
+            // Esta función se mantiene para compatibilidad, pero ahora usa el formulario
+            document.getElementById('resumenTextoForm').dispatchEvent(new Event('submit'));
+        }
+    </script>
+</body>
+</html>
